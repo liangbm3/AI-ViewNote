@@ -16,21 +16,6 @@ export function MenuBar({ onOpenSettings }: MenuBarProps) {
         <span className="font-semibold text-gray-900">视频转文档</span>
       </div>
 
-      <div className="flex items-center gap-1">
-        <button className="px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-          文件
-        </button>
-        <button className="px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-          编辑
-        </button>
-        <button className="px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-          视图
-        </button>
-        <button className="px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
-          帮助
-        </button>
-      </div>
-
       <div className="ml-auto flex items-center gap-2">
         <button
           onClick={onOpenSettings}
