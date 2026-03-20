@@ -305,102 +305,135 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                   )}
 
                   {activeCategory === 'service' && (
-                    <div className="space-y-6">
+                    <div className="space-y-8">
                       {/* LLM Service */}
                       <div className="space-y-4">
-                        <h4 className="text-sm font-medium text-gray-900">LLM服务</h4>
-                        <div className="space-y-3">
-                          <input
-                            type="text"
-                            value={llmBaseUrl}
-                            onChange={(e) => setLlmBaseUrl(e.target.value)}
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
-                            placeholder="Base URL"
-                          />
-                          <input
-                            type="text"
-                            value={llmModelId}
-                            onChange={(e) => setLlmModelId(e.target.value)}
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
-                            placeholder="Model ID"
-                          />
-                          <input
-                            type="password"
-                            value={llmApiKey}
-                            onChange={(e) => setLlmApiKey(e.target.value)}
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
-                            placeholder="API Key"
-                          />
+                        <h4 className="text-sm font-semibold text-gray-900 border-b border-gray-100 pb-2">LLM 服务</h4>
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                            <label className="text-sm text-gray-600 font-medium text-right">Base URL</label>
+                            <input
+                              type="text"
+                              value={llmBaseUrl}
+                              onChange={(e) => setLlmBaseUrl(e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                              placeholder="例如: https://api.openai.com/v1"
+                            />
+                          </div>
+                          <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                            <label className="text-sm text-gray-600 font-medium text-right">Model ID</label>
+                            <input
+                              type="text"
+                              value={llmModelId}
+                              onChange={(e) => setLlmModelId(e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                              placeholder="例如: gpt-4o"
+                            />
+                          </div>
+                          <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                            <label className="text-sm text-gray-600 font-medium text-right">API Key</label>
+                            <input
+                              type="password"
+                              value={llmApiKey}
+                              onChange={(e) => setLlmApiKey(e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                              placeholder="输入你的 API Key"
+                            />
+                          </div>
                         </div>
                       </div>
 
                       {/* ASR Service */}
                       <div className="space-y-4">
-                        <h4 className="text-sm font-medium text-gray-900">ASR服务</h4>
-                        <div className="space-y-3">
-                          <input
-                            type="text"
-                            value={asrAppId}
-                            onChange={(e) => setAsrAppId(e.target.value)}
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
-                            placeholder="App ID"
-                          />
-                          <input
-                            type="password"
-                            value={asrAccessToken}
-                            onChange={(e) => setAsrAccessToken(e.target.value)}
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
-                            placeholder="Access Token"
-                          />
-                          <input
-                            type="text"
-                            value={asrClusterId}
-                            onChange={(e) => setAsrClusterId(e.target.value)}
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
-                            placeholder="Cluster ID"
-                          />
+                        <h4 className="text-sm font-semibold text-gray-900 border-b border-gray-100 pb-2">ASR 服务</h4>
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                            <label className="text-sm text-gray-600 font-medium text-right">App ID</label>
+                            <input
+                              type="text"
+                              value={asrAppId}
+                              onChange={(e) => setAsrAppId(e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                              placeholder="输入 App ID"
+                            />
+                          </div>
+                          <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                            <label className="text-sm text-gray-600 font-medium text-right">Access Token</label>
+                            <input
+                              type="password"
+                              value={asrAccessToken}
+                              onChange={(e) => setAsrAccessToken(e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                              placeholder="输入 Access Token"
+                            />
+                          </div>
+                          <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                            <label className="text-sm text-gray-600 font-medium text-right">Cluster ID</label>
+                            <input
+                              type="text"
+                              value={asrClusterId}
+                              onChange={(e) => setAsrClusterId(e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                              placeholder="例如: volcano"
+                            />
+                          </div>
                         </div>
                       </div>
 
                       {/* Object Storage Service */}
                       <div className="space-y-4">
-                        <h4 className="text-sm font-medium text-gray-900">对象存储服务</h4>
-                        <div className="space-y-3">
-                          <input
-                            type="text"
-                            value={ossEndpoint}
-                            onChange={(e) => setOssEndpoint(e.target.value)}
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
-                            placeholder="Endpoint"
-                          />
-                          <input
-                            type="text"
-                            value={ossBucket}
-                            onChange={(e) => setOssBucket(e.target.value)}
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
-                            placeholder="Bucket"
-                          />
-                          <input
-                            type="text"
-                            value={ossRegion}
-                            onChange={(e) => setOssRegion(e.target.value)}
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
-                            placeholder="Region"
-                          />
-                          <input
-                            type="text"
-                            value={ossAccessKey}
-                            onChange={(e) => setOssAccessKey(e.target.value)}
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
-                            placeholder="Access Key"
-                          />
-                          <input
-                            type="password"
-                            value={ossSecretKey}
-                            onChange={(e) => setOssSecretKey(e.target.value)}
-                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
-                            placeholder="Secret Key"
-                          />
+                        <h4 className="text-sm font-semibold text-gray-900 border-b border-gray-100 pb-2">对象存储服务</h4>
+                        <div className="space-y-4">
+                          <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                            <label className="text-sm text-gray-600 font-medium text-right">Endpoint</label>
+                            <input
+                              type="text"
+                              value={ossEndpoint}
+                              onChange={(e) => setOssEndpoint(e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                              placeholder="例如: oss-cn-hangzhou.aliyuncs.com"
+                            />
+                          </div>
+                          <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                            <label className="text-sm text-gray-600 font-medium text-right">Bucket</label>
+                            <input
+                              type="text"
+                              value={ossBucket}
+                              onChange={(e) => setOssBucket(e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                              placeholder="例如: my-video-bucket"
+                            />
+                          </div>
+                          <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                            <label className="text-sm text-gray-600 font-medium text-right">Region</label>
+                            <input
+                              type="text"
+                              value={ossRegion}
+                              onChange={(e) => setOssRegion(e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                              placeholder="例如: cn-hangzhou"
+                            />
+                          </div>
+                          <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                            <label className="text-sm text-gray-600 font-medium text-right">Access Key</label>
+                            <input
+                              type="text"
+                              value={ossAccessKey}
+                              onChange={(e) => setOssAccessKey(e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                              placeholder="输入 Access Key"
+                            />
+                          </div>
+                          <div className="grid grid-cols-[120px_1fr] items-center gap-4">
+                            <label className="text-sm text-gray-600 font-medium text-right">Secret Key</label>
+                            <input
+                              type="password"
+                              value={ossSecretKey}
+                              onChange={(e) => setOssSecretKey(e.target.value)}
+                              className="w-full px-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                              placeholder="输入 Secret Key"
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
