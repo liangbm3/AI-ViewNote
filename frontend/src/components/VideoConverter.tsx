@@ -51,7 +51,7 @@ export function VideoConverter() {
   };
 
   return (
-    <div className="h-screen flex flex-col bg-gray-50">
+    <div className="h-screen flex flex-col bg-gray-50 pb-2 border-b border-gray-300 overflow-hidden">
       <MenuBar onOpenSettings={() => setSettingsOpen(true)} />
 
       <div className="flex-1 flex min-h-0">
