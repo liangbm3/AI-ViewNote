@@ -2,12 +2,10 @@ import { useState, useCallback } from 'react';
 import { OutputFormat } from '../types';
 
 const defaultFormats: OutputFormat[] = [
-  { id: 'srt', name: 'SRT 字幕', extension: 'srt', description: '标准字幕格式', selected: true },
-  { id: 'vtt', name: 'VTT 字幕', extension: 'vtt', description: 'Web 字幕格式', selected: false },
-  { id: 'txt', name: 'TXT 文本', extension: 'txt', description: '纯文本文件', selected: true },
-  { id: 'docx', name: 'Word', extension: 'docx', description: 'Microsoft Word', selected: false },
-  { id: 'pdf', name: 'PDF', extension: 'pdf', description: 'PDF 文档', selected: true },
-  { id: 'md', name: 'Markdown', extension: 'md', description: '标记语言', selected: false },
+  { id: 'knowledge', name: '知识笔记', extension: 'md', description: '结构化的知识总结', selected: true },
+  { id: 'xiaohongshu', name: '小红书', extension: 'md', description: '小红书风格内容', selected: false },
+  { id: 'mp', name: '公众号', extension: 'md', description: '微信公众号文章', selected: false },
+  { id: 'summary', name: '内容总结', extension: 'md', description: '简洁的内容摘要', selected: false },
 ];
 
 export function useOutputFormats() {

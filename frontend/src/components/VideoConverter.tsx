@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { SettingsDialog } from './SettingsDialog';
 import { Toaster } from './ui/sonner';
 import { MenuBar } from './MenuBar';
@@ -8,6 +8,7 @@ import { FormatSelection } from './FormatSelection';
 import { ProgressSection } from './ProgressSection';
 import { ActionButtons } from './ActionButtons';
 import { LogPanel } from './LogPanel';
+import { ContentDisplay } from './ContentDisplay';
 
 // Hooks
 import { useFileUpload } from '../hooks/useFileUpload';
@@ -19,6 +20,7 @@ import { useTasks } from '../hooks/useTasks';
 export function VideoConverter() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [showUploadInterface, setShowUploadInterface] = useState(true); // 控制是否显示上传界面
 
   // Custom hooks
   const { logs, addLog, clearLogs, getLogColor } = useLog();
@@ -27,9 +29,17 @@ export function VideoConverter() {
   const { conversionStatus, progress, startConversion, reset: resetConversion, downloadFile } = useConversion(addLog);
   const { tasks, addTask, getStatusColor, getStatusText } = useTasks();
 
+  // 监听转换状态变化
+  useEffect(() => {
+    if (conversionStatus === 'completed') {
+      setShowUploadInterface(false); // 转换完成后隐藏上传界面
+    }
+  }, [conversionStatus]);
+
   const handleStartConversion = () => {
     const selectedFormats = getSelectedFormats();
     if (selectedFile && selectedFormats.length > 0) {
+      setShowUploadInterface(true); // 确保显示上传界面
       startConversion(selectedFile, selectedFormats);
     }
   };
@@ -37,6 +47,7 @@ export function VideoConverter() {
   const handleReset = () => {
     resetFile();
     resetConversion();
+    setShowUploadInterface(true); // 重置时显示上传界面
   };
 
   return (
@@ -50,38 +61,50 @@ export function VideoConverter() {
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
           getStatusColor={getStatusColor}
           getStatusText={getStatusText}
+          onNewTask={() => {
+            setShowUploadInterface(true);
+            resetConversion();
+            resetFile();
+          }}
         />
 
         <div className="flex-1 flex flex-col min-w-0">
           <div className="flex-1 overflow-y-auto p-6">
             <div className="max-w-4xl mx-auto space-y-6">
-              <UploadSection
-                selectedFile={selectedFile}
-                dragActive={dragActive}
-                conversionStatus={conversionStatus}
-                onDrag={handleDrag}
-                onDrop={handleDrop}
-                onFileSelect={handleFileSelect}
-                onReset={handleReset}
-              />
+              {/* 根据状态显示不同界面 */}
+              {showUploadInterface ? (
+                <>
+                  <UploadSection
+                    selectedFile={selectedFile}
+                    dragActive={dragActive}
+                    conversionStatus={conversionStatus}
+                    onDrag={handleDrag}
+                    onDrop={handleDrop}
+                    onFileSelect={handleFileSelect}
+                    onReset={handleReset}
+                  />
 
-              <FormatSelection
-                outputFormats={outputFormats}
-                onToggleFormat={toggleFormat}
-              />
+                  <FormatSelection
+                    outputFormats={outputFormats}
+                    onToggleFormat={toggleFormat}
+                  />
 
-              <ProgressSection
-                conversionStatus={conversionStatus}
-                progress={progress}
-              />
+                  <ProgressSection
+                    conversionStatus={conversionStatus}
+                    progress={progress}
+                  />
 
-              <ActionButtons
-                conversionStatus={conversionStatus}
-                selectedFile={selectedFile}
-                onStartConversion={handleStartConversion}
-                onDownload={downloadFile}
-                onReset={handleReset}
-              />
+                  <ActionButtons
+                    conversionStatus={conversionStatus}
+                    selectedFile={selectedFile}
+                    onStartConversion={handleStartConversion}
+                    onDownload={downloadFile}
+                    onReset={handleReset}
+                  />
+                </>
+              ) : (
+                <ContentDisplay />
+              )}
             </div>
           </div>
 

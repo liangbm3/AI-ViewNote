@@ -10,7 +10,7 @@ export function FormatSelection({ outputFormats, onToggleFormat }: FormatSelecti
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
       <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-        <h2 className="font-semibold text-gray-900">输出格式</h2>
+        <h2 className="font-semibold text-gray-900">输出风格</h2>
         <span className="px-2.5 py-0.5 bg-gray-100 rounded-full text-xs text-gray-600 font-medium">
           单选
         </span>

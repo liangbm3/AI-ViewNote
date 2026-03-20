@@ -10,6 +10,7 @@ interface SidebarProps {
   onToggleCollapse: () => void;
   getStatusColor: (status: Task['status']) => string;
   getStatusText: (status: Task['status']) => string;
+  onNewTask: () => void; // 新建任务回调
 }
 
 export function Sidebar({
@@ -17,7 +18,8 @@ export function Sidebar({
   tasks,
   onToggleCollapse,
   getStatusColor,
-  getStatusText
+  getStatusText,
+  onNewTask
 }: SidebarProps) {
   return (
     <>
@@ -39,6 +41,18 @@ export function Sidebar({
                 className="w-7 h-7 p-0"
               >
                 <ChevronLeft className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
+              </Button>
+            </div>
+
+            {/* 新建任务按钮 */}
+            <div className="p-3 border-b border-gray-200">
+              <Button
+                variant="primary"
+                size="sm"
+                onClick={onNewTask}
+                className="w-full"
+              >
+                新建任务
               </Button>
             </div>
 
