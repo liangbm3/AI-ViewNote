@@ -17,7 +17,7 @@ export function LogPanel({ logs, onClearLogs, getLogColor }: LogPanelProps) {
         <div className="flex items-center gap-2">
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="p-1 hover:bg-gray-200 rounded text-gray-500 hover:text-gray-900 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-300"
+            className="p-1 hover:bg-gray-200 rounded text-gray-500 hover:text-gray-900 transition-colors focus:outline-none"
             aria-label={isCollapsed ? "展开日志" : "折叠日志"}
           >
             {isCollapsed ? (

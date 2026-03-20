@@ -103,7 +103,7 @@ export function Sidebar({
       >
         <button
           onClick={onToggleCollapse}
-          className="w-6 h-6 p-0 bg-white border border-gray-200 shadow-sm rounded-full flex items-center justify-center hover:bg-gray-50 text-gray-500 hover:text-gray-900 transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-1"
+          className="w-6 h-6 p-0 bg-white border border-gray-200 shadow-sm rounded-full flex items-center justify-center hover:bg-gray-50 text-gray-500 hover:text-gray-900 transition-all hover:scale-110 focus:outline-none"
           aria-label={isCollapsed ? "展开任务列表" : "折叠任务列表"}
         >
           {isCollapsed ? (
