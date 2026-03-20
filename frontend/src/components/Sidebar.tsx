@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ListTodo } from 'lucide-react';
 import { Task } from '../types';
 import { Button } from './ui/Button';
 
@@ -32,18 +32,6 @@ export function Sidebar({
             transition={{ duration: 0.2 }}
             className="bg-white border-r border-gray-200 flex flex-col overflow-hidden"
           >
-            <div className="h-12 px-4 border-b border-gray-200 flex items-center justify-between">
-              <span className="font-medium text-gray-900 text-sm">任务列表</span>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onToggleCollapse}
-                className="w-7 h-7 p-0"
-              >
-                <ChevronLeft className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
-              </Button>
-            </div>
-
             {/* 新建任务按钮 */}
             <div className="p-3 border-b border-gray-200">
               <Button
@@ -53,6 +41,21 @@ export function Sidebar({
                 className="w-full"
               >
                 新建任务
+              </Button>
+            </div>
+
+            <div className="h-12 px-4 border-b border-gray-200 flex items-center justify-between bg-gray-50/50">
+              <div className="flex items-center gap-2">
+                <ListTodo className="w-4 h-4 text-gray-500" />
+                <span className="font-semibold text-gray-900 text-sm tracking-tight">任务列表</span>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={onToggleCollapse}
+                className="w-7 h-7 p-0 hover:bg-gray-200/50"
+              >
+                <ChevronLeft className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
               </Button>
             </div>
 
