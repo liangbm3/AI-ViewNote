@@ -8,10 +8,18 @@ import (
 	"log"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
+
+type WailsEventEmitter struct{}
+
+func (w *WailsEventEmitter) Emit(eventName string, data any) {
+	app := application.Get()
+	if app != nil {
+		app.Event.Emit(eventName, data)
+	}
+}
 
 //go:embed all:frontend/dist
 var assets embed.FS
@@ -29,8 +37,10 @@ func main() {
 	}
 	defer db.Close()
 
+	wailsEmitter := &WailsEventEmitter{}
+
 	taskRepo := repository.NewTaskRepository(db)
-	taskService := service.NewTaskService(taskRepo)
+	taskService := service.NewTaskService(taskRepo, wailsEmitter)
 
 	confRepo := repository.NewConfigRepository(db)
 	confService := service.NewConfigService(confRepo)
@@ -70,16 +80,6 @@ func main() {
 		URL:              "/",
 	})
 
-	// 启动一个 goroutine，每分钟获取一次任务列表并通过事件通知前端。
-	go func() {
-		ticker := time.NewTicker(time.Minute)
-		defer ticker.Stop()
-		for range ticker.C {
-			resp := taskService.GetTaskList()
-			app.Event.Emit("task_list_update", resp)
-		}
-	}()
-
 	// 运行应用程序。此操作会阻塞，直到应用退出。
 	err = app.Run()
 
@@ -88,7 +88,6 @@ func main() {
 		log.Fatal(err)
 	}
 }
-
 
 func ensureConfigExists(service *service.ConfigService, key string, defaultValue string) {
 	resp := service.ConfigExists(key)

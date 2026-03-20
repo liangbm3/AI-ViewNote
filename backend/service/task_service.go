@@ -7,16 +7,22 @@ import (
 	"time"
 )
 
+// 发射器接口
+type EventEmitter interface {
+	Emit(event string, data interface{})
+}
+
 type TaskService struct {
 	task_repo *repository.TaskRepository
+	event_emitter EventEmitter
 }
 
-func NewTaskService(repo *repository.TaskRepository) *TaskService {
+func NewTaskService(repo *repository.TaskRepository, emitter EventEmitter) *TaskService {
 	return &TaskService{
 		task_repo: repo,
+		event_emitter: emitter,
 	}
 }
-
 
 func (b *TaskService) NewTask(filePath string, contentStyle string) models.Response {
 
@@ -36,6 +42,11 @@ func (b *TaskService) NewTask(filePath string, contentStyle string) models.Respo
 	if err != nil {
 		return errorResponse("Failed to retrieve task: " + err.Error())
 	}
+
+	defer func ()  {
+		resp := b.GetTaskList()
+		b.event_emitter.Emit("task_list_update", resp)
+	}()
 	return successResponse("Task created successfully", new_task)
 }
 
