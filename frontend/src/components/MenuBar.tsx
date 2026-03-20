@@ -1,0 +1,49 @@
+import React from 'react';
+import { Settings, HelpCircle, FileVideo } from 'lucide-react';
+import { Button } from './ui/Button';
+
+interface MenuBarProps {
+  onOpenSettings: () => void;
+}
+
+export function MenuBar({ onOpenSettings }: MenuBarProps) {
+  return (
+    <div className="h-14 bg-white border-b border-gray-200 flex items-center px-4 gap-6">
+      <div className="flex items-center gap-2">
+        <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center">
+          <FileVideo className="w-4 h-4 text-white" strokeWidth={2} />
+        </div>
+        <span className="font-semibold text-gray-900">视频转文档</span>
+      </div>
+
+      <div className="flex items-center gap-1">
+        <button className="px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+          文件
+        </button>
+        <button className="px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+          编辑
+        </button>
+        <button className="px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+          视图
+        </button>
+        <button className="px-3 py-1.5 text-sm text-gray-700 hover:bg-gray-100 rounded-lg transition-colors">
+          帮助
+        </button>
+      </div>
+
+      <div className="ml-auto flex items-center gap-2">
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={onOpenSettings}
+          className="w-8 h-8 p-0"
+        >
+          <Settings className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
+        </Button>
+        <Button variant="ghost" size="sm" className="w-8 h-8 p-0">
+          <HelpCircle className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
+        </Button>
+      </div>
+    </div>
+  );
+}
