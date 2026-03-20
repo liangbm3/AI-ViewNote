@@ -24,7 +24,7 @@ export type LogEntry = {
 
 export type ConversionStatus = 'idle' | 'converting' | 'completed';
 
-export type SettingsCategory = 'general' | 'output' | 'advanced' | 'about';
+export type SettingsCategory = 'general' | 'service' | 'advanced' | 'about';
 
 export type Language = {
   value: string;

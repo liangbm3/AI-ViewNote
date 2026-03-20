@@ -9,7 +9,6 @@ import {
   Sparkles,
   Database,
   Palette,
-  Download,
   ChevronRight
 } from 'lucide-react';
 import { toast } from 'sonner';
@@ -19,55 +18,55 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   const [activeCategory, setActiveCategory] = useState<SettingsCategory>('general');
 
   // General Settings
-  const [language, setLanguage] = useState('zh-CN');
-  const [autoStart, setAutoStart] = useState(false);
+  const [closeAction, setCloseAction] = useState<'background' | 'close'>('background');
   const [notifications, setNotifications] = useState(true);
 
-  // Output Settings
-  const [outputPath, setOutputPath] = useState('/用户/文档/视频转换');
-  const [quality, setQuality] = useState('high');
-  const [autoOpen, setAutoOpen] = useState(true);
-  const [keepOriginal, setKeepOriginal] = useState(true);
+  // Service Settings
+  const [llmBaseUrl, setLlmBaseUrl] = useState('');
+  const [llmModelId, setLlmModelId] = useState('');
+  const [llmApiKey, setLlmApiKey] = useState('');
+  const [asrAppId, setAsrAppId] = useState('');
+  const [asrAccessToken, setAsrAccessToken] = useState('');
+  const [asrClusterId, setAsrClusterId] = useState('');
+  const [ossEndpoint, setOssEndpoint] = useState('');
+  const [ossBucket, setOssBucket] = useState('');
+  const [ossRegion, setOssRegion] = useState('');
+  const [ossAccessKey, setOssAccessKey] = useState('');
+  const [ossSecretKey, setOssSecretKey] = useState('');
 
   // Advanced Settings
-  const [hardwareAcceleration, setHardwareAcceleration] = useState(true);
-  const [multiThreading, setMultiThreading] = useState(true);
+  const [smartScreenshot, setSmartScreenshot] = useState(true);
   const [cacheSize, setCacheSize] = useState('1024');
   const [autoUpdate, setAutoUpdate] = useState(true);
 
   const categories = [
     { id: 'general' as const, name: '通用', icon: Globe },
-    { id: 'output' as const, name: '输出设置', icon: Download },
+    { id: 'service' as const, name: '服务', icon: Database },
     { id: 'advanced' as const, name: '高级', icon: Sparkles },
-    { id: 'about' as const, name: '关于', icon: Database },
+    { id: 'about' as const, name: '关于', icon: Palette },
   ];
 
-  const languages: Language[] = [
-    { value: 'zh-CN', label: '简体中文' },
-    { value: 'en-US', label: 'English' },
-    { value: 'ja-JP', label: '日本語' },
-  ];
-
-  const qualityOptions: QualityOption[] = [
-    { value: 'low', label: '低', description: '快速处理，文件较小' },
-    { value: 'medium', label: '中', description: '平衡质量与速度' },
-    { value: 'high', label: '高', description: '最佳质量，处理较慢' },
-  ];
-
+  
   const handleSave = () => {
     toast.success('设置已保存');
     onClose();
   };
 
   const handleReset = () => {
-    setLanguage('zh-CN');
-    setAutoStart(false);
+    setCloseAction('background');
     setNotifications(true);
-    setQuality('high');
-    setAutoOpen(true);
-    setKeepOriginal(true);
-    setHardwareAcceleration(true);
-    setMultiThreading(true);
+    setLlmBaseUrl('');
+    setLlmModelId('');
+    setLlmApiKey('');
+    setAsrAppId('');
+    setAsrAccessToken('');
+    setAsrClusterId('');
+    setOssEndpoint('');
+    setOssBucket('');
+    setOssRegion('');
+    setOssAccessKey('');
+    setOssSecretKey('');
+    setSmartScreenshot(true);
     setCacheSize('1024');
     setAutoUpdate(true);
     toast.success('已恢复默认设置');
@@ -152,62 +151,63 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                 <div className="flex-1 overflow-y-auto p-6">
                   {activeCategory === 'general' && (
                     <div className="space-y-6">
-                      {/* Language */}
+                      {/* Close Action */}
                       <div>
                         <label className="block text-sm font-medium text-gray-900 mb-3">
-                          语言
+                          关闭选项
                         </label>
                         <div className="space-y-2">
-                          {languages.map((lang) => (
-                            <button
-                              key={lang.value}
-                              onClick={() => setLanguage(lang.value)}
-                              className={`
-                                w-full px-4 py-3 rounded-lg border text-left transition-all flex items-center justify-between
-                                ${language === lang.value
-                                  ? 'border-gray-900 bg-gray-50'
-                                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                                }
-                              `}
-                            >
-                              <span className="text-sm text-gray-900">{lang.label}</span>
-                              <div className={`
-                                w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all
-                                ${language === lang.value
-                                  ? 'border-gray-900 bg-gray-900'
-                                  : 'border-gray-300'
-                                }
-                              `}>
-                                {language === lang.value && (
-                                  <div className="w-2 h-2 bg-white rounded-full" />
-                                )}
-                              </div>
-                            </button>
-                          ))}
+                          <button
+                            onClick={() => setCloseAction('background')}
+                            className={`
+                              w-full px-4 py-3 rounded-lg border text-left transition-all flex items-center justify-between
+                              ${closeAction === 'background'
+                                ? 'border-gray-900 bg-gray-50'
+                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                              }
+                            `}
+                          >
+                            <span className="text-sm text-gray-900">在后台运行</span>
+                            <div className={`
+                              w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all
+                              ${closeAction === 'background'
+                                ? 'border-gray-900 bg-gray-900'
+                                : 'border-gray-300'
+                              }
+                            `}>
+                              {closeAction === 'background' && (
+                                <div className="w-2 h-2 bg-white rounded-full" />
+                              )}
+                            </div>
+                          </button>
+                          <button
+                            onClick={() => setCloseAction('close')}
+                            className={`
+                              w-full px-4 py-3 rounded-lg border text-left transition-all flex items-center justify-between
+                              ${closeAction === 'close'
+                                ? 'border-gray-900 bg-gray-50'
+                                : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
+                              }
+                            `}
+                          >
+                            <span className="text-sm text-gray-900">关闭程序</span>
+                            <div className={`
+                              w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all
+                              ${closeAction === 'close'
+                                ? 'border-gray-900 bg-gray-900'
+                                : 'border-gray-300'
+                              }
+                            `}>
+                              {closeAction === 'close' && (
+                                <div className="w-2 h-2 bg-white rounded-full" />
+                              )}
+                            </div>
+                          </button>
                         </div>
                       </div>
 
                       {/* Toggle Settings */}
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">开机自动启动</div>
-                            <div className="text-xs text-gray-500 mt-0.5">启动系统时自动打开应用</div>
-                          </div>
-                          <button
-                            onClick={() => setAutoStart(!autoStart)}
-                            className={`
-                              w-11 h-6 rounded-full transition-colors relative
-                              ${autoStart ? 'bg-gray-900' : 'bg-gray-200'}
-                            `}
-                          >
-                            <div className={`
-                              w-4 h-4 bg-white rounded-full absolute top-1 transition-transform
-                              ${autoStart ? 'translate-x-6' : 'translate-x-1'}
-                            `} />
-                          </button>
-                        </div>
-
                         <div className="flex items-center justify-between py-3 border-b border-gray-100">
                           <div>
                             <div className="text-sm font-medium text-gray-900">桌面通知</div>
@@ -230,110 +230,103 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                     </div>
                   )}
 
-                  {activeCategory === 'output' && (
+                  {activeCategory === 'service' && (
                     <div className="space-y-6">
-                      {/* Output Path */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-3">
-                          输出路径
-                        </label>
-                        <div className="flex gap-2">
+                      {/* LLM Service */}
+                      <div className="space-y-4">
+                        <h4 className="text-sm font-medium text-gray-900">LLM服务</h4>
+                        <div className="space-y-3">
                           <input
                             type="text"
-                            value={outputPath}
-                            onChange={(e) => setOutputPath(e.target.value)}
-                            className="flex-1 px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
-                            placeholder="/用户/文档/视频转换"
+                            value={llmBaseUrl}
+                            onChange={(e) => setLlmBaseUrl(e.target.value)}
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                            placeholder="Base URL"
                           />
-                          <button className="px-4 py-2.5 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center gap-2">
-                            <Folder className="w-4 h-4" strokeWidth={1.5} />
-                            浏览
-                          </button>
+                          <input
+                            type="text"
+                            value={llmModelId}
+                            onChange={(e) => setLlmModelId(e.target.value)}
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                            placeholder="Model ID"
+                          />
+                          <input
+                            type="password"
+                            value={llmApiKey}
+                            onChange={(e) => setLlmApiKey(e.target.value)}
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                            placeholder="API Key"
+                          />
                         </div>
                       </div>
 
-                      {/* Quality */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-900 mb-3">
-                          输出质量
-                        </label>
-                        <div className="space-y-2">
-                          {qualityOptions.map((option) => (
-                            <button
-                              key={option.value}
-                              onClick={() => setQuality(option.value)}
-                              className={`
-                                w-full px-4 py-3 rounded-lg border text-left transition-all
-                                ${quality === option.value
-                                  ? 'border-gray-900 bg-gray-50'
-                                  : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
-                                }
-                              `}
-                            >
-                              <div className="flex items-start justify-between">
-                                <div>
-                                  <div className="text-sm font-medium text-gray-900 mb-0.5">
-                                    {option.label}
-                                  </div>
-                                  <div className="text-xs text-gray-500">
-                                    {option.description}
-                                  </div>
-                                </div>
-                                <div className={`
-                                  w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all flex-shrink-0 mt-0.5
-                                  ${quality === option.value
-                                    ? 'border-gray-900 bg-gray-900'
-                                    : 'border-gray-300'
-                                  }
-                                `}>
-                                  {quality === option.value && (
-                                    <div className="w-2 h-2 bg-white rounded-full" />
-                                  )}
-                                </div>
-                              </div>
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-
-                      {/* Toggle Settings */}
+                      {/* ASR Service */}
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">转换完成后自动打开</div>
-                            <div className="text-xs text-gray-500 mt-0.5">转换完成时自动打开文件</div>
-                          </div>
-                          <button
-                            onClick={() => setAutoOpen(!autoOpen)}
-                            className={`
-                              w-11 h-6 rounded-full transition-colors relative
-                              ${autoOpen ? 'bg-gray-900' : 'bg-gray-200'}
-                            `}
-                          >
-                            <div className={`
-                              w-4 h-4 bg-white rounded-full absolute top-1 transition-transform
-                              ${autoOpen ? 'translate-x-6' : 'translate-x-1'}
-                            `} />
-                          </button>
+                        <h4 className="text-sm font-medium text-gray-900">ASR服务</h4>
+                        <div className="space-y-3">
+                          <input
+                            type="text"
+                            value={asrAppId}
+                            onChange={(e) => setAsrAppId(e.target.value)}
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                            placeholder="App ID"
+                          />
+                          <input
+                            type="password"
+                            value={asrAccessToken}
+                            onChange={(e) => setAsrAccessToken(e.target.value)}
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                            placeholder="Access Token"
+                          />
+                          <input
+                            type="text"
+                            value={asrClusterId}
+                            onChange={(e) => setAsrClusterId(e.target.value)}
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                            placeholder="Cluster ID"
+                          />
                         </div>
+                      </div>
 
-                        <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">保留原始文件</div>
-                            <div className="text-xs text-gray-500 mt-0.5">转换后不删除源视频文件</div>
-                          </div>
-                          <button
-                            onClick={() => setKeepOriginal(!keepOriginal)}
-                            className={`
-                              w-11 h-6 rounded-full transition-colors relative
-                              ${keepOriginal ? 'bg-gray-900' : 'bg-gray-200'}
-                            `}
-                          >
-                            <div className={`
-                              w-4 h-4 bg-white rounded-full absolute top-1 transition-transform
-                              ${keepOriginal ? 'translate-x-6' : 'translate-x-1'}
-                            `} />
-                          </button>
+                      {/* Object Storage Service */}
+                      <div className="space-y-4">
+                        <h4 className="text-sm font-medium text-gray-900">对象存储服务</h4>
+                        <div className="space-y-3">
+                          <input
+                            type="text"
+                            value={ossEndpoint}
+                            onChange={(e) => setOssEndpoint(e.target.value)}
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                            placeholder="Endpoint"
+                          />
+                          <input
+                            type="text"
+                            value={ossBucket}
+                            onChange={(e) => setOssBucket(e.target.value)}
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                            placeholder="Bucket"
+                          />
+                          <input
+                            type="text"
+                            value={ossRegion}
+                            onChange={(e) => setOssRegion(e.target.value)}
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                            placeholder="Region"
+                          />
+                          <input
+                            type="text"
+                            value={ossAccessKey}
+                            onChange={(e) => setOssAccessKey(e.target.value)}
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                            placeholder="Access Key"
+                          />
+                          <input
+                            type="password"
+                            value={ossSecretKey}
+                            onChange={(e) => setOssSecretKey(e.target.value)}
+                            className="w-full px-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:border-gray-900 transition-colors"
+                            placeholder="Secret Key"
+                          />
                         </div>
                       </div>
                     </div>
@@ -341,46 +334,30 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
 
                   {activeCategory === 'advanced' && (
                     <div className="space-y-6">
-                      {/* Performance Settings */}
+                      {/* Smart Screenshot Toggle */}
                       <div className="space-y-4">
                         <div className="flex items-center justify-between py-3 border-b border-gray-100">
                           <div>
-                            <div className="text-sm font-medium text-gray-900">硬件加速</div>
-                            <div className="text-xs text-gray-500 mt-0.5">使用 GPU 加速处理（如果可用）</div>
+                            <div className="text-sm font-medium text-gray-900">启用智能截图</div>
+                            <div className="text-xs text-gray-500 mt-0.5">自动识别并截取关键画面</div>
                           </div>
                           <button
-                            onClick={() => setHardwareAcceleration(!hardwareAcceleration)}
+                            onClick={() => setSmartScreenshot(!smartScreenshot)}
                             className={`
                               w-11 h-6 rounded-full transition-colors relative
-                              ${hardwareAcceleration ? 'bg-gray-900' : 'bg-gray-200'}
+                              ${smartScreenshot ? 'bg-gray-900' : 'bg-gray-200'}
                             `}
                           >
                             <div className={`
                               w-4 h-4 bg-white rounded-full absolute top-1 transition-transform
-                              ${hardwareAcceleration ? 'translate-x-6' : 'translate-x-1'}
+                              ${smartScreenshot ? 'translate-x-6' : 'translate-x-1'}
                             `} />
                           </button>
                         </div>
+                      </div>
 
-                        <div className="flex items-center justify-between py-3 border-b border-gray-100">
-                          <div>
-                            <div className="text-sm font-medium text-gray-900">多线程处理</div>
-                            <div className="text-xs text-gray-500 mt-0.5">同时处理多个任务以提高效率</div>
-                          </div>
-                          <button
-                            onClick={() => setMultiThreading(!multiThreading)}
-                            className={`
-                              w-11 h-6 rounded-full transition-colors relative
-                              ${multiThreading ? 'bg-gray-900' : 'bg-gray-200'}
-                            `}
-                          >
-                            <div className={`
-                              w-4 h-4 bg-white rounded-full absolute top-1 transition-transform
-                              ${multiThreading ? 'translate-x-6' : 'translate-x-1'}
-                            `} />
-                          </button>
-                        </div>
-
+                      {/* Auto Update Setting */}
+                      <div className="space-y-4">
                         <div className="flex items-center justify-between py-3 border-b border-gray-100">
                           <div>
                             <div className="text-sm font-medium text-gray-900">自动更新</div>
