@@ -9,31 +9,31 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
-// Wails uses Go's `embed` package to embed the frontend files into the binary.
-// Any files in the frontend/dist folder will be embedded into the binary and
-// made available to the frontend.
-// See https://pkg.go.dev/embed for more information.
+// Wails 使用 Go 的 `embed` 包将前端文件嵌入到二进制文件中。
+// frontend/dist 文件夹中的所有文件都会被嵌入到二进制中，
+// 并可供前端访问。
+// 详细信息见：https://pkg.go.dev/embed
 
 //go:embed all:frontend/dist
 var assets embed.FS
 
 func init() {
-	// Register a custom event whose associated data type is string.
-	// This is not required, but the binding generator will pick up registered events
-	// and provide a strongly typed JS/TS API for them.
+	// 注册一个自定义事件，关联的数据类型为 string。
+	// 这不是必须的，但绑定生成器会自动识别已注册的事件，
+	// 并为其生成强类型的 JS/TS API。
 	application.RegisterEvent[string]("time")
 }
 
-// main function serves as the application's entry point. It initializes the application, creates a window,
-// and starts a goroutine that emits a time-based event every second. It subsequently runs the application and
-// logs any error that might occur.
+// main 函数是应用程序的入口。它初始化应用、创建窗口，
+// 并启动一个 goroutine 每秒发送一次时间事件。随后运行应用，
+// 并记录可能发生的任何错误。
 func main() {
 
-	// Create a new Wails application by providing the necessary options.
-	// Variables 'Name' and 'Description' are for application metadata.
-	// 'Assets' configures the asset server with the 'FS' variable pointing to the frontend files.
-	// 'Bind' is a list of Go struct instances. The frontend has access to the methods of these instances.
-	// 'Mac' options tailor the application when running an macOS.
+	// 创建一个新的 Wails 应用，并提供必要的选项。
+	// 'Name' 和 'Description' 用于应用元数据。
+	// 'Assets' 配置资源服务器，'FS' 指向前端文件。
+	// 'Bind' 是 Go 结构体实例的列表，前端可访问这些实例的方法。
+	// 'Mac' 选项用于 macOS 下的应用定制。
 	app := application.New(application.Options{
 		Name:        "AI-ViewNote",
 		Description: "A demo of using raw HTML & CSS",
@@ -48,11 +48,11 @@ func main() {
 		},
 	})
 
-	// Create a new window with the necessary options.
-	// 'Title' is the title of the window.
-	// 'Mac' options tailor the window when running on macOS.
-	// 'BackgroundColour' is the background colour of the window.
-	// 'URL' is the URL that will be loaded into the webview.
+	// 创建一个新窗口并设置相关选项。
+	// 'Title' 是窗口标题。
+	// 'Mac' 选项用于 macOS 下的窗口定制。
+	// 'BackgroundColour' 是窗口背景色。
+	// 'URL' 是加载到 webview 的地址。
 	app.Window.NewWithOptions(application.WebviewWindowOptions{
 		Title: "Window 1",
 		Mac: application.MacWindow{
@@ -64,8 +64,8 @@ func main() {
 		URL:              "/",
 	})
 
-	// Create a goroutine that emits an event containing the current time every second.
-	// The frontend can listen to this event and update the UI accordingly.
+	// 启动一个 goroutine，每秒发送一次包含当前时间的事件。
+	// 前端可监听该事件并相应更新 UI。
 	go func() {
 		for {
 			now := time.Now().Format(time.RFC1123)
@@ -74,10 +74,10 @@ func main() {
 		}
 	}()
 
-	// Run the application. This blocks until the application has been exited.
+	// 运行应用程序。此操作会阻塞，直到应用退出。
 	err := app.Run()
 
-	// If an error occurred while running the application, log it and exit.
+	// 如果运行应用时发生错误，则记录日志并退出。
 	if err != nil {
 		log.Fatal(err)
 	}
