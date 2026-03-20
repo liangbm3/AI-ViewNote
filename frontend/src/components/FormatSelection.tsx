@@ -1,4 +1,5 @@
 import React from 'react';
+import { LayoutTemplate } from 'lucide-react';
 import { OutputFormat } from '../types';
 
 interface FormatSelectionProps {
@@ -8,10 +9,13 @@ interface FormatSelectionProps {
 
 export function FormatSelection({ outputFormats, onToggleFormat }: FormatSelectionProps) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-        <h2 className="font-semibold text-gray-900">输出风格</h2>
-        <span className="px-2.5 py-0.5 bg-gray-100 rounded-full text-xs text-gray-600 font-medium">
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+      <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <LayoutTemplate className="w-5 h-5 text-emerald-500" />
+          <h2 className="text-lg font-semibold text-gray-900 tracking-tight">输出风格</h2>
+        </div>
+        <span className="px-2.5 py-1 bg-white border border-gray-200 rounded-full text-xs text-gray-600 font-medium shadow-sm">
           单选
         </span>
       </div>

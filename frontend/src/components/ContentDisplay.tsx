@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactMarkdown from 'react-markdown';
+import { Sparkles, FileText, MessageSquare } from 'lucide-react';
 
 interface SubtitleItem {
   start_time: number;
@@ -59,9 +60,10 @@ export function ContentDisplay({ imageTextContent, subtitles }: ContentDisplayPr
   // 确保始终有内容显示
   if (!displayContent && !displaySubtitles.length) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col min-h-0">
-        <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
-          <h2 className="font-semibold text-gray-900">转换结果</h2>
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col min-h-0 shadow-sm">
+        <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0 bg-gray-50/50 flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-amber-500" />
+          <h2 className="text-lg font-semibold text-gray-900 tracking-tight">转换结果</h2>
         </div>
         <div className="p-6 flex-1 flex items-center justify-center text-gray-500">
           暂无内容，请稍后再试...
@@ -78,15 +80,19 @@ export function ContentDisplay({ imageTextContent, subtitles }: ContentDisplayPr
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col min-h-0">
-      <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
-        <h2 className="font-semibold text-gray-900">转换结果</h2>
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col min-h-0 shadow-sm">
+      <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0 bg-gray-50/50 flex items-center gap-2">
+        <Sparkles className="w-5 h-5 text-amber-500" />
+        <h2 className="text-lg font-semibold text-gray-900 tracking-tight">转换结果</h2>
       </div>
 
       <div className="grid grid-cols-2 divide-x divide-gray-200 flex-1 min-h-0">
         {/* 左侧：图文信息 */}
         <div className="p-6 flex flex-col min-h-0">
-          <h3 className="font-medium text-gray-900 mb-4 flex-shrink-0">图文信息</h3>
+          <div className="flex items-center gap-2 mb-4 flex-shrink-0">
+            <FileText className="w-4 h-4 text-gray-500" />
+            <h3 className="font-medium text-gray-900">图文信息</h3>
+          </div>
           <div className="prose prose-sm max-w-none overflow-y-auto flex-1 pr-2">
             <ReactMarkdown
               components={{
@@ -109,7 +115,10 @@ export function ContentDisplay({ imageTextContent, subtitles }: ContentDisplayPr
 
         {/* 右侧：字幕 */}
         <div className="p-6 flex flex-col min-h-0">
-          <h3 className="font-medium text-gray-900 mb-4 flex-shrink-0">字幕</h3>
+          <div className="flex items-center gap-2 mb-4 flex-shrink-0">
+            <MessageSquare className="w-4 h-4 text-gray-500" />
+            <h3 className="font-medium text-gray-900">字幕</h3>
+          </div>
           <div className="space-y-3 overflow-y-auto flex-1 pr-2">
             {displaySubtitles.map((subtitle, index) => (
               <div

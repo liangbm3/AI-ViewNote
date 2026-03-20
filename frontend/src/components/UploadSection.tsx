@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Upload, FileVideo, X } from 'lucide-react';
+import { Upload, FileVideo, X, Film } from 'lucide-react';
 import { Button } from './ui/Button';
 import { formatFileSize } from '../utils/formatUtils';
 
@@ -24,9 +24,10 @@ export function UploadSection({
   onReset
 }: UploadSectionProps) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-200">
-        <h2 className="font-semibold text-gray-900">视频上传</h2>
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+      <div className="px-6 py-4 border-b border-gray-200 bg-gray-50/50 flex items-center gap-2">
+        <Film className="w-5 h-5 text-indigo-500" />
+        <h2 className="text-lg font-semibold text-gray-900 tracking-tight">视频上传</h2>
       </div>
 
       <div className="p-6">
