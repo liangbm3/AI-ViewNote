@@ -15,12 +15,21 @@ import * as models$0 from "../models/models.js";
 import * as $models from "./models.js";
 
 /**
+ * @returns {$CancellablePromise<$models.Response>}
+ */
+export function GetTaskList() {
+    return $Call.ByID(1250851696).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType0($result);
+    }));
+}
+
+/**
  * @param {string} filePath
  * @param {string} contentStyle
  * @returns {$CancellablePromise<$models.Response>}
  */
 export function NewTask(filePath, contentStyle) {
-    return $Call.ByID(741167988, filePath, contentStyle).then(/** @type {($result: any) => any} */(($result) => {
+    return $Call.ByID(3665119974, filePath, contentStyle).then(/** @type {($result: any) => any} */(($result) => {
         return $$createType0($result);
     }));
 }

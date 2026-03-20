@@ -1,36 +1,109 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { Task } from '../types';
+import { GetTaskList } from '../../bindings/AI-ViewNote/backend/bindings/taskbinding.js';
+import { Events } from '@wailsio/runtime';
 
-const defaultTasks: Task[] = [
-  {
-    id: '1',
-    fileName: 'demo_video.mp4',
-    status: 'completed',
-    progress: 100,
-    formats: ['SRT', 'TXT', 'PDF'],
-    timestamp: '14:32'
-  },
-  {
-    id: '2',
-    fileName: 'presentation.mov',
-    status: 'processing',
-    progress: 67,
-    formats: ['PDF', 'DOCX'],
-    timestamp: '14:45'
+type BackendTaskRecord = {
+  id: number;
+  title: string;
+  file_name: string;
+  content_style: string;
+  created_at: string;
+  progress: number;
+};
+
+type BackendResponse = {
+  success: boolean;
+  message: string;
+  data?: BackendTaskRecord[];
+};
+
+function mapProgressToStatus(p: number): Task['status'] {
+  switch (p) {
+    case 0:
+      return 'pending';
+    case 4:
+      return 'completed';
+    case 5:
+      return 'error';
+    default:
+      return 'processing';
   }
-];
+}
+
+function mapProgressToPercent(p: number): number {
+  switch (p) {
+    case 0:
+      return 0;
+    case 1:
+      return 25;
+    case 2:
+      return 50;
+    case 3:
+      return 75;
+    case 4:
+      return 100;
+    case 5:
+      return 0;
+    default:
+      return 0;
+  }
+}
 
 export function useTasks() {
-  const [tasks, setTasks] = useState<Task[]>(defaultTasks);
+  const [tasks, setTasks] = useState<Task[]>([]);
+
+  const applyBackendTasks = useCallback((resp: BackendResponse) => {
+    if (!resp || !resp.success || !Array.isArray(resp.data)) {
+      return;
+    }
+
+    const mapped: Task[] = resp.data.map((t) => ({
+      id: String(t.id),
+      fileName: t.file_name,
+      status: mapProgressToStatus(t.progress),
+      progress: mapProgressToPercent(t.progress),
+      formats: t.content_style ? [t.content_style] : [],
+      timestamp: new Date(t.created_at).toLocaleTimeString('zh-CN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      }),
+    }));
+
+    setTasks(mapped);
+  }, []);
+
+  useEffect(() => {
+    // 初始化时获取任务列表
+    GetTaskList()
+      .then((resp: BackendResponse) => {
+        applyBackendTasks(resp);
+      })
+      .catch(() => {
+        // 获取失败时保持空列表
+      });
+
+    // 监听后端任务列表更新事件（从 WailsEvent.data 中取出后端响应）
+    const off = Events.On('task_list_update', (event: any) => {
+      applyBackendTasks(event?.data as BackendResponse);
+    });
+
+    return () => {
+      if (typeof off === 'function') {
+        off();
+      }
+    };
+  }, [applyBackendTasks]);
 
   const addTask = useCallback((fileName: string, formats: string[]) => {
     const newTask: Task = {
       id: Date.now().toString(),
       fileName,
-      status: 'completed',
-      progress: 100,
+      status: 'pending',
+      progress: 0,
       formats,
-      timestamp: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false })
+      timestamp: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false }),
     };
     setTasks(prev => [newTask, ...prev]);
   }, []);

@@ -18,13 +18,13 @@ func init() {
 }
 
 func main() {
-	processBinding := bindings.NewProcessBinding()
+	taskBinding := bindings.NewTaskBinding()
 
 	app := application.New(application.Options{
 		Name:        "AI-ViewNote",
 		Description: "A demo of using raw HTML & CSS",
 		Services: []application.Service{
-			application.NewService(processBinding),
+			application.NewService(taskBinding),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
@@ -49,6 +49,16 @@ func main() {
 		BackgroundColour: application.NewRGB(27, 38, 54),
 		URL:              "/",
 	})
+
+	// 启动一个 goroutine，每分钟获取一次任务列表并通过事件通知前端。
+	go func() {
+		ticker := time.NewTicker(time.Minute)
+		defer ticker.Stop()
+		for range ticker.C {
+			resp := taskBinding.GetTaskList()
+			app.Event.Emit("task_list_update", resp)
+		}
+	}()
 
 	// 启动一个 goroutine，每秒发送一次包含当前时间的事件。
 	// 前端可监听该事件并相应更新 UI。

@@ -1,7 +1,7 @@
 import { useState, useCallback } from 'react';
 import { ConversionStatus, LogEntry } from '../types';
 import { toast } from 'sonner';
-import { NewTask } from '../../bindings/AI-ViewNote/backend/bindings/processbinding.js';
+import { NewTask } from '../../bindings/AI-ViewNote/backend/bindings/taskbinding.js';
 
 export function useConversion(addLog: (message: string, type?: LogEntry['type']) => void) {
   const [conversionStatus, setConversionStatus] = useState<ConversionStatus>('idle');

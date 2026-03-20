@@ -21,6 +21,7 @@
     "checkJs": false,
     "strict": true,
     "skipLibCheck": true,
+    "noEmit": true
   },
   "include": ["src"],
   "exclude": ["node_modules", "bindings", "dist"]

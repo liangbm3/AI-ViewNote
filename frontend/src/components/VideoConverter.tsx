@@ -31,10 +31,6 @@ export function VideoConverter() {
     const selectedFormats = getSelectedFormats();
     if (selectedFile && selectedFormats.length > 0) {
       startConversion(selectedFile, selectedFormats);
-      // Add to task list when conversion completes
-      setTimeout(() => {
-        addTask(selectedFile.name, selectedFormats.map(f => f.extension.toUpperCase()));
-      }, 100);
     }
   };
 
