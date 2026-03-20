@@ -13,6 +13,7 @@
      */
     "target": "ESNext",
     "module": "ESNext",
+    "jsx": "react-jsx",
     "resolveJsonModule": true,
     /**
      * Enable checkJs if you'd like type checking in `.js(x)` files.
