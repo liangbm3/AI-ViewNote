@@ -32,17 +32,15 @@ export function MenuBar({ onOpenSettings }: MenuBarProps) {
       </div>
 
       <div className="ml-auto flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="sm"
+        <button
           onClick={onOpenSettings}
-          className="w-8 h-8 p-0"
+          className="w-8 h-8 hover:bg-gray-100 rounded-lg flex items-center justify-center transition-colors"
         >
           <Settings className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
-        </Button>
-        <Button variant="ghost" size="sm" className="w-8 h-8 p-0">
+        </button>
+        <button className="w-8 h-8 hover:bg-gray-100 rounded-lg flex items-center justify-center transition-colors">
           <HelpCircle className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
-        </Button>
+        </button>
       </div>
     </div>
   );
