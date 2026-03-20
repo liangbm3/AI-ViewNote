@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   X,
@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import { toast } from 'sonner';
 import { SettingsDialogProps, SettingsCategory, Language, QualityOption } from '../types';
+import { SaveConfig, GetConfig, GetAllConfigs } from '../../bindings/AI-ViewNote/backend/service/configservice';
 
 export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   const [activeCategory, setActiveCategory] = useState<SettingsCategory>('general');
@@ -39,6 +40,49 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   const [cacheSize, setCacheSize] = useState('1024');
   const [autoUpdate, setAutoUpdate] = useState(true);
 
+  // Load settings from backend when dialog opens
+  useEffect(() => {
+    if (isOpen) {
+      loadSettings();
+    }
+  }, [isOpen]);
+
+  const loadSettings = async () => {
+    try {
+      // Try to load the saved app_settings first
+      const response = await GetConfig('app_settings');
+      if (response.success && response.data) {
+        // response.data is an AppConfig object with key, value fields
+        const configData = response.data;
+        if (configData && configData.value) {
+          // The value field contains the JSON string of our settings
+          const settingsData = JSON.parse(configData.value);
+
+          // Apply loaded settings
+          setCloseAction(settingsData.closeAction || 'background');
+          setNotifications(settingsData.notifications !== undefined ? settingsData.notifications : true);
+          setLlmBaseUrl(settingsData.llmBaseUrl || '');
+          setLlmModelId(settingsData.llmModelId || '');
+          setLlmApiKey(settingsData.llmApiKey || '');
+          setAsrAppId(settingsData.asrAppId || '');
+          setAsrAccessToken(settingsData.asrAccessToken || '');
+          setAsrClusterId(settingsData.asrClusterId || '');
+          setOssEndpoint(settingsData.ossEndpoint || '');
+          setOssBucket(settingsData.ossBucket || '');
+          setOssRegion(settingsData.ossRegion || '');
+          setOssAccessKey(settingsData.ossAccessKey || '');
+          setOssSecretKey(settingsData.ossSecretKey || '');
+          setSmartScreenshot(settingsData.smartScreenshot !== undefined ? settingsData.smartScreenshot : true);
+          setCacheSize(settingsData.cacheSize || '1024');
+          setAutoUpdate(settingsData.autoUpdate !== undefined ? settingsData.autoUpdate : true);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to load settings:', error);
+      toast.error('加载设置失败');
+    }
+  };
+
   const categories = [
     { id: 'general' as const, name: '通用', icon: Globe },
     { id: 'service' as const, name: '服务', icon: Database },
@@ -47,9 +91,39 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   ];
 
   
-  const handleSave = () => {
-    toast.success('设置已保存');
-    onClose();
+  const handleSave = async () => {
+    try {
+      // Save all settings to backend
+      const settings = {
+        closeAction,
+        notifications,
+        llmBaseUrl,
+        llmModelId,
+        llmApiKey,
+        asrAppId,
+        asrAccessToken,
+        asrClusterId,
+        ossEndpoint,
+        ossBucket,
+        ossRegion,
+        ossAccessKey,
+        ossSecretKey,
+        smartScreenshot,
+        cacheSize,
+        autoUpdate
+      };
+
+      const response = await SaveConfig('app_settings', JSON.stringify(settings));
+      if (response.success) {
+        toast.success('设置已保存');
+        onClose();
+      } else {
+        toast.error('保存设置失败: ' + response.message);
+      }
+    } catch (error) {
+      console.error('Failed to save settings:', error);
+      toast.error('保存设置失败');
+    }
   };
 
   const handleReset = () => {
