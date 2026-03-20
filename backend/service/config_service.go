@@ -46,3 +46,11 @@ func (s *ConfigService) GetAllConfigs() models.Response {
 	}
 	return successResponse("Configs retrieved successfully", configs)
 }
+
+func (s *ConfigService) ConfigExists(key string) models.Response{
+	_, err := s.config_repo.GetConfig(key)
+	if err != nil {
+		return errorResponse("Failed to check config existence: " + err.Error())
+	}
+	return successResponse("Config exists", nil)
+}

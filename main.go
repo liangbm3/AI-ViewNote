@@ -35,6 +35,10 @@ func main() {
 	confRepo := repository.NewConfigRepository(db)
 	confService := service.NewConfigService(confRepo)
 
+	// 确保默认配置项存在
+	ensureConfigExists(confService, "run_in_background", "false")
+	ensureConfigExists(confService, "desktop_notifications", "false")
+
 	app := application.New(application.Options{
 		Name:        "AI-ViewNote",
 		Description: "A demo of using raw HTML & CSS",
@@ -82,5 +86,21 @@ func main() {
 	// 如果运行应用时发生错误，则记录日志并退出。
 	if err != nil {
 		log.Fatal(err)
+	}
+}
+
+
+func ensureConfigExists(service *service.ConfigService, key string, defaultValue string) {
+	resp := service.ConfigExists(key)
+	if !resp.Success {
+		log.Printf("Config '%s' does not exist, creating with default value.\n", key)
+		saveResp := service.SaveConfig(key, defaultValue)
+		if !saveResp.Success {
+			log.Printf("Failed to create config '%s': %s\n", key, saveResp.Message)
+		} else {
+			log.Printf("Config '%s' created successfully.\n", key)
+		}
+	} else {
+		log.Printf("Config '%s' already exists.\n", key)
 	}
 }

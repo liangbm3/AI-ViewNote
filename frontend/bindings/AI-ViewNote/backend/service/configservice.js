@@ -14,6 +14,16 @@ import * as models$0 from "../models/models.js";
  * @param {string} key
  * @returns {$CancellablePromise<models$0.Response>}
  */
+export function ConfigExists(key) {
+    return $Call.ByID(1452669869, key).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType0($result);
+    }));
+}
+
+/**
+ * @param {string} key
+ * @returns {$CancellablePromise<models$0.Response>}
+ */
 export function DeleteConfig(key) {
     return $Call.ByID(3228890338, key).then(/** @type {($result: any) => any} */(($result) => {
         return $$createType0($result);

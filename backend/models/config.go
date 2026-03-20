@@ -20,7 +20,14 @@ type LlmConfig struct {
 	LlmApiKey  string `json:"llm_api_key"`
 }
 
+type SetBool string
+
+const (
+	True  SetBool = "true"
+	False SetBool = "false"
+)
+
 type GeneralConfig struct{
-	RunInBackground bool `json:"run_in_background"`
-	DesktopNotifications bool `json:"desktop_notifications"`
+	RunInBackground SetBool `json:"run_in_background"`
+	DesktopNotifications SetBool `json:"desktop_notifications"`
 }
