@@ -22,7 +22,7 @@ export function Sidebar({
   onNewTask
 }: SidebarProps) {
   return (
-    <>
+    <div className="relative h-full flex flex-shrink-0 z-10">
       <AnimatePresence mode="wait">
         {!isCollapsed && (
           <motion.div
@@ -30,7 +30,7 @@ export function Sidebar({
             animate={{ width: '280px', opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="bg-white border-r border-gray-200 flex flex-col overflow-hidden"
+            className="bg-white border-r border-gray-200 flex flex-col h-full overflow-hidden"
           >
             {/* 新建任务按钮 */}
             <div className="p-3 border-b border-gray-200">
@@ -44,19 +44,11 @@ export function Sidebar({
               </Button>
             </div>
 
-            <div className="h-12 px-4 border-b border-gray-200 flex items-center justify-between bg-gray-50/50">
+            <div className="h-12 px-4 border-b border-gray-200 flex items-center bg-gray-50/50">
               <div className="flex items-center gap-2">
                 <ListTodo className="w-4 h-4 text-gray-500" />
                 <span className="font-semibold text-gray-900 text-sm tracking-tight">任务列表</span>
               </div>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={onToggleCollapse}
-                className="w-7 h-7 p-0 hover:bg-gray-200/50"
-              >
-                <ChevronLeft className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
-              </Button>
             </div>
 
             <div className="flex-1 overflow-y-auto p-3 space-y-2">
@@ -105,16 +97,22 @@ export function Sidebar({
         )}
       </AnimatePresence>
 
-      {isCollapsed && (
-        <Button
-          variant="ghost"
-          size="sm"
+      {/* 悬浮折叠/展开按钮 */}
+      <div 
+        className={`absolute top-1/2 -translate-y-1/2 z-50 transition-all duration-200 ${isCollapsed ? '-right-6' : '-right-3'}`}
+      >
+        <button
           onClick={onToggleCollapse}
-          className="w-10 h-10 p-0 bg-white border-r border-gray-200 hover:bg-gray-50 rounded-none"
+          className="w-6 h-6 p-0 bg-white border border-gray-200 shadow-sm rounded-full flex items-center justify-center hover:bg-gray-50 text-gray-500 hover:text-gray-900 transition-all hover:scale-110 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-offset-1"
+          aria-label={isCollapsed ? "展开任务列表" : "折叠任务列表"}
         >
-          <ChevronRight className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
-        </Button>
-      )}
-    </>
+          {isCollapsed ? (
+            <ChevronRight className="w-3.5 h-3.5" strokeWidth={2.5} />
+          ) : (
+            <ChevronLeft className="w-3.5 h-3.5" strokeWidth={2.5} />
+          )}
+        </button>
+      </div>
+    </div>
   );
 }
