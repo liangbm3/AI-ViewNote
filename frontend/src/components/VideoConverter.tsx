@@ -69,8 +69,8 @@ export function VideoConverter() {
         />
 
         <div className="flex-1 flex flex-col min-w-0">
-          <div className="flex-1 overflow-y-auto p-6">
-            <div className="max-w-4xl mx-auto space-y-6">
+          <div className={`flex-1 p-6 flex flex-col ${showUploadInterface ? 'overflow-y-auto' : 'overflow-hidden min-h-0'}`}>
+            <div className={`mx-auto w-full ${showUploadInterface ? 'max-w-4xl space-y-6' : 'max-w-7xl flex-1 flex flex-col min-h-0'}`}>
               {/* 根据状态显示不同界面 */}
               {showUploadInterface ? (
                 <>

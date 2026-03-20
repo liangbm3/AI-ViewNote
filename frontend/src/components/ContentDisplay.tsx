@@ -59,11 +59,11 @@ export function ContentDisplay({ imageTextContent, subtitles }: ContentDisplayPr
   // 确保始终有内容显示
   if (!displayContent && !displaySubtitles.length) {
     return (
-      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col min-h-0">
+        <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
           <h2 className="font-semibold text-gray-900">转换结果</h2>
         </div>
-        <div className="p-6 text-center text-gray-500">
+        <div className="p-6 flex-1 flex items-center justify-center text-gray-500">
           暂无内容，请稍后再试...
         </div>
       </div>
@@ -78,16 +78,16 @@ export function ContentDisplay({ imageTextContent, subtitles }: ContentDisplayPr
   };
 
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
-      <div className="px-6 py-4 border-b border-gray-200">
+    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col min-h-0">
+      <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0">
         <h2 className="font-semibold text-gray-900">转换结果</h2>
       </div>
 
-      <div className="grid grid-cols-2 divide-x divide-gray-200">
+      <div className="grid grid-cols-2 divide-x divide-gray-200 flex-1 min-h-0">
         {/* 左侧：图文信息 */}
-        <div className="p-6">
-          <h3 className="font-medium text-gray-900 mb-4">图文信息</h3>
-          <div className="prose prose-sm max-w-none overflow-y-auto max-h-96">
+        <div className="p-6 flex flex-col min-h-0">
+          <h3 className="font-medium text-gray-900 mb-4 flex-shrink-0">图文信息</h3>
+          <div className="prose prose-sm max-w-none overflow-y-auto flex-1 pr-2">
             <ReactMarkdown
               components={{
                 h1: ({children}) => <h1 className="text-lg font-semibold text-gray-900 mb-3">{children}</h1>,
@@ -108,9 +108,9 @@ export function ContentDisplay({ imageTextContent, subtitles }: ContentDisplayPr
         </div>
 
         {/* 右侧：字幕 */}
-        <div className="p-6">
-          <h3 className="font-medium text-gray-900 mb-4">字幕</h3>
-          <div className="space-y-3 max-h-96 overflow-y-auto">
+        <div className="p-6 flex flex-col min-h-0">
+          <h3 className="font-medium text-gray-900 mb-4 flex-shrink-0">字幕</h3>
+          <div className="space-y-3 overflow-y-auto flex-1 pr-2">
             {displaySubtitles.map((subtitle, index) => (
               <div
                 key={index}
