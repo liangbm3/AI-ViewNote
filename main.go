@@ -1,6 +1,7 @@
 package main
 
 import (
+	"AI-ViewNote/backend/bindings"
 	"embed"
 	_ "embed"
 	"log"
@@ -9,36 +10,21 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
-// Wails 使用 Go 的 `embed` 包将前端文件嵌入到二进制文件中。
-// frontend/dist 文件夹中的所有文件都会被嵌入到二进制中，
-// 并可供前端访问。
-// 详细信息见：https://pkg.go.dev/embed
-
 //go:embed all:frontend/dist
 var assets embed.FS
 
 func init() {
-	// 注册一个自定义事件，关联的数据类型为 string。
-	// 这不是必须的，但绑定生成器会自动识别已注册的事件，
-	// 并为其生成强类型的 JS/TS API。
 	application.RegisterEvent[string]("time")
 }
 
-// main 函数是应用程序的入口。它初始化应用、创建窗口，
-// 并启动一个 goroutine 每秒发送一次时间事件。随后运行应用，
-// 并记录可能发生的任何错误。
 func main() {
+	processBinding := bindings.NewProcessBinding()
 
-	// 创建一个新的 Wails 应用，并提供必要的选项。
-	// 'Name' 和 'Description' 用于应用元数据。
-	// 'Assets' 配置资源服务器，'FS' 指向前端文件。
-	// 'Bind' 是 Go 结构体实例的列表，前端可访问这些实例的方法。
-	// 'Mac' 选项用于 macOS 下的应用定制。
 	app := application.New(application.Options{
 		Name:        "AI-ViewNote",
 		Description: "A demo of using raw HTML & CSS",
 		Services: []application.Service{
-			application.NewService(&GreetService{}),
+			application.NewService(processBinding),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),

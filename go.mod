@@ -1,4 +1,4 @@
-module changeme
+module AI-ViewNote
 
 go 1.25
 

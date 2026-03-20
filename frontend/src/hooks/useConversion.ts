@@ -1,12 +1,13 @@
 import { useState, useCallback } from 'react';
-import { Task, ConversionStatus, LogEntry } from '../types';
+import { ConversionStatus, LogEntry } from '../types';
 import { toast } from 'sonner';
+import { NewTask } from '../../bindings/AI-ViewNote/backend/bindings/processbinding.js';
 
 export function useConversion(addLog: (message: string, type?: LogEntry['type']) => void) {
   const [conversionStatus, setConversionStatus] = useState<ConversionStatus>('idle');
   const [progress, setProgress] = useState(0);
 
-  const startConversion = useCallback((selectedFile: File, selectedFormats: Array<{id: string, extension: string}>) => {
+  const startConversion = useCallback((selectedFile: File, selectedFormats: Array<{ id: string; extension: string }>) => {
     if (!selectedFile) {
       addLog('错误: 未选择文件', 'error');
       toast.error('请先选择文件');
@@ -19,26 +20,57 @@ export function useConversion(addLog: (message: string, type?: LogEntry['type'])
       return;
     }
 
+    const primaryFormat = selectedFormats[0];
+    const fileWithPath = selectedFile as File & { path?: string };
+    const filePath = (fileWithPath as any).path || selectedFile.name;
+    const contentStyle = primaryFormat.extension;
+
     addLog(`开始转换: ${selectedFile.name}`, 'info');
-    addLog(`输出格式: ${selectedFormats[0].extension.toUpperCase()}`, 'info');
+    addLog(`输出格式: ${primaryFormat.extension.toUpperCase()}`, 'info');
+
     setConversionStatus('converting');
     setProgress(0);
 
+    // 模拟前端进度条，在后端任务完成前推进到 95%
     const interval = setInterval(() => {
       setProgress(prev => {
-        if (prev >= 100) {
+        if (prev >= 95) {
           clearInterval(interval);
-          setConversionStatus('completed');
-          addLog(`转换完成: ${selectedFile.name}`, 'success');
-          toast.success('转换完成');
-          return 100;
+          return 95;
         }
-        if (prev % 25 === 0) {
-          addLog(`处理进度: ${prev}%`, 'info');
+        const next = prev + 5;
+        if (next % 25 === 0) {
+          addLog(`处理进度: ${next}%`, 'info');
         }
-        return prev + 2;
+        return next;
       });
-    }, 80);
+    }, 200);
+
+    NewTask(filePath, contentStyle)
+      .then((res: any) => {
+        clearInterval(interval);
+
+        if (res && res.success) {
+          addLog(res.message || '任务创建成功', 'success');
+          setProgress(100);
+          setConversionStatus('completed');
+          toast.success('转换任务已创建');
+        } else {
+          const msg = (res && res.message) || '任务创建失败';
+          addLog(`错误: ${msg}`, 'error');
+          toast.error(msg);
+          setConversionStatus('idle');
+          setProgress(0);
+        }
+      })
+      .catch((err: unknown) => {
+        clearInterval(interval);
+        const msg = err instanceof Error ? err.message : String(err);
+        addLog(`错误: ${msg}`, 'error');
+        toast.error('调用后端转换接口失败');
+        setConversionStatus('idle');
+        setProgress(0);
+      });
   }, [addLog]);
 
   const reset = useCallback(() => {
