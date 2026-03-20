@@ -9,45 +9,51 @@ type ConfigRepository struct {
 	DB *sql.DB
 }
 
-func (r *ConfigRepository) GetConfig(moduleName string) (*models.AppConfig, error) {
-	query := `SELECT id, module_name, config_data, updated_at FROM configs WHERE module_name = ?`
-	row := r.DB.QueryRow(query, moduleName)
-	config := &models.AppConfig{}
-	if err := row.Scan(&config.ID, &config.ModuleName, &config.ConfigData, &config.UpdateAt); err != nil {
-		if err == sql.ErrNoRows {
-			return nil, nil // 没有找到配置，返回 nil
-		}
-		return nil, err
+func NewConfigRepository(db *sql.DB) *ConfigRepository {
+	return &ConfigRepository{
+		DB: db,
 	}
-	return config, nil
 }
 
-func (r *ConfigRepository) SaveConfig(moduleName string, configData string) error {
+func (r *ConfigRepository) GetConfig(key string) (models.AppConfig, error) {
+	query := `SELECT id, key, value, updated_at FROM configs WHERE key = ?`
+	row := r.DB.QueryRow(query, key)
+	config := &models.AppConfig{}
+	if err := row.Scan(&config.ID, &config.Key, &config.Value, &config.UpdateAt); err != nil {
+		if err == sql.ErrNoRows {
+			return models.AppConfig{}, nil // 没有找到配置，返回空配置
+		}
+		return models.AppConfig{}, err
+	}
+	return *config, nil
+}
+
+func (r *ConfigRepository) SaveConfig(key string, value string) error {
 	// 先检查是否存在
-	existingConfig, err := r.GetConfig(moduleName)
+	existingConfig, err := r.GetConfig(key)
 	if err != nil {
 		return err
 	}
-	if existingConfig == nil {
+	if existingConfig == (models.AppConfig{}) {
 		// 不存在，插入新记录
-		query := `INSERT INTO configs (module_name, config_data, updated_at) VALUES (?, ?, datetime('now'))`
-		_, err := r.DB.Exec(query, moduleName, configData)
+		query := `INSERT INTO configs (key, value, updated_at) VALUES (?, ?, datetime('now'))`
+		_, err := r.DB.Exec(query, key, value)
 		return err
 	}
 	// 存在，更新记录
-	query := `UPDATE configs SET config_data = ?, updated_at = datetime('now') WHERE module_name = ?`
-	_, err = r.DB.Exec(query, configData, moduleName)
+	query := `UPDATE configs SET value = ?, updated_at = datetime('now') WHERE key = ?`
+	_, err = r.DB.Exec(query, value, key)
 	return err
 }
 
-func (r *ConfigRepository) DeleteConfig(moduleName string) error {
-	query := `DELETE FROM configs WHERE module_name = ?`
-	_, err := r.DB.Exec(query, moduleName)
+func (r *ConfigRepository) DeleteConfig(key string) error {
+	query := `DELETE FROM configs WHERE key = ?`
+	_, err := r.DB.Exec(query, key)
 	return err
 }
 
 func (r *ConfigRepository) GetAllConfigs() ([]*models.AppConfig, error) {
-	query := `SELECT id, module_name, config_data, updated_at FROM configs ORDER BY updated_at DESC`
+	query := `SELECT id, key, value, updated_at FROM configs ORDER BY updated_at DESC`
 	rows, err := r.DB.Query(query)
 	if err != nil {
 		return nil, err
@@ -56,7 +62,7 @@ func (r *ConfigRepository) GetAllConfigs() ([]*models.AppConfig, error) {
 	var configs []*models.AppConfig
 	for rows.Next() {
 		config := &models.AppConfig{}
-		if err := rows.Scan(&config.ID, &config.ModuleName, &config.ConfigData, &config.UpdateAt); err != nil {
+		if err := rows.Scan(&config.ID, &config.Key, &config.Value, &config.UpdateAt); err != nil {
 			return nil, err
 		}
 		configs = append(configs, config)

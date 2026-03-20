@@ -10,15 +10,11 @@ import { Call as $Call, CancellablePromise as $CancellablePromise, Create as $Cr
 // @ts-ignore: Unused imports
 import * as models$0 from "../models/models.js";
 
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore: Unused imports
-import * as $models from "./models.js";
-
 /**
- * @returns {$CancellablePromise<$models.Response>}
+ * @returns {$CancellablePromise<models$0.Response>}
  */
 export function GetTaskList() {
-    return $Call.ByID(1250851696).then(/** @type {($result: any) => any} */(($result) => {
+    return $Call.ByID(1890625269).then(/** @type {($result: any) => any} */(($result) => {
         return $$createType0($result);
     }));
 }
@@ -26,10 +22,10 @@ export function GetTaskList() {
 /**
  * @param {string} filePath
  * @param {string} contentStyle
- * @returns {$CancellablePromise<$models.Response>}
+ * @returns {$CancellablePromise<models$0.Response>}
  */
 export function NewTask(filePath, contentStyle) {
-    return $Call.ByID(3665119974, filePath, contentStyle).then(/** @type {($result: any) => any} */(($result) => {
+    return $Call.ByID(1542729443, filePath, contentStyle).then(/** @type {($result: any) => any} */(($result) => {
         return $$createType0($result);
     }));
 }

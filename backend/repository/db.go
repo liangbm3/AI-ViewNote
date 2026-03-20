@@ -51,8 +51,8 @@ func InitDB(dbPath string) (*sql.DB, error) {
 	// 创建表：应用配置表，对应 models.AppConfig
 	createConfigTable := `CREATE TABLE IF NOT EXISTS configs (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
-			module_name TEXT UNIQUE NOT NULL,
-			config_data TEXT,
+			key TEXT NOT NULL UNIQUE,
+			value TEXT NOT NULL,
 			updated_at TEXT NOT NULL
 			);`
 	if _, err := db.Exec(createConfigTable); err != nil {

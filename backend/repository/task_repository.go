@@ -9,6 +9,12 @@ type TaskRepository struct {
 	DB *sql.DB
 }
 
+func NewTaskRepository(db *sql.DB) *TaskRepository {
+	return &TaskRepository{
+		DB: db,
+	}
+}
+
 func (r *TaskRepository) Create(task *models.TaskRecord) (int, error) {
 	query := `INSERT INTO tasks (title, file_name, content_style, created_at, progress) VALUES (?, ?, ?, ?, ?)`
 	res, err := r.DB.Exec(query, task.Title, task.FileName, task.ContentStyle, task.CreatedAt, task.Progress)
@@ -61,4 +67,3 @@ func (r *TaskRepository) DeleteByID(id int) error {
 	_, err := r.DB.Exec(query, id)
 	return err
 }
-

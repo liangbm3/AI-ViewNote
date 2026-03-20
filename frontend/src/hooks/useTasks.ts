@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from 'react';
 import { Task } from '../types';
-import { GetTaskList } from '../../bindings/AI-ViewNote/backend/bindings/taskbinding.js';
+import { GetTaskList } from '../../bindings/AI-ViewNote/backend/service/taskservice.js';
 import { Events } from '@wailsio/runtime';
 
 type BackendTaskRecord = {

@@ -1,10 +1,13 @@
 package main
 
 import (
-	"AI-ViewNote/backend/bindings"
+	"AI-ViewNote/backend/repository"
+	"AI-ViewNote/backend/service"
 	"embed"
 	_ "embed"
 	"log"
+	"os"
+	"path/filepath"
 	"time"
 
 	"github.com/wailsapp/wails/v3/pkg/application"
@@ -18,13 +21,26 @@ func init() {
 }
 
 func main() {
-	taskBinding := bindings.NewTaskBinding()
+	configDir, _ := os.UserConfigDir()
+	dBPath := filepath.Join(configDir, "AI-ViewNote", "data.db")
+	db, err := repository.InitDB(dBPath)
+	if err != nil {
+		log.Fatal("Failed to initialize database: ", err)
+	}
+	defer db.Close()
+
+	taskRepo := repository.NewTaskRepository(db)
+	taskService := service.NewTaskService(taskRepo)
+
+	confRepo := repository.NewConfigRepository(db)
+	confService := service.NewConfigService(confRepo)
 
 	app := application.New(application.Options{
 		Name:        "AI-ViewNote",
 		Description: "A demo of using raw HTML & CSS",
 		Services: []application.Service{
-			application.NewService(taskBinding),
+			application.NewService(taskService),
+			application.NewService(confService),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),
@@ -55,23 +71,13 @@ func main() {
 		ticker := time.NewTicker(time.Minute)
 		defer ticker.Stop()
 		for range ticker.C {
-			resp := taskBinding.GetTaskList()
+			resp := taskService.GetTaskList()
 			app.Event.Emit("task_list_update", resp)
 		}
 	}()
 
-	// 启动一个 goroutine，每秒发送一次包含当前时间的事件。
-	// 前端可监听该事件并相应更新 UI。
-	go func() {
-		for {
-			now := time.Now().Format(time.RFC1123)
-			app.Event.Emit("time", now)
-			time.Sleep(time.Second)
-		}
-	}()
-
 	// 运行应用程序。此操作会阻塞，直到应用退出。
-	err := app.Run()
+	err = app.Run()
 
 	// 如果运行应用时发生错误，则记录日志并退出。
 	if err != nil {

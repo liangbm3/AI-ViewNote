@@ -23,7 +23,7 @@ type TaskRecord struct {
 
 type AppConfig struct {
 	ID int `json:"id"`
-	ModuleName string `json:"module_name"`
-	ConfigData string `json:"config_data"`
+	Key string `json:"key"`
+	Value string `json:"value"`
 	UpdateAt string `json:"updated_at"`
 }
