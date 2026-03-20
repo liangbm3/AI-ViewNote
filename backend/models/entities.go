@@ -20,3 +20,10 @@ type TaskRecord struct {
 	CreatedAt string `json:"created_at"`
 	Progress TaskProgress `json:"progress"`
 }
+
+type AppConfig struct {
+	ID int `json:"id"`
+	ModuleName string `json:"module_name"`
+	ConfigData string `json:"config_data"`
+	UpdateAt string `json:"updated_at"`
+}
