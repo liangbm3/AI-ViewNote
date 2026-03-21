@@ -30,7 +30,7 @@ func (b *TaskService) NewTask(filePath string, contentStyle string) models.Respo
 		FileName:     filepath.Base(filePath),
 		ContentStyle: contentStyle,
 		CreatedAt:    time.Now().Format(time.RFC3339),
-		Progress:     models.Failed,
+		Progress:     models.NotStarted,
 	}
 
 	id, err := b.task_repo.Create(&task)
@@ -56,4 +56,45 @@ func (b *TaskService) GetTaskList() models.Response {
 		return errorResponse("Failed to retrieve task list: " + err.Error())
 	}
 	return successResponse("Task list retrieved successfully", taskList)
+}
+
+func (b *TaskService) mockProcessTask(taskID int) {
+	// 模拟任务处理流程，逐步更新进度
+	task,err:= b.task_repo.GetByID(taskID)
+	if err != nil {
+		return
+	}
+	// 处理音频
+	task.Progress = models.ExtractingAudio
+	b.task_repo.UpdateProgress(taskID, task.Progress)
+	resp := b.GetTaskList()
+	b.event_emitter.Emit("task_list_update", resp)
+	time.Sleep(1 * time.Second)
+	task.Progress = models.ExtractingAudioSuccess
+	b.task_repo.UpdateProgress(taskID, task.Progress)
+	resp = b.GetTaskList()
+	b.event_emitter.Emit("task_list_update", resp)
+
+	// 提取文本
+	task.Progress = models.ExtractingText
+	b.task_repo.UpdateProgress(taskID, task.Progress)
+	resp = b.GetTaskList()
+	b.event_emitter.Emit("task_list_update", resp)
+	time.Sleep(2 * time.Second)
+	task.Progress = models.ExtractingTextSuccess
+	task.TranscriptionText = "{\"start\": 0.0,  \"text\": \"Hello, world!\"}"
+	b.task_repo.UpdateProgress(taskID, task.Progress)
+	resp = b.GetTaskList()
+	b.event_emitter.Emit("task_list_update", resp)
+
+	task.Progress = models.GeneratingStyle
+	b.task_repo.UpdateProgress(taskID, task.Progress)
+	resp = b.GetTaskList()
+	b.event_emitter.Emit("task_list_update", resp)
+	time.Sleep(3 * time.Second)
+	task.Progress = models.GeneratingStyleSuccess
+	task.GeneratedContent = "{\"content\": \"This is a generated note based on the transcription.\"}"
+	b.task_repo.UpdateProgress(taskID, task.Progress)
+	resp = b.GetTaskList()
+	b.event_emitter.Emit("task_list_update", resp)
 }
