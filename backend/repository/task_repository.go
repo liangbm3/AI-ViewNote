@@ -41,11 +41,22 @@ func (r *TaskRepository) GetAll() ([]*models.TaskRecord, error) {
 	var tasks []*models.TaskRecord
 	for rows.Next() {
 		task := &models.TaskRecord{}
+		var transcriptionText sql.NullString
+		var markdownContent sql.NullString
 		if err := rows.Scan(&task.ID, &task.Title, &task.FileName, &task.ContentStyle, &task.CreatedAt,
-			&task.UpdatedAt, &task.Progress, &task.TranscriptionText, &task.MarkdownContent); err != nil {
+			&task.UpdatedAt, &task.Progress, &transcriptionText, &markdownContent); err != nil {
 			return nil, err
 		}
+		if transcriptionText.Valid {
+			task.TranscriptionText = []byte(transcriptionText.String)
+		}
+		if markdownContent.Valid {
+			task.MarkdownContent = markdownContent.String
+		}
 		tasks = append(tasks, task)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, err
 	}
 	return tasks, nil
 }
@@ -73,9 +84,17 @@ func (r *TaskRepository) GetByID(id int) (*models.TaskRecord, error) {
 	progress, transcription_text, markdown_content FROM tasks WHERE id = ?`
 	row := r.DB.QueryRow(query, id)
 	task := &models.TaskRecord{}
+	var transcriptionText sql.NullString
+	var markdownContent sql.NullString
 	if err := row.Scan(&task.ID, &task.Title, &task.FileName, &task.ContentStyle, &task.CreatedAt,
-		&task.UpdatedAt, &task.Progress, &task.TranscriptionText, &task.MarkdownContent); err != nil {
+		&task.UpdatedAt, &task.Progress, &transcriptionText, &markdownContent); err != nil {
 		return nil, err
+	}
+	if transcriptionText.Valid {
+		task.TranscriptionText = []byte(transcriptionText.String)
+	}
+	if markdownContent.Valid {
+		task.MarkdownContent = markdownContent.String
 	}
 	return task, nil
 }
