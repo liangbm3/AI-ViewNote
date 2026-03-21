@@ -1,5 +1,7 @@
 package models
 
+import "encoding/json"
+
 // 任务进度枚举
 type TaskProgress int
 const (
@@ -24,8 +26,8 @@ type TaskRecord struct {
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 	Progress TaskProgress `json:"progress"`
-	TranscriptionText interface{} `json:"transcription_text"` 
-	GeneratedContent interface{} `json:"generated_content"` 
+	TranscriptionText json.RawMessage `json:"transcription_text"` 
+	MarkdownContent string `json:"markdown_content"` 
 }
 
 type AppConfig struct {

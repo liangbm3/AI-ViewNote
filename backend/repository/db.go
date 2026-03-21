@@ -46,7 +46,7 @@ func InitDB(dbPath string) (*sql.DB, error) {
 			updated_at TEXT NOT NULL,
 			progress INTEGER NOT NULL,
 			transcription_text TEXT,
-			generated_content TEXT
+			markdown_content TEXT
 			);`
 	if _, err := db.Exec(createTasksTable); err != nil {
 		return nil, err

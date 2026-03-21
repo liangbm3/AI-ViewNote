@@ -11,6 +11,16 @@ import { Call as $Call, CancellablePromise as $CancellablePromise, Create as $Cr
 import * as models$0 from "../models/models.js";
 
 /**
+ * @param {number} id
+ * @returns {$CancellablePromise<models$0.Response>}
+ */
+export function GetTaskByID(id) {
+    return $Call.ByID(3731936101, id).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType0($result);
+    }));
+}
+
+/**
  * @returns {$CancellablePromise<models$0.Response>}
  */
 export function GetTaskList() {

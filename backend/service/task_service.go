@@ -5,6 +5,8 @@ import (
 	"AI-ViewNote/backend/repository"
 	"path/filepath"
 	"time"
+	"log"
+	"encoding/json"
 )
 
 // 发射器接口
@@ -46,6 +48,7 @@ func (b *TaskService) NewTask(filePath string, contentStyle string) models.Respo
 	defer func ()  {
 		resp := b.GetTaskList()
 		b.event_emitter.Emit("task_list_update", resp)
+		go b.mockProcessTask(id)
 	}()
 	return successResponse("Task created successfully", new_task)
 }
@@ -58,13 +61,24 @@ func (b *TaskService) GetTaskList() models.Response {
 	return successResponse("Task list retrieved successfully", taskList)
 }
 
+func (b *TaskService) GetTaskByID(id int) models.Response {
+	task, err := b.task_repo.GetByID(id)
+	if err != nil {
+		return errorResponse("Failed to retrieve task: " + err.Error())
+	}
+	return successResponse("Task retrieved successfully", task)
+}
+
 func (b *TaskService) mockProcessTask(taskID int) {
+	log.Println("Starting mock processing for task ID:", taskID)
 	// 模拟任务处理流程，逐步更新进度
 	task,err:= b.task_repo.GetByID(taskID)
 	if err != nil {
+		log.Println("Error retrieving task:", err)
 		return
 	}
 	// 处理音频
+	log.Println("Processing audio for task ID:", taskID)
 	task.Progress = models.ExtractingAudio
 	b.task_repo.UpdateProgress(taskID, task.Progress)
 	resp := b.GetTaskList()
@@ -76,24 +90,31 @@ func (b *TaskService) mockProcessTask(taskID int) {
 	b.event_emitter.Emit("task_list_update", resp)
 
 	// 提取文本
+	log.Println("Extracting text for task ID:", taskID)
 	task.Progress = models.ExtractingText
 	b.task_repo.UpdateProgress(taskID, task.Progress)
 	resp = b.GetTaskList()
 	b.event_emitter.Emit("task_list_update", resp)
 	time.Sleep(2 * time.Second)
 	task.Progress = models.ExtractingTextSuccess
-	task.TranscriptionText = "{\"start\": 0.0,  \"text\": \"Hello, world!\"}"
+	task.TranscriptionText = json.RawMessage([]byte(`{"start": 0.0,  "text": "Hello, world!"}`))
 	b.task_repo.UpdateProgress(taskID, task.Progress)
+	b.task_repo.UpdateTranscriptionText(taskID, string(task.TranscriptionText))
+	log.Println("Updated transcription text for task ID:", taskID)
+
 	resp = b.GetTaskList()
 	b.event_emitter.Emit("task_list_update", resp)
 
+	// 生成内容
+	log.Println("Generating content for task ID:", taskID)
 	task.Progress = models.GeneratingStyle
 	b.task_repo.UpdateProgress(taskID, task.Progress)
 	resp = b.GetTaskList()
 	b.event_emitter.Emit("task_list_update", resp)
 	time.Sleep(3 * time.Second)
 	task.Progress = models.GeneratingStyleSuccess
-	task.GeneratedContent = "{\"content\": \"This is a generated note based on the transcription.\"}"
+	task.MarkdownContent = "## This is a generated note based on the transcription.}"
+	b.task_repo.UpdateMarkdownContent(taskID, task.MarkdownContent)
 	b.task_repo.UpdateProgress(taskID, task.Progress)
 	resp = b.GetTaskList()
 	b.event_emitter.Emit("task_list_update", resp)

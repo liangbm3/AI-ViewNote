@@ -17,9 +17,9 @@ func NewTaskRepository(db *sql.DB) *TaskRepository {
 
 func (r *TaskRepository) Create(task *models.TaskRecord) (int, error) {
 	query := `INSERT INTO tasks (title, file_name, content_style, created_at, updated_at, progress, 
-	transcription_text, generated_content) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
+	transcription_text, markdown_content) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
 	res, err := r.DB.Exec(query, task.Title, task.FileName, task.ContentStyle, task.CreatedAt,
-		task.UpdatedAt, task.Progress, task.TranscriptionText, task.GeneratedContent)
+		task.UpdatedAt, task.Progress, task.TranscriptionText, task.MarkdownContent)
 	if err != nil {
 		return 0, err
 	}
@@ -32,7 +32,7 @@ func (r *TaskRepository) Create(task *models.TaskRecord) (int, error) {
 
 func (r *TaskRepository) GetAll() ([]*models.TaskRecord, error) {
 	query := `SELECT id, title, file_name, content_style, created_at, updated_at, 
-	progress, transcription_text, generated_content FROM tasks ORDER BY created_at DESC`
+	progress, transcription_text, markdown_content FROM tasks ORDER BY created_at DESC`
 	rows, err := r.DB.Query(query)
 	if err != nil {
 		return nil, err
@@ -42,7 +42,7 @@ func (r *TaskRepository) GetAll() ([]*models.TaskRecord, error) {
 	for rows.Next() {
 		task := &models.TaskRecord{}
 		if err := rows.Scan(&task.ID, &task.Title, &task.FileName, &task.ContentStyle, &task.CreatedAt,
-			&task.UpdatedAt, &task.Progress, &task.TranscriptionText, &task.GeneratedContent); err != nil {
+			&task.UpdatedAt, &task.Progress, &task.TranscriptionText, &task.MarkdownContent); err != nil {
 			return nil, err
 		}
 		tasks = append(tasks, task)
@@ -62,19 +62,19 @@ func (r *TaskRepository) UpdateTranscriptionText(id int, text string) error {
 	return err
 }
 
-func (r *TaskRepository) UpdateGeneratedContent(id int, content string) error {
-	query := `UPDATE tasks SET generated_content = ?, updated_at = datetime('now') WHERE id = ?`
+func (r *TaskRepository) UpdateMarkdownContent(id int, content string) error {
+	query := `UPDATE tasks SET markdown_content = ?, updated_at = datetime('now') WHERE id = ?`
 	_, err := r.DB.Exec(query, content, id)
 	return err
 }
 
 func (r *TaskRepository) GetByID(id int) (*models.TaskRecord, error) {
 	query := `SELECT id, title, file_name, content_style, created_at, updated_at, 
-	progress, transcription_text, generated_content FROM tasks WHERE id = ?`
+	progress, transcription_text, markdown_content FROM tasks WHERE id = ?`
 	row := r.DB.QueryRow(query, id)
 	task := &models.TaskRecord{}
 	if err := row.Scan(&task.ID, &task.Title, &task.FileName, &task.ContentStyle, &task.CreatedAt,
-		&task.UpdatedAt, &task.Progress, &task.TranscriptionText, &task.GeneratedContent); err != nil {
+		&task.UpdatedAt, &task.Progress, &task.TranscriptionText, &task.MarkdownContent); err != nil {
 		return nil, err
 	}
 	return task, nil
