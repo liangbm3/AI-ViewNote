@@ -17,9 +17,11 @@ export function useLog() {
     }
   ]);
 
+  let logIdCounter = 3; // 从3开始，避免与初始日志冲突
+
   const addLog = useCallback((message: string, type: LogEntry['type'] = 'info') => {
     const newLog: LogEntry = {
-      id: Date.now().toString(),
+      id: `${Date.now()}-${logIdCounter++}`,
       message,
       type,
       timestamp: new Date().toLocaleTimeString('zh-CN', { hour12: false })
