@@ -10,6 +10,8 @@ type BackendTaskRecord = {
   content_style: string;
   created_at: string;
   progress: number;
+  markdown_content?: string;
+  transcription_text?: string;
 };
 
 type BackendResponse = {
@@ -22,6 +24,10 @@ function mapProgressToStatus(p: number): Task['status'] {
   switch (p) {
     case 0:
       return 'pending';
+    case 8:
+      return 'GeneratingStyleSuccess';
+    case 9:
+      return 'GeneratingStyleFailed';
     case 4:
       return 'completed';
     case 5:
@@ -55,8 +61,11 @@ export function useTasks() {
 
   const applyBackendTasks = useCallback((resp: BackendResponse) => {
     if (!resp || !resp.success || !Array.isArray(resp.data)) {
+      console.log('任务列表更新失败或数据无效');
       return;
     }
+
+    console.log('收到任务列表更新，任务数量:', resp.data.length);
 
     const mapped: Task[] = resp.data.map((t) => ({
       id: String(t.id),
@@ -69,8 +78,11 @@ export function useTasks() {
         minute: '2-digit',
         hour12: false,
       }),
+      markdownContent: t.markdown_content,
+      transcriptionText: t.transcription_text,
     }));
 
+    console.log('更新任务列表，新任务数量:', mapped.length);
     setTasks(mapped);
   }, []);
 
@@ -113,6 +125,8 @@ export function useTasks() {
       case 'completed': return 'bg-green-100 text-green-700';
       case 'processing': return 'bg-blue-100 text-blue-700';
       case 'error': return 'bg-red-100 text-red-700';
+      case 'GeneratingStyleSuccess': return 'bg-green-100 text-green-700';
+      case 'GeneratingStyleFailed': return 'bg-red-100 text-red-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   }, []);
@@ -122,14 +136,32 @@ export function useTasks() {
       case 'completed': return '已完成';
       case 'processing': return '处理中';
       case 'error': return '错误';
+      case 'GeneratingStyleSuccess': return '已完成';
+      case 'GeneratingStyleFailed': return '失败';
       default: return '等待中';
     }
   }, []);
+
+  const getTaskById = useCallback((taskId: string) => {
+    return tasks.find(task => task.id === taskId);
+  }, [tasks]);
+
+  const refreshTasks = useCallback(() => {
+    GetTaskList()
+      .then((resp: BackendResponse) => {
+        applyBackendTasks(resp);
+      })
+      .catch(() => {
+        // 获取失败时保持当前列表
+      });
+  }, [applyBackendTasks]);
 
   return {
     tasks,
     addTask,
     getStatusColor,
-    getStatusText
+    getStatusText,
+    getTaskById,
+    refreshTasks
   };
 }

@@ -7,6 +7,7 @@ import (
 	"time"
 	"log"
 	"encoding/json"
+	"strconv"
 )
 
 // 发射器接口
@@ -97,7 +98,7 @@ func (b *TaskService) mockProcessTask(taskID int) {
 	b.event_emitter.Emit("task_list_update", resp)
 	time.Sleep(2 * time.Second)
 	task.Progress = models.ExtractingTextSuccess
-	task.TranscriptionText = json.RawMessage([]byte(`{"start": 0.0,  "text": "Hello, world!"}`))
+	task.TranscriptionText = json.RawMessage([]byte(`[{"start_time": 0, "text": "大家好，今天我们来学习人工智能的基础知识"}, {"start_time": 3000, "text": "人工智能是指由人制造出来的机器所表现出来的智能"}, {"start_time": 6000, "text": "它通过学习、推理、感知等能力模拟人类的思维过程"}]`))
 	b.task_repo.UpdateProgress(taskID, task.Progress)
 	b.task_repo.UpdateTranscriptionText(taskID, string(task.TranscriptionText))
 	log.Println("Updated transcription text for task ID:", taskID)
@@ -113,7 +114,7 @@ func (b *TaskService) mockProcessTask(taskID int) {
 	b.event_emitter.Emit("task_list_update", resp)
 	time.Sleep(3 * time.Second)
 	task.Progress = models.GeneratingStyleSuccess
-	task.MarkdownContent = "## This is a generated note based on the transcription.}"
+	task.MarkdownContent = "## This is a generated note based on the transcription.\n id:"+ strconv.Itoa(task.ID)
 	b.task_repo.UpdateMarkdownContent(taskID, task.MarkdownContent)
 	b.task_repo.UpdateProgress(taskID, task.Progress)
 	resp = b.GetTaskList()

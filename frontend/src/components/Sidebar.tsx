@@ -7,19 +7,23 @@ import { Button } from './ui/Button';
 interface SidebarProps {
   isCollapsed: boolean;
   tasks: Task[];
+  selectedTaskId?: string;
   onToggleCollapse: () => void;
   getStatusColor: (status: Task['status']) => string;
   getStatusText: (status: Task['status']) => string;
   onNewTask: () => void; // 新建任务回调
+  onTaskSelect: (task: Task) => void; // 任务选择回调
 }
 
 export function Sidebar({
   isCollapsed,
   tasks,
+  selectedTaskId,
   onToggleCollapse,
   getStatusColor,
   getStatusText,
-  onNewTask
+  onNewTask,
+  onTaskSelect
 }: SidebarProps) {
   return (
     <div className="relative h-full flex flex-shrink-0 z-10">
@@ -55,7 +59,12 @@ export function Sidebar({
               {tasks.map((task) => (
                 <div
                   key={task.id}
-                  className="bg-gray-50 rounded-lg p-3 border border-gray-100 hover:border-gray-200 transition-colors"
+                  className={`rounded-lg p-3 border transition-colors cursor-pointer ${
+                    selectedTaskId === task.id
+                      ? 'bg-blue-50 border-blue-200 shadow-sm'
+                      : 'bg-gray-50 border-gray-100 hover:border-gray-200'
+                  }`}
+                  onClick={() => onTaskSelect(task)}
                 >
                   <div className="flex items-start justify-between mb-2">
                     <div className="flex-1 min-w-0 mr-2">

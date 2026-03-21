@@ -13,49 +13,8 @@ interface ContentDisplayProps {
 }
 
 export function ContentDisplay({ imageTextContent, subtitles }: ContentDisplayProps) {
-  // 模拟数据
-  const mockImageTextContent = `# 视频内容分析
-
-## 主要知识点
-
-### 1. 人工智能基础概念
-人工智能（AI）是指由人制造出来的机器所表现出来的智能。它通过学习、推理、感知、理解、交流等能力，模拟人类的思维过程。
-
-### 2. 机器学习分类
-- **监督学习**：有标签数据训练
-- **无监督学习**：无标签数据聚类
-- **强化学习**：通过奖励机制学习
-
-### 3. 深度学习应用
-深度学习是机器学习的一个分支，主要应用于：
-- 计算机视觉
-- 自然语言处理
-- 语音识别
-- 推荐系统
-
-## 实践建议
-
-1. **数据质量**：确保训练数据的质量和多样性
-2. **模型选择**：根据任务特点选择合适的模型架构
-3. **评估指标**：使用合适的评估指标衡量模型性能
-
-> 人工智能的发展正在深刻改变我们的生活和工作方式，掌握相关技能对个人发展至关重要。`;
-
-  const mockSubtitles: SubtitleItem[] = [
-    { start_time: 0, text: "大家好，今天我们来学习人工智能的基础知识" },
-    { start_time: 3000, text: "人工智能是指由人制造出来的机器所表现出来的智能" },
-    { start_time: 6000, text: "它通过学习、推理、感知等能力模拟人类的思维过程" },
-    { start_time: 9000, text: "机器学习是人工智能的一个重要分支" },
-    { start_time: 12000, text: "监督学习需要有标签的数据进行训练" },
-    { start_time: 15000, text: "无监督学习则是在无标签数据中发现模式" },
-    { start_time: 18000, text: "强化学习通过奖励机制来指导学习过程" },
-    { start_time: 21000, text: "深度学习在计算机视觉领域有广泛应用" },
-    { start_time: 24000, text: "自然语言处理让机器能够理解和生成人类语言" },
-    { start_time: 27000, text: "语音识别技术让机器能够听懂人类的语音" },
-  ];
-
-  const displayContent = imageTextContent || mockImageTextContent;
-  const displaySubtitles = subtitles || mockSubtitles;
+  const displayContent = imageTextContent || '';
+  const displaySubtitles = subtitles || [];
 
   // 确保始终有内容显示
   if (!displayContent && !displaySubtitles.length) {
