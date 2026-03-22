@@ -263,7 +263,7 @@ func (s *TaskService) uploadAudioToTOS(audioPath string) (string, error) {
 	}
 	defer f.Close()
 
-	output, err := client.PutObjectV2(ctx, &tos.PutObjectV2Input{
+	_, err = client.PutObjectV2(ctx, &tos.PutObjectV2Input{
 		PutObjectBasicInput: tos.PutObjectBasicInput{
 			Bucket: StorageBucketCfg.Value,
 			Key:    filepath.Base(audioPath),
