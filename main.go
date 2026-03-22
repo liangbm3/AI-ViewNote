@@ -1,6 +1,7 @@
 package main
 
 import (
+	"AI-ViewNote/backend/models"
 	"AI-ViewNote/backend/repository"
 	"AI-ViewNote/backend/service"
 	"embed"
@@ -90,10 +91,10 @@ func main() {
 }
 
 func ensureConfigExists(service *service.ConfigService, key string, defaultValue string) {
-	resp := service.ConfigExists(key)
+	resp := service.ConfigExists(models.ConfigKey(key))
 	if !resp.Success {
 		log.Printf("Config '%s' does not exist, creating with default value.\n", key)
-		saveResp := service.SaveConfig(key, defaultValue)
+		saveResp := service.SaveConfig(models.ConfigKey(key), defaultValue)
 		if !saveResp.Success {
 			log.Printf("Failed to create config '%s': %s\n", key, saveResp.Message)
 		} else {

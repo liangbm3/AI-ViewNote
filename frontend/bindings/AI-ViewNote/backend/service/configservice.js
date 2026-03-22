@@ -11,7 +11,7 @@ import { Call as $Call, CancellablePromise as $CancellablePromise, Create as $Cr
 import * as models$0 from "../models/models.js";
 
 /**
- * @param {string} key
+ * @param {models$0.ConfigKey} key
  * @returns {$CancellablePromise<models$0.Response>}
  */
 export function ConfigExists(key) {
@@ -21,7 +21,7 @@ export function ConfigExists(key) {
 }
 
 /**
- * @param {string} key
+ * @param {models$0.ConfigKey} key
  * @returns {$CancellablePromise<models$0.Response>}
  */
 export function DeleteConfig(key) {
@@ -50,7 +50,7 @@ export function GetConfig(key) {
 }
 
 /**
- * @param {string} key
+ * @param {models$0.ConfigKey} key
  * @param {string} value
  * @returns {$CancellablePromise<models$0.Response>}
  */
