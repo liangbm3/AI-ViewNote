@@ -1,13 +1,11 @@
 import React from 'react';
-import { Download } from 'lucide-react';
 import { Button } from './ui/Button';
-import { ConversionStatus } from '../types';
+import { ConversionStatus, SelectedVideoFile } from '../types';
 
 interface ActionButtonsProps {
   conversionStatus: ConversionStatus;
-  selectedFile: File | null;
+  selectedFile: SelectedVideoFile | null;
   onStartConversion: () => void;
-  onDownload: () => void;
   onReset: () => void;
 }
 
@@ -15,30 +13,18 @@ export function ActionButtons({
   conversionStatus,
   selectedFile,
   onStartConversion,
-  onDownload,
   onReset
 }: ActionButtonsProps) {
   if (conversionStatus === 'completed') {
     return (
-      <div className="flex gap-3">
-        <Button
-          variant="primary"
-          size="lg"
-          onClick={onDownload}
-          className="flex-1 h-11"
-        >
-          <Download className="w-4 h-4 mr-2" strokeWidth={2} />
-          下载文件
-        </Button>
-        <Button
-          variant="secondary"
-          size="lg"
-          onClick={onReset}
-          className="h-11"
-        >
-          重置
-        </Button>
-      </div>
+      <Button
+        variant="secondary"
+        size="lg"
+        onClick={onReset}
+        className="w-full h-11"
+      >
+        重置
+      </Button>
     );
   }
 

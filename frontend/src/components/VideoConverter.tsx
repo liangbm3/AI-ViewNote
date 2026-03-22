@@ -28,7 +28,7 @@ export function VideoConverter() {
   const { logs, addLog, clearLogs, getLogColor } = useLog();
   const { selectedFile, dragActive, handleDrag, handleDrop, handleFileSelect, resetFile } = useFileUpload(addLog);
   const { outputFormats, toggleFormat, getSelectedFormats, getSelectedFormatsCount } = useOutputFormats();
-  const { conversionStatus, progress, startConversion, reset: resetConversion, downloadFile } = useConversion(addLog);
+  const { conversionStatus, progress, startConversion, reset: resetConversion } = useConversion(addLog);
   const { tasks, addTask, getStatusColor, getStatusText, getTaskById, refreshTasks } = useTasks();
 
   // 监听转换状态变化
@@ -38,26 +38,33 @@ export function VideoConverter() {
     }
   }, [conversionStatus]);
 
-  const handleStartConversion = () => {
+  const handleStartConversion = async () => {
     const selectedFormats = getSelectedFormats();
     if (selectedFile && selectedFormats.length > 0) {
-      setShowUploadInterface(true); // 确保显示上传界面
-      startConversion(selectedFile, selectedFormats);
+      // 显示上传界面，表示正在处理
+      setShowUploadInterface(true);
+      setSelectedTask(null); // 清除之前的选中任务
 
-      // 简单直接的方法：等待一段时间后选择最新任务
-      setTimeout(() => {
-        // 给后端足够时间创建任务并发送事件
-        console.log('开始查找最新任务，当前任务数量:', tasks.length);
-        if (tasks.length > 0) {
-          // 选择最新的任务（数组第一个）
-          const latestTask = tasks[0];
-          console.log('聚焦到任务:', latestTask.fileName, '状态:', latestTask.status);
-          setSelectedTask(latestTask);
-          setShowUploadInterface(false);
-        } else {
-          console.log('没有找到任务，可能创建失败');
-        }
-      }, 1500); // 1.5秒延迟，确保任务创建完成
+      // 调用转换并等待结果
+      const taskData = await startConversion(selectedFile, selectedFormats);
+
+      if (taskData) {
+        console.log('任务创建成功，任务数据:', taskData);
+
+        // 给后端一点时间更新任务列表，然后选择最新任务
+        setTimeout(() => {
+          if (tasks.length > 0) {
+            // 选择最新的任务（数组第一个）
+            const latestTask = tasks[0];
+            console.log('聚焦到任务:', latestTask.fileName, '状态:', latestTask.status);
+            setSelectedTask(latestTask);
+            setShowUploadInterface(false); // 跳转到进度页面
+          } else {
+            console.log('没有找到任务，可能创建失败');
+            // 如果没找到任务，保持上传界面显示以便用户重试
+          }
+        }, 500); // 给后端时间更新任务列表
+      }
     }
   };
 
@@ -135,6 +142,7 @@ export function VideoConverter() {
                   <ProgressSection
                     conversionStatus="converting"
                     progress={selectedTask.progress}
+                    selectedTask={selectedTask}
                   />
                 )
               ) : showUploadInterface ? (
@@ -158,13 +166,13 @@ export function VideoConverter() {
                   <ProgressSection
                     conversionStatus={conversionStatus}
                     progress={progress}
+                    selectedTask={selectedTask}
                   />
 
                   <ActionButtons
                     conversionStatus={conversionStatus}
                     selectedFile={selectedFile}
                     onStartConversion={handleStartConversion}
-                    onDownload={downloadFile}
                     onReset={handleReset}
                   />
                 </>

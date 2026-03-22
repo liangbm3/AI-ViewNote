@@ -1,14 +1,15 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Activity } from 'lucide-react';
-import { ConversionStatus } from '../types';
+import { ConversionStatus, Task } from '../types';
 
 interface ProgressSectionProps {
   conversionStatus: ConversionStatus;
   progress: number;
+  selectedTask?: Task | null;
 }
 
-export function ProgressSection({ conversionStatus, progress }: ProgressSectionProps) {
+export function ProgressSection({ conversionStatus, progress, selectedTask }: ProgressSectionProps) {
   return (
     <AnimatePresence>
       {conversionStatus !== 'idle' && (
@@ -25,14 +26,16 @@ export function ProgressSection({ conversionStatus, progress }: ProgressSectionP
           <div className="p-6">
             <div className="flex items-center justify-between mb-3">
               <span className="text-sm text-gray-700">
-                {conversionStatus === 'converting' ? '正在转换...' : '转换完成'}
+                {selectedTask ? getStatusText(selectedTask.status) : (conversionStatus === 'converting' ? '正在转换...' : '转换完成')}
               </span>
-              <span className="text-sm font-medium text-gray-900">{progress}%</span>
+              <span className="text-sm font-medium text-gray-900">
+                {selectedTask ? selectedTask.progress : progress}%
+              </span>
             </div>
             <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
               <motion.div
                 initial={{ width: 0 }}
-                animate={{ width: `${progress}%` }}
+                animate={{ width: `${selectedTask ? selectedTask.progress : progress}%` }}
                 transition={{ duration: 0.3 }}
                 className="h-full bg-gray-900 rounded-full"
               />
@@ -42,4 +45,13 @@ export function ProgressSection({ conversionStatus, progress }: ProgressSectionP
       )}
     </AnimatePresence>
   );
+}
+
+function getStatusText(status: Task['status']): string {
+  switch (status) {
+    case 'completed': return '转换完成';
+    case 'processing': return '正在转换...';
+    case 'error': return '转换失败';
+    default: return '等待中';
+  }
 }

@@ -23,6 +23,12 @@ export type Utterance = {
   text: string;
 };
 
+export type SelectedVideoFile = {
+  name: string;
+  size: number;
+  path: string;
+};
+
 export type LogEntry = {
   id: string;
   message: string;

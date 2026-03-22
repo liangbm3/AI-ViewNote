@@ -3,14 +3,15 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Upload, FileVideo, X, Film } from 'lucide-react';
 import { Button } from './ui/Button';
 import { formatFileSize } from '../utils/formatUtils';
+import { SelectedVideoFile } from '../types';
 
 interface UploadSectionProps {
-  selectedFile: File | null;
+  selectedFile: SelectedVideoFile | null;
   dragActive: boolean;
   conversionStatus: string;
   onDrag: (e: React.DragEvent) => void;
   onDrop: (e: React.DragEvent) => void;
-  onFileSelect: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  onFileSelect: () => void;
   onReset: () => void;
 }
 
@@ -38,6 +39,7 @@ export function UploadSection({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
+              onClick={onFileSelect}
               onDragEnter={onDrag}
               onDragLeave={onDrag}
               onDragOver={onDrag}
@@ -50,12 +52,6 @@ export function UploadSection({
                 }
               `}
             >
-              <input
-                type="file"
-                accept="video/*"
-                onChange={onFileSelect}
-                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-              />
               <div className="flex flex-col items-center text-center">
                 <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mb-4">
                   <Upload className="w-6 h-6 text-gray-400" strokeWidth={1.5} />
