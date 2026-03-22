@@ -8,7 +8,6 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
-	"log"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -274,7 +273,6 @@ func (s *TaskService) uploadAudioToTOS(audioPath string) (string, error) {
 	if err != nil {
 		return "", errors.New("Failed to upload audio file: " + err.Error())
 	}
-	log.Println("PutObjectV2 Request ID:", output.RequestID)
 
 	url, err := client.PreSignedURL(&tos.PreSignedURLInput{
 		HTTPMethod: enum.HttpMethodGet,
