@@ -51,19 +51,40 @@ export function VideoConverter() {
       if (taskData) {
         console.log('任务创建成功，任务数据:', taskData);
 
-        // 给后端一点时间更新任务列表，然后选择最新任务
-        setTimeout(() => {
-          if (tasks.length > 0) {
-            // 选择最新的任务（数组第一个）
-            const latestTask = tasks[0];
-            console.log('聚焦到任务:', latestTask.fileName, '状态:', latestTask.status);
-            setSelectedTask(latestTask);
+        // 使用返回的任务数据直接设置焦点，而不是依赖tasks数组的顺序
+        if (taskData.id) {
+          // 先刷新任务列表获取最新数据
+          console.log('刷新任务列表...');
+          const updatedTasks = await refreshTasks() || [];
+
+          // 尝试从刷新后的任务列表中找到匹配的任务
+          const matchedTask = updatedTasks.find(task => task.id === String(taskData.id));
+          if (matchedTask) {
+            console.log('聚焦到任务:', matchedTask.fileName, '状态:', matchedTask.status);
+            setSelectedTask(matchedTask);
             setShowUploadInterface(false); // 跳转到进度页面
           } else {
-            console.log('没有找到任务，可能创建失败');
-            // 如果没找到任务，保持上传界面显示以便用户重试
+            // 如果没有找到匹配的任务，等待一小段时间让任务列表更新
+            setTimeout(async () => {
+              // 再次刷新任务列表
+              const nextTasks = await refreshTasks() || [];
+              const updatedTask = nextTasks.find(task => task.id === String(taskData.id));
+              if (updatedTask) {
+                console.log('延迟聚焦到任务:', updatedTask.fileName, '状态:', updatedTask.status);
+                setSelectedTask(updatedTask);
+                setShowUploadInterface(false);
+              } else {
+                console.log('任务列表中未找到新创建的任务，ID:', taskData.id);
+                // 如果仍然找不到，回退到选择第一个任务（最新任务）
+                if (nextTasks.length > 0) {
+                  console.log('回退到选择最新任务:', nextTasks[0].fileName);
+                  setSelectedTask(nextTasks[0]);
+                  setShowUploadInterface(false);
+                }
+              }
+            }, 1000); // 给任务列表更新留出更多时间
           }
-        }, 500); // 给后端时间更新任务列表
+        }
       }
     }
   };

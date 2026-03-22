@@ -75,7 +75,7 @@ export function useTasks() {
   const applyBackendTasks = useCallback((resp: BackendResponse) => {
     if (!resp || !resp.success || !Array.isArray(resp.data)) {
       console.log('任务列表更新失败或数据无效');
-      return;
+      return [];
     }
 
     console.log('收到任务列表更新，任务数量:', resp.data.length);
@@ -97,6 +97,7 @@ export function useTasks() {
 
     console.log('更新任务列表，新任务数量:', mapped.length);
     setTasks(mapped);
+    return mapped;
   }, []);
 
   useEffect(() => {
@@ -163,12 +164,14 @@ export function useTasks() {
   }, [tasks]);
 
   const refreshTasks = useCallback(() => {
-    GetTaskList()
+    return GetTaskList()
       .then((resp: BackendResponse) => {
-        applyBackendTasks(resp);
+        return applyBackendTasks(resp);
       })
-      .catch(() => {
+      .catch((error) => {
+        console.log('刷新任务列表失败:', error);
         // 获取失败时保持当前列表
+        throw error; // 重新抛出错误以便调用者可以处理
       });
   }, [applyBackendTasks]);
 
