@@ -7,6 +7,32 @@
 import { Create as $Create } from "@wailsio/runtime";
 
 /**
+ * 配置项枚举
+ * @readonly
+ * @enum {string}
+ */
+export const ConfigKey = {
+    /**
+     * The Go zero value for the underlying type of the enum.
+     */
+    $zero: "",
+
+    StorageAccessKey: "StorageAccessKey",
+    StorageSecretKey: "StorageSecretKey",
+    StorageEndpoint: "StorageEndpoint",
+    StorageRegion: "StorageRegion",
+    StorageBucket: "StorageBucket",
+    AucAppID: "AucAppID",
+    AucAccessToken: "AucAccessToken",
+    AucClusterID: "AucClusterID",
+    LlmBaseURL: "LlmBaseURL",
+    LlmModelID: "LlmModelID",
+    LlmApiKey: "LlmApiKey",
+    RunInBackground: "RunInBackground",
+    DesktopNotifications: "DesktopNotifications",
+};
+
+/**
  * 响应结构体
  */
 export class Response {

@@ -40,7 +40,7 @@ export function GetAllConfigs() {
 }
 
 /**
- * @param {string} key
+ * @param {models$0.ConfigKey} key
  * @returns {$CancellablePromise<models$0.Response>}
  */
 export function GetConfig(key) {
