@@ -6,12 +6,13 @@ import { Events } from '@wailsio/runtime';
 type BackendTaskRecord = {
   id: number;
   title: string;
-  file_name: string;
-  content_style: string;
+  file_path: string;
+  style: string;
   created_at: string;
+  updated_at?: string;
   progress: number;
   markdown_content?: string;
-  transcription_text?: string;
+  transcription_text?: any[];
 };
 
 type BackendResponse = {
@@ -22,15 +23,19 @@ type BackendResponse = {
 
 function mapProgressToStatus(p: number): Task['status'] {
   switch (p) {
-    case 0:
+    case 0: // NotStarted
       return 'pending';
-    case 8:
-      return 'GeneratingStyleSuccess';
-    case 9:
-      return 'GeneratingStyleFailed';
-    case 4:
+    case 1: // ExtractingAudio
+    case 4: // ExtractingText
+    case 7: // GeneratingMarkdown
+      return 'processing';
+    case 2: // ExtractingAudioSuccess
+    case 5: // ExtractingTextSuccess
+    case 8: // GeneratingMarkdownSuccess
       return 'completed';
-    case 5:
+    case 3: // ExtractingAudioFailed
+    case 6: // ExtractingTextFailed
+    case 9: // GeneratingMarkdownFailed (如果存在)
       return 'error';
     default:
       return 'processing';
@@ -39,17 +44,25 @@ function mapProgressToStatus(p: number): Task['status'] {
 
 function mapProgressToPercent(p: number): number {
   switch (p) {
-    case 0:
+    case 0: // NotStarted
       return 0;
-    case 1:
+    case 1: // ExtractingAudio
       return 25;
-    case 2:
+    case 2: // ExtractingAudioSuccess
+      return 30;
+    case 3: // ExtractingAudioFailed
+      return 0;
+    case 4: // ExtractingText
       return 50;
-    case 3:
+    case 5: // ExtractingTextSuccess
       return 75;
-    case 4:
+    case 6: // ExtractingTextFailed
+      return 0;
+    case 7: // GeneratingMarkdown
+      return 85;
+    case 8: // GeneratingMarkdownSuccess
       return 100;
-    case 5:
+    case 9: // GeneratingMarkdownFailed (如果存在)
       return 0;
     default:
       return 0;
@@ -69,17 +82,17 @@ export function useTasks() {
 
     const mapped: Task[] = resp.data.map((t) => ({
       id: String(t.id),
-      fileName: t.file_name,
+      fileName: t.file_path ? t.file_path.split('/').pop() || t.file_path : 'Unknown',
       status: mapProgressToStatus(t.progress),
       progress: mapProgressToPercent(t.progress),
-      formats: t.content_style ? [t.content_style] : [],
+      formats: t.style ? [t.style] : [],
       timestamp: new Date(t.created_at).toLocaleTimeString('zh-CN', {
         hour: '2-digit',
         minute: '2-digit',
         hour12: false,
       }),
       markdownContent: t.markdown_content,
-      transcriptionText: t.transcription_text,
+      transcriptionText: t.transcription_text ? t.transcription_text : [],
     }));
 
     console.log('更新任务列表，新任务数量:', mapped.length);
@@ -96,9 +109,16 @@ export function useTasks() {
         // 获取失败时保持空列表
       });
 
-    // 监听后端任务列表更新事件（从 WailsEvent.data 中取出后端响应）
-    const off = Events.On('task_list_update', (event: any) => {
-      applyBackendTasks(event?.data as BackendResponse);
+    // 监听后端任务更新事件（从 WailsEvent.data 中取出后端响应）
+    const off = Events.On('task_update', (event: any) => {
+      // 任务更新时重新获取任务列表
+      GetTaskList()
+        .then((resp: BackendResponse) => {
+          applyBackendTasks(resp);
+        })
+        .catch(() => {
+          // 获取失败时保持当前列表
+        });
     });
 
     return () => {
@@ -125,8 +145,6 @@ export function useTasks() {
       case 'completed': return 'bg-green-100 text-green-700';
       case 'processing': return 'bg-blue-100 text-blue-700';
       case 'error': return 'bg-red-100 text-red-700';
-      case 'GeneratingStyleSuccess': return 'bg-green-100 text-green-700';
-      case 'GeneratingStyleFailed': return 'bg-red-100 text-red-700';
       default: return 'bg-gray-100 text-gray-700';
     }
   }, []);
@@ -136,8 +154,6 @@ export function useTasks() {
       case 'completed': return '已完成';
       case 'processing': return '处理中';
       case 'error': return '错误';
-      case 'GeneratingStyleSuccess': return '已完成';
-      case 'GeneratingStyleFailed': return '失败';
       default: return '等待中';
     }
   }, []);

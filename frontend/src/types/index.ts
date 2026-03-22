@@ -9,12 +9,18 @@ export type OutputFormat = {
 export type Task = {
   id: string;
   fileName: string;
-  status: 'pending' | 'processing' | 'completed' | 'error' | 'GeneratingStyleSuccess' | 'GeneratingStyleFailed';
+  status: 'pending' | 'processing' | 'completed' | 'error';
   progress: number;
   formats: string[];
   timestamp: string;
   markdownContent?: string;
-  transcriptionText?: string | any[];
+  transcriptionText?: Utterance[];
+};
+
+export type Utterance = {
+  start_time: number;
+  end_time: number;
+  text: string;
 };
 
 export type LogEntry = {

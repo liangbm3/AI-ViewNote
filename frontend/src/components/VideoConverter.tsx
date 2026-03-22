@@ -68,40 +68,15 @@ export function VideoConverter() {
   };
 
   // 解析字幕文本
-  const parseSubtitles = (transcriptionText?: string | any[]) => {
-    if (!transcriptionText) return [];
+  const parseSubtitles = (transcriptionText?: Utterance[]) => {
+    if (!transcriptionText || !Array.isArray(transcriptionText)) return [];
 
     try {
-      let parsed;
-
-      // 如果已经是对象/数组，直接使用
-      if (typeof transcriptionText === 'object') {
-        parsed = transcriptionText;
-      } else {
-        // 如果是字符串，尝试解析 JSON
-        parsed = JSON.parse(transcriptionText);
-      }
-
-      // 处理数组格式的字幕
-      if (Array.isArray(parsed)) {
-        return parsed.map(item => ({
-          start_time: item.start_time !== undefined ? item.start_time : (item.start || 0) * 1000,
-          text: item.text || ''
-        }));
-      }
-
-      // 处理单个对象格式的字幕
-      if (typeof parsed === 'object' && parsed !== null) {
-        // 如果是单个字幕对象，包装成数组
-        if (parsed.text) {
-          return [{
-            start_time: parsed.start_time !== undefined ? parsed.start_time : (parsed.start || 0) * 1000,
-            text: parsed.text
-          }];
-        }
-      }
-
-      return [];
+      // 转换后端返回的Utterance数组为前端需要的格式
+      return transcriptionText.map(item => ({
+        start_time: item.start_time || 0,
+        text: item.text || ''
+      }));
     } catch (error) {
       console.error('Failed to parse subtitles:', error, 'Raw data:', transcriptionText);
       return [];
@@ -138,12 +113,12 @@ export function VideoConverter() {
               {/* 根据状态显示不同界面 */}
               {selectedTask ? (
                 // 显示选中任务的内容
-                selectedTask.status === 'GeneratingStyleSuccess' ? (
+                selectedTask.status === 'completed' ? (
                   <ContentDisplay
                     imageTextContent={selectedTask.markdownContent}
                     subtitles={parseSubtitles(selectedTask.transcriptionText)}
                   />
-                ) : selectedTask.status === 'GeneratingStyleFailed' ? (
+                ) : selectedTask.status === 'error' ? (
                   <ErrorPrompt
                     task={selectedTask}
                     onRetry={() => {
