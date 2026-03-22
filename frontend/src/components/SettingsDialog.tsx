@@ -49,34 +49,38 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
 
   const loadSettings = async () => {
     try {
-      // Try to load the saved app_settings first
-      const response = await GetConfig('app_settings');
-      if (response.success && response.data) {
-        // response.data is an AppConfig object with key, value fields
-        const configData = response.data;
-        if (configData && configData.value) {
-          // The value field contains the JSON string of our settings
-          const settingsData = JSON.parse(configData.value);
-
-          // Apply loaded settings
-          setCloseAction(settingsData.closeAction || 'background');
-          setNotifications(settingsData.notifications !== undefined ? settingsData.notifications : true);
-          setLlmBaseUrl(settingsData.llmBaseUrl || '');
-          setLlmModelId(settingsData.llmModelId || '');
-          setLlmApiKey(settingsData.llmApiKey || '');
-          setAsrAppId(settingsData.asrAppId || '');
-          setAsrAccessToken(settingsData.asrAccessToken || '');
-          setAsrClusterId(settingsData.asrClusterId || '');
-          setOssEndpoint(settingsData.ossEndpoint || '');
-          setOssBucket(settingsData.ossBucket || '');
-          setOssRegion(settingsData.ossRegion || '');
-          setOssAccessKey(settingsData.ossAccessKey || '');
-          setOssSecretKey(settingsData.ossSecretKey || '');
-          setSmartScreenshot(settingsData.smartScreenshot !== undefined ? settingsData.smartScreenshot : true);
-          setCacheSize(settingsData.cacheSize || '1024');
-          setAutoUpdate(settingsData.autoUpdate !== undefined ? settingsData.autoUpdate : true);
+      // 分别加载每个配置项
+      const loadConfig = async (key: string, defaultValue: any = '') => {
+        try {
+          const response = await GetConfig(key);
+          if (response.success && response.data && response.data.value) {
+            return response.data.value;
+          }
+        } catch (error) {
+          console.warn(`Failed to load config ${key}:`, error);
         }
-      }
+        return defaultValue;
+      };
+
+      // 加载各个配置项
+      setCloseAction(await loadConfig('RunInBackground', 'background') === 'true' ? 'background' : 'close');
+      setNotifications(await loadConfig('DesktopNotifications', 'true') === 'true');
+      setLlmBaseUrl(await loadConfig('LlmBaseURL', ''));
+      setLlmModelId(await loadConfig('LlmModelID', ''));
+      setLlmApiKey(await loadConfig('LlmApiKey', ''));
+      setAsrAppId(await loadConfig('AucAppID', ''));
+      setAsrAccessToken(await loadConfig('AucAccessToken', ''));
+      setAsrClusterId(await loadConfig('AucClusterID', ''));
+      setOssEndpoint(await loadConfig('StorageEndpoint', ''));
+      setOssBucket(await loadConfig('StorageBucket', ''));
+      setOssRegion(await loadConfig('StorageRegion', ''));
+      setOssAccessKey(await loadConfig('StorageAccessKey', ''));
+      setOssSecretKey(await loadConfig('StorageSecretKey', ''));
+
+      // 对于高级设置，使用默认值（后端可能没有这些配置项）
+      setSmartScreenshot(true);
+      setCacheSize('1024');
+      setAutoUpdate(true);
     } catch (error) {
       console.error('Failed to load settings:', error);
       toast.error('加载设置失败');
@@ -93,32 +97,36 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   
   const handleSave = async () => {
     try {
-      // Save all settings to backend
-      const settings = {
-        closeAction,
-        notifications,
-        llmBaseUrl,
-        llmModelId,
-        llmApiKey,
-        asrAppId,
-        asrAccessToken,
-        asrClusterId,
-        ossEndpoint,
-        ossBucket,
-        ossRegion,
-        ossAccessKey,
-        ossSecretKey,
-        smartScreenshot,
-        cacheSize,
-        autoUpdate
-      };
+      // 分别保存每个配置项到后端
+      const saveOperations = [
+        { key: 'RunInBackground', value: closeAction === 'background' ? 'true' : 'false' },
+        { key: 'DesktopNotifications', value: notifications ? 'true' : 'false' },
+        { key: 'LlmBaseURL', value: llmBaseUrl },
+        { key: 'LlmModelID', value: llmModelId },
+        { key: 'LlmApiKey', value: llmApiKey },
+        { key: 'AucAppID', value: asrAppId },
+        { key: 'AucAccessToken', value: asrAccessToken },
+        { key: 'AucClusterID', value: asrClusterId },
+        { key: 'StorageEndpoint', value: ossEndpoint },
+        { key: 'StorageBucket', value: ossBucket },
+        { key: 'StorageRegion', value: ossRegion },
+        { key: 'StorageAccessKey', value: ossAccessKey },
+        { key: 'StorageSecretKey', value: ossSecretKey }
+      ];
 
-      const response = await SaveConfig('app_settings', JSON.stringify(settings));
-      if (response.success) {
+      // 执行所有保存操作
+      const results = await Promise.allSettled(
+        saveOperations.map(({ key, value }) => SaveConfig(key, value))
+      );
+
+      // 检查是否有失败的保存操作
+      const failedCount = results.filter(result => result.status === 'rejected').length;
+
+      if (failedCount === 0) {
         toast.success('设置已保存');
         onClose();
       } else {
-        toast.error('保存设置失败: ' + response.message);
+        toast.error(`保存设置失败: ${failedCount} 个配置项保存失败`);
       }
     } catch (error) {
       console.error('Failed to save settings:', error);
