@@ -31,12 +31,15 @@ export function VideoConverter() {
   const { conversionStatus, progress, startConversion, reset: resetConversion } = useConversion(addLog);
   const { tasks, addTask, getStatusColor, getStatusText, getTaskById, refreshTasks } = useTasks();
 
-  // 监听转换状态变化
+  // 监听任务列表的变化，如果当前正在展示某个选中的任务（比如进行中），那么要在 tasks 发生变化时同步更新它
   useEffect(() => {
-    if (conversionStatus === 'completed') {
-      setShowUploadInterface(false); // 转换完成后隐藏上传界面
+    if (selectedTask) {
+      const updatedTask = tasks.find(t => t.id === selectedTask.id);
+      if (updatedTask && (updatedTask.status !== selectedTask.status || updatedTask.progress !== selectedTask.progress)) {
+        setSelectedTask(updatedTask);
+      }
     }
-  }, [conversionStatus]);
+  }, [tasks, selectedTask]);
 
   const handleStartConversion = async () => {
     const selectedFormats = getSelectedFormats();
