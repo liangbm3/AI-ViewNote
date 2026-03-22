@@ -22,12 +22,21 @@ const (
 	GeneratingStyleFailed // 生成目标样式失败
 )
 
+// 内容风格枚举
+type ContentStyle string
+const (
+	NoteStyle ContentStyle = "note"
+	XiaohongshuStyle ContentStyle = "xiaohongshu"
+	WeChatStyle ContentStyle = "wechat"
+	summaryStyle ContentStyle = "summary"
+)
+
 // 任务定义
 type TaskRecord struct {
 	ID		  int    `json:"id"`
 	Title	 string `json:"title"`
 	FilePath  string `json:"file_path"`
-	ContentStyle string `json:"content_style"`
+	Style ContentStyle `json:"style"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 	Progress TaskProgress `json:"progress"`

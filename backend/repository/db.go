@@ -41,7 +41,7 @@ func InitDB(dbPath string) (*sql.DB, error) {
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			title TEXT NOT NULL,
 			file_path TEXT NOT NULL,
-			content_style TEXT NOT NULL,
+			style TEXT NOT NULL,
 			created_at TEXT NOT NULL,
 			updated_at TEXT NOT NULL,
 			progress INTEGER NOT NULL,

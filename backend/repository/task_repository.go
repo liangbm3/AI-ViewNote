@@ -22,9 +22,9 @@ func (r *TaskRepository) Create(task *models.TaskRecord) (int, error) {
 		return 0, err
 	}
 
-	query := `INSERT INTO tasks (title, file_path, content_style, created_at, updated_at, progress, 
+	query := `INSERT INTO tasks (title, file_path, style, created_at, updated_at, progress, 
 	transcription_text, markdown_content) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-	res, err := r.DB.Exec(query, task.Title, task.FilePath, task.ContentStyle, task.CreatedAt,
+	res, err := r.DB.Exec(query, task.Title, task.FilePath, task.Style, task.CreatedAt,
 		task.UpdatedAt, task.Progress, string(utterancesJSON), task.MarkdownContent)
 	if err != nil {
 		return 0, err
@@ -37,7 +37,7 @@ func (r *TaskRepository) Create(task *models.TaskRecord) (int, error) {
 }
 
 func (r *TaskRepository) GetAll() ([]*models.TaskRecord, error) {
-	query := `SELECT id, title, file_path, content_style, created_at, updated_at, 
+	query := `SELECT id, title, file_path, style, created_at, updated_at, 
 	progress, transcription_text, markdown_content FROM tasks ORDER BY created_at DESC`
 	rows, err := r.DB.Query(query)
 	if err != nil {
@@ -48,7 +48,7 @@ func (r *TaskRepository) GetAll() ([]*models.TaskRecord, error) {
 	for rows.Next() {
 		task := &models.TaskRecord{}
 		var utterancesJSON string
-		if err := rows.Scan(&task.ID, &task.Title, &task.FilePath, &task.ContentStyle, &task.CreatedAt,
+		if err := rows.Scan(&task.ID, &task.Title, &task.FilePath, &task.Style, &task.CreatedAt,
 			&task.UpdatedAt, &task.Progress, &utterancesJSON, &task.MarkdownContent); err != nil {
 			return nil, err
 		}
@@ -70,12 +70,12 @@ func (r *TaskRepository) GetAll() ([]*models.TaskRecord, error) {
 }
 
 func (r *TaskRepository) GetByID(id int) (*models.TaskRecord, error) {
-	query := `SELECT id, title, file_path, content_style, created_at, updated_at, 
+	query := `SELECT id, title, file_path, style, created_at, updated_at, 
 	progress, transcription_text, markdown_content FROM tasks WHERE id = ?`
 	row := r.DB.QueryRow(query, id)
 	task := &models.TaskRecord{}
 	var utterancesJSON string
-	if err := row.Scan(&task.ID, &task.Title, &task.FilePath, &task.ContentStyle, &task.CreatedAt,
+	if err := row.Scan(&task.ID, &task.Title, &task.FilePath, &task.Style, &task.CreatedAt,
 		&task.UpdatedAt, &task.Progress, &utterancesJSON, &task.MarkdownContent); err != nil {
 		return nil, err
 	}
@@ -100,9 +100,9 @@ func (r *TaskRepository) Update(task *models.TaskRecord) error {
 		return err
 	}
 
-	query := `UPDATE tasks SET title = ?, file_path = ?, content_style = ?, created_at = ?,
+	query := `UPDATE tasks SET title = ?, file_path = ?, style = ?, created_at = ?,
 	updated_at = ?, progress = ?, transcription_text = ?, markdown_content = ? WHERE id = ?`
-	_, err = r.DB.Exec(query, task.Title, task.FilePath, task.ContentStyle, task.CreatedAt,
+	_, err = r.DB.Exec(query, task.Title, task.FilePath, task.Style, task.CreatedAt,
 		task.UpdatedAt, task.Progress, string(utterancesJSON), task.MarkdownContent, task.ID)
 	if err != nil {
 		return err
