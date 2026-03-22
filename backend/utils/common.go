@@ -8,6 +8,7 @@ import (
 	"io"
 	"net"
 	"net/http"
+	"AI-ViewNote/backend/models"
 )
 
 func GenerateLocalUUID() string {
@@ -52,5 +53,13 @@ func PostJSON(url string, payload interface{}, token string) ([]byte, error) {
 		panic(err)
 	}
 	return respBody, nil
+}
+
+func UtterancesToText(utterances []models.Utterance) (string, error) {
+	jsonData, err := json.Marshal(utterances)
+	if err != nil {
+		return "", err
+	}
+	return string(jsonData), nil
 }
 

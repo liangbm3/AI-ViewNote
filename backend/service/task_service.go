@@ -14,6 +14,7 @@ import (
 	"path/filepath"
 	"strconv"
 	"time"
+	ark "github.com/sashabaranov/go-openai"
 )
 
 type submitResponse struct {
@@ -55,7 +56,7 @@ func (s *TaskService) NewTask(filePath string, contentStyle string) models.Respo
 
 	task := models.TaskRecord{
 		FilePath:     filePath,
-		ContentStyle: contentStyle,
+		Style:          models.ContentStyle(contentStyle),
 		CreatedAt:    time.Now().Format(time.RFC3339),
 		Progress:     models.NotStarted,
 	}
@@ -71,9 +72,7 @@ func (s *TaskService) NewTask(filePath string, contentStyle string) models.Respo
 	}
 
 	defer func() {
-		resp := s.GetTaskList()
-		s.event_emitter.Emit("task_list_update", resp)
-		go s.processTask(id)
+		go s.task(id)
 	}()
 	return successResponse("Task created successfully", new_task)
 }
@@ -94,7 +93,7 @@ func (s *TaskService) GetTaskByID(id int) models.Response {
 	return successResponse("Task retrieved successfully", task)
 }
 
-func (s *TaskService) processTask(taskID int) {
+func (s *TaskService) task(taskID int) {
 	task, err := s.task_repo.GetByID(taskID)
 	if err != nil {
 		s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelError,
@@ -102,35 +101,40 @@ func (s *TaskService) processTask(taskID int) {
 		return
 	}
 
-	// 提取视频音频
+	// 处理视频（提取音频）
 	s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelInfo,
 		Message: "Starting audio extraction for task ID " + strconv.Itoa(taskID)})
 	task.Progress = models.ExtractingAudio
 	err = s.task_repo.Update(task)
+	s.event_emitter.Emit("task_update", nil)// 触发前端更新
 	audioPath, err := s.extractAudioWithFFmpeg(task.FilePath)
 	if err != nil {
 		s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelError,
 			Message: "Audio extraction failed for task ID " + strconv.Itoa(taskID) + ": " + err.Error()})
 		task.Progress = models.ExtractingAudioFailed
 		s.task_repo.Update(task)
+		s.event_emitter.Emit("task_update", nil)// 触发前端更新
 		return
 	}
 	s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelInfo,
 		Message: "Audio extraction completed for task ID " + strconv.Itoa(taskID)})
 	task.Progress = models.ExtractingAudioSuccess
 	s.task_repo.Update(task)
+	s.event_emitter.Emit("task_update", nil)// 触发前端更新
 
 	// 处理音频（上传到TOS并调用ASR）
 	s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelInfo,
 		Message: "Starting audio processing for task ID " + strconv.Itoa(taskID)})
 	task.Progress = models.ExtractingText
 	s.task_repo.Update(task)
+	s.event_emitter.Emit("task_update", nil)// 触发前端更新
 	data, err := s.processAudio(audioPath)
 	if err != nil {
 		s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelError,
 			Message: "Audio processing failed for task ID " + strconv.Itoa(taskID) + ": " + err.Error()})
 		task.Progress = models.ExtractingTextFailed
 		s.task_repo.Update(task)
+		s.event_emitter.Emit("task_update", nil)// 触发前端更新
 		return
 	}
 	s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelInfo,
@@ -138,7 +142,30 @@ func (s *TaskService) processTask(taskID int) {
 	task.TranscriptionText = data
 	task.Progress = models.ExtractingTextSuccess
 	s.task_repo.Update(task)
+	s.event_emitter.Emit("task_update", nil)// 触发前端更新
 
+	// 生成Markdown内容
+	s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelInfo,
+		Message: "Starting markdown generation for task ID " + strconv.Itoa(taskID)})
+	task.Progress = models.GeneratingMarkdown
+	s.task_repo.Update(task)
+	s.event_emitter.Emit("task_update", nil)// 触发前端更新
+
+	markdown, err := s.generateMarkdown(data, task.Style)
+	if err != nil {
+		s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelError,
+			Message: "Markdown generation failed for task ID " + strconv.Itoa(taskID) + ": " + err.Error()})
+		task.Progress = models.GeneratingMarkdownFailed
+		s.task_repo.Update(task)
+		s.event_emitter.Emit("task_update", nil)// 触发前端更新
+		return
+	}
+	s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelInfo,
+		Message: "Markdown generation completed for task ID " + strconv.Itoa(taskID)})
+	task.MarkdownContent = markdown
+	task.Progress = models.GeneratingMarkdownSuccess
+	s.task_repo.Update(task)
+	s.event_emitter.Emit("task_update", nil)// 触发前端更新
 }
 
 // 提取音频
@@ -329,4 +356,65 @@ func (s *TaskService) queryAsr(taskID string) ([]models.Utterance, error) {
 	default:
 		return nil, errors.New("ASR task failed with message: " + queryResp.Resp.Message)
 	}
+}
+
+func (s* TaskService) generateMarkdown(data []models.Utterance,style models.ContentStyle) (string,error) {
+	text,err:= utils.UtterancesToText(data)
+	if err != nil {
+		return "", errors.New("Failed to convert utterances to text: " + err.Error())
+	}
+
+	LlmBaseURL,err:= s.config_repo.GetConfig(models.LlmBaseURL)
+	if err != nil {
+		return "", errors.New("Failed to get LlmBaseURL config: " + err.Error())
+	}
+	LlmModelID,err := s.config_repo.GetConfig(models.LlmModelID)
+	if err != nil {
+		return "", errors.New("Failed to get LlmModelID config: " + err.Error())
+	}
+	LlmApiKey,err := s.config_repo.GetConfig(models.LlmApiKey)
+	if err != nil {
+		return "", errors.New("Failed to get LlmApiKey config: " + err.Error())
+	}
+
+	config:=ark.DefaultConfig(LlmApiKey.Value)
+	config.BaseURL = LlmBaseURL.Value
+	client :=ark.NewClientWithConfig(config)
+
+	var content string
+	switch style{
+	case models.NoteStyle:
+		content=noteDefaultPrompt()
+	case models.XiaohongshuStyle:
+		content=xiaohongshuDefaultPrompt()
+	case models.WeChatStyle:
+		content=wechatDefaultPrompt()
+	case models.SummaryStyle:
+		content=summaryDefaultPrompt()
+	default:
+		return "", errors.New("Unsupported content style: " + string(style))
+	}
+
+	resp, err := client.CreateChatCompletion(
+		context.Background(),
+		ark.ChatCompletionRequest{
+			Model: LlmModelID.Value,
+			Messages: []ark.ChatCompletionMessage{
+				{
+					Role:    ark.ChatMessageRoleSystem,
+					Content: "你是人工智能助手，请按照用户的要求准确回答问题",
+				},
+				{
+					Role:    ark.ChatMessageRoleUser,
+					Content: content + "\n\n" + text,
+				},
+			},
+		},
+	)
+	if err != nil {
+		return "", errors.New("Failed to generate markdown content: " + err.Error())
+	}
+
+	// 这里只取第一个回答
+	return resp.Choices[0].Message.Content, nil
 }
