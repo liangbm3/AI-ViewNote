@@ -7,14 +7,17 @@ import (
 	"context"
 	"encoding/json"
 	"errors"
-	"github.com/volcengine/ve-tos-golang-sdk/v2/tos"
-	"github.com/volcengine/ve-tos-golang-sdk/v2/tos/enum"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
+
 	ark "github.com/sashabaranov/go-openai"
+	"github.com/volcengine/ve-tos-golang-sdk/v2/tos"
+	"github.com/volcengine/ve-tos-golang-sdk/v2/tos/enum"
 )
 
 type submitResponse struct {
@@ -55,10 +58,10 @@ func NewTaskService(repo *repository.TaskRepository, config_repo *repository.Con
 func (s *TaskService) NewTask(filePath string, contentStyle string) models.Response {
 
 	task := models.TaskRecord{
-		FilePath:     filePath,
-		Style:          models.ContentStyle(contentStyle),
-		CreatedAt:    time.Now().Format(time.RFC3339),
-		Progress:     models.NotStarted,
+		FilePath:  filePath,
+		Style:     models.ContentStyle(contentStyle),
+		CreatedAt: time.Now().Format(time.RFC3339),
+		Progress:  models.NotStarted,
 	}
 
 	id, err := s.task_repo.Create(&task)
@@ -101,40 +104,50 @@ func (s *TaskService) task(taskID int) {
 		return
 	}
 
+	// 创建临时目录
+	tempDir, err := os.MkdirTemp("", "AI-ViewNote-ffmpeg-")
+	if err != nil {
+		s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelError,
+			Message: "Failed to create temporary directory for task ID " + strconv.Itoa(taskID) + ": " + err.Error()})
+		return
+	}
+
+	audioPath := filepath.Join(tempDir, "output_audio.mp3")
+
 	// 处理视频（提取音频）
 	s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelInfo,
 		Message: "Starting audio extraction for task ID " + strconv.Itoa(taskID)})
 	task.Progress = models.ExtractingAudio
 	err = s.task_repo.Update(task)
-	s.event_emitter.Emit("task_update", nil)// 触发前端更新
-	audioPath, err := s.extractAudioWithFFmpeg(task.FilePath)
+	s.event_emitter.Emit("task_update", nil) // 触发前端更新
+	err = s.extractAudioWithFFmpeg(task.FilePath, audioPath)
 	if err != nil {
 		s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelError,
 			Message: "Audio extraction failed for task ID " + strconv.Itoa(taskID) + ": " + err.Error()})
 		task.Progress = models.ExtractingAudioFailed
 		s.task_repo.Update(task)
-		s.event_emitter.Emit("task_update", nil)// 触发前端更新
+		s.event_emitter.Emit("task_update", nil) // 触发前端更新
 		return
 	}
 	s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelInfo,
 		Message: "Audio extraction completed for task ID " + strconv.Itoa(taskID)})
 	task.Progress = models.ExtractingAudioSuccess
 	s.task_repo.Update(task)
-	s.event_emitter.Emit("task_update", nil)// 触发前端更新
+	s.event_emitter.Emit("task_update", nil) // 触发前端更新
 
 	// 处理音频（上传到TOS并调用ASR）
 	s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelInfo,
 		Message: "Starting audio processing for task ID " + strconv.Itoa(taskID)})
 	task.Progress = models.ExtractingText
 	s.task_repo.Update(task)
-	s.event_emitter.Emit("task_update", nil)// 触发前端更新
+	s.event_emitter.Emit("task_update", nil) // 触发前端更新
 	data, err := s.processAudio(audioPath)
 	if err != nil {
 		s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelError,
 			Message: "Audio processing failed for task ID " + strconv.Itoa(taskID) + ": " + err.Error()})
 		task.Progress = models.ExtractingTextFailed
 		s.task_repo.Update(task)
-		s.event_emitter.Emit("task_update", nil)// 触发前端更新
+		s.event_emitter.Emit("task_update", nil) // 触发前端更新
 		return
 	}
 	s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelInfo,
@@ -142,14 +155,14 @@ func (s *TaskService) task(taskID int) {
 	task.TranscriptionText = data
 	task.Progress = models.ExtractingTextSuccess
 	s.task_repo.Update(task)
-	s.event_emitter.Emit("task_update", nil)// 触发前端更新
+	s.event_emitter.Emit("task_update", nil) // 触发前端更新
 
 	// 生成Markdown内容
 	s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelInfo,
 		Message: "Starting markdown generation for task ID " + strconv.Itoa(taskID)})
 	task.Progress = models.GeneratingMarkdown
 	s.task_repo.Update(task)
-	s.event_emitter.Emit("task_update", nil)// 触发前端更新
+	s.event_emitter.Emit("task_update", nil) // 触发前端更新
 
 	markdown, err := s.generateMarkdown(data, task.Style)
 	if err != nil {
@@ -157,7 +170,7 @@ func (s *TaskService) task(taskID int) {
 			Message: "Markdown generation failed for task ID " + strconv.Itoa(taskID) + ": " + err.Error()})
 		task.Progress = models.GeneratingMarkdownFailed
 		s.task_repo.Update(task)
-		s.event_emitter.Emit("task_update", nil)// 触发前端更新
+		s.event_emitter.Emit("task_update", nil) // 触发前端更新
 		return
 	}
 	s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelInfo,
@@ -165,24 +178,31 @@ func (s *TaskService) task(taskID int) {
 	task.MarkdownContent = markdown
 	task.Progress = models.GeneratingMarkdownSuccess
 	s.task_repo.Update(task)
-	s.event_emitter.Emit("task_update", nil)// 触发前端更新
+	s.event_emitter.Emit("task_update", nil) // 触发前端更新
 }
 
 // 提取音频
-func (s *TaskService) extractAudioWithFFmpeg(videoPath string) (string, error) {
+func (s *TaskService) extractAudioWithFFmpeg(videoPath string, audioPath string) error {
+	cleanedPath := strings.TrimSpace(videoPath)
+	if cleanedPath == "" {
+		return errors.New("video path is empty")
+	}
+	if !filepath.IsAbs(cleanedPath) {
+		return fmt.Errorf("invalid video path: expected absolute path but got %q", cleanedPath)
+	}
+	if _, err := os.Stat(cleanedPath); err != nil {
+		return fmt.Errorf("video file not found: %s (%w)", cleanedPath, err)
+	}
+
 	ffmpegPath := utils.GetFFmpegPath()
 	if ffmpegPath == "" {
-		return "", errors.New("FFmpeg path not configured")
+		return errors.New("FFmpeg path not configured")
 	}
-
-	tempDir, err := os.MkdirTemp("", "AI-ViewNote-ffmpeg-")
+	err := utils.ExtractAudioWithFFmpeg(cleanedPath, audioPath)
 	if err != nil {
-		return "", errors.New("Failed to create temp directory: " + err.Error())
+		return err
 	}
-
-	outputFile := filepath.Join(tempDir, "output_audio.mp3")
-	utils.ExtractAudioWithFFmpeg(videoPath, outputFile)
-	return outputFile, nil
+	return nil
 }
 
 func (s *TaskService) processAudio(audioPath string) ([]models.Utterance, error) {
@@ -358,39 +378,39 @@ func (s *TaskService) queryAsr(taskID string) ([]models.Utterance, error) {
 	}
 }
 
-func (s* TaskService) generateMarkdown(data []models.Utterance,style models.ContentStyle) (string,error) {
-	text,err:= utils.UtterancesToText(data)
+func (s *TaskService) generateMarkdown(data []models.Utterance, style models.ContentStyle) (string, error) {
+	text, err := utils.UtterancesToText(data)
 	if err != nil {
 		return "", errors.New("Failed to convert utterances to text: " + err.Error())
 	}
 
-	LlmBaseURL,err:= s.config_repo.GetConfig(models.LlmBaseURL)
+	LlmBaseURL, err := s.config_repo.GetConfig(models.LlmBaseURL)
 	if err != nil {
 		return "", errors.New("Failed to get LlmBaseURL config: " + err.Error())
 	}
-	LlmModelID,err := s.config_repo.GetConfig(models.LlmModelID)
+	LlmModelID, err := s.config_repo.GetConfig(models.LlmModelID)
 	if err != nil {
 		return "", errors.New("Failed to get LlmModelID config: " + err.Error())
 	}
-	LlmApiKey,err := s.config_repo.GetConfig(models.LlmApiKey)
+	LlmApiKey, err := s.config_repo.GetConfig(models.LlmApiKey)
 	if err != nil {
 		return "", errors.New("Failed to get LlmApiKey config: " + err.Error())
 	}
 
-	config:=ark.DefaultConfig(LlmApiKey.Value)
+	config := ark.DefaultConfig(LlmApiKey.Value)
 	config.BaseURL = LlmBaseURL.Value
-	client :=ark.NewClientWithConfig(config)
+	client := ark.NewClientWithConfig(config)
 
 	var content string
-	switch style{
+	switch style {
 	case models.NoteStyle:
-		content=noteDefaultPrompt()
+		content = noteDefaultPrompt()
 	case models.XiaohongshuStyle:
-		content=xiaohongshuDefaultPrompt()
+		content = xiaohongshuDefaultPrompt()
 	case models.WeChatStyle:
-		content=wechatDefaultPrompt()
+		content = wechatDefaultPrompt()
 	case models.SummaryStyle:
-		content=summaryDefaultPrompt()
+		content = summaryDefaultPrompt()
 	default:
 		return "", errors.New("Unsupported content style: " + string(style))
 	}
