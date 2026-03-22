@@ -16,7 +16,7 @@ func NewConfigService(repo *repository.ConfigRepository) *ConfigService {
 }
 
 func (s *ConfigService) GetConfig(key string) models.Response {
-	config, err := s.config_repo.GetConfig(key)
+	config, err := s.config_repo.GetConfig(findConfigKey(key))
 	if err != nil {
 		return errorResponse("Failed to get config: " + err.Error())
 	}
@@ -24,7 +24,7 @@ func (s *ConfigService) GetConfig(key string) models.Response {
 }
 
 func (s *ConfigService) SaveConfig(key string, value string) models.Response {
-	err := s.config_repo.SaveConfig(key, value)
+	err := s.config_repo.SaveConfig(findConfigKey(key), value)
 	if err != nil {
 		return errorResponse("Failed to save config: " + err.Error())
 	}
@@ -32,7 +32,7 @@ func (s *ConfigService) SaveConfig(key string, value string) models.Response {
 }
 
 func (s *ConfigService) DeleteConfig(key string) models.Response {
-	err := s.config_repo.DeleteConfig(key)
+	err := s.config_repo.DeleteConfig(findConfigKey(key))
 	if err != nil {
 		return errorResponse("Failed to delete config: " + err.Error())
 	}
@@ -48,9 +48,42 @@ func (s *ConfigService) GetAllConfigs() models.Response {
 }
 
 func (s *ConfigService) ConfigExists(key string) models.Response{
-	_, err := s.config_repo.GetConfig(key)
+	_, err := s.config_repo.GetConfig(findConfigKey(key))
 	if err != nil {
 		return errorResponse("Failed to check config existence: " + err.Error())
 	}
 	return successResponse("Config exists", nil)
+}
+
+func findConfigKey(key string) models.ConfigKey {
+	switch key {
+	case string(models.StorageAccessKey):
+		return models.StorageAccessKey
+	case string(models.StorageSecretKey):
+		return models.StorageSecretKey
+	case string(models.StorageEndpoint):
+		return models.StorageEndpoint
+	case string(models.StorageRegion):
+		return models.StorageRegion
+	case string(models.StorageBucket):
+		return models.StorageBucket
+	case string(models.AucAppID):
+		return models.AucAppID
+	case string(models.AucAccessToken):
+		return models.AucAccessToken
+	case string(models.AucClusterID):
+		return models.AucClusterID
+	case string(models.LlmBaseURL):
+		return models.LlmBaseURL
+	case string(models.LlmModelID):
+		return models.LlmModelID
+	case string(models.LlmApiKey):
+		return models.LlmApiKey
+	case string(models.RunInBackground):
+		return models.RunInBackground
+	case string(models.DesktopNotifications):
+		return models.DesktopNotifications
+	default:
+		return ""
+	}
 }

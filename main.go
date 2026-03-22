@@ -40,9 +40,9 @@ func main() {
 	wailsEmitter := &WailsEventEmitter{}
 
 	taskRepo := repository.NewTaskRepository(db)
-	taskService := service.NewTaskService(taskRepo, wailsEmitter)
-
 	confRepo := repository.NewConfigRepository(db)
+
+	taskService := service.NewTaskService(taskRepo,confRepo, wailsEmitter)
 	confService := service.NewConfigService(confRepo)
 
 	// 确保默认配置项存在
