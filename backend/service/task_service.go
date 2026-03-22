@@ -174,9 +174,6 @@ func (s *TaskService) processAudio(audioPath string) ([]models.Utterance, error)
 			return nil, err
 		}
 		if utterances != nil {
-			if err != nil {
-				return nil, errors.New("Failed to update task with ASR results: " + err.Error())
-			}
 			return utterances, nil
 		}
 		// ASR 任务仍在进行中，等待一段时间后继续查询
