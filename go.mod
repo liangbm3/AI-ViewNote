@@ -3,7 +3,6 @@ module AI-ViewNote
 go 1.25
 
 require (
-	github.com/volcengine/ve-tos-golang-sdk v0.2.2
 	github.com/volcengine/ve-tos-golang-sdk/v2 v2.9.1
 	github.com/wailsapp/wails/v3 v3.0.0-alpha.74
 	modernc.org/sqlite v1.44.3
