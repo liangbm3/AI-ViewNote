@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">
-<svg width="100%" height="100%" viewBox="0 0 583 533" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xml:space="preserve" xmlns:serif="http://www.serif.com/" style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
-    <g transform="matrix(1,0,0,1,-246,-251)">
-        <g id="Ebene1">
-            <path d="M246,251L265,784L401,784L506,450L507,450L505,784L641,784L829,251L682,251L596,567L595,567L596,251L478,251L378,568L391,251L246,251Z"/>
-        </g>
-    </g>
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1024" height="1024" rx="160" fill="#FFFFFF"/>
+  <rect x="150" y="150" width="624" height="700" rx="88" stroke="#34475A" stroke-width="24"/>
+  <text x="250" y="315" fill="#34475A" font-family="Arial, Helvetica, sans-serif" font-size="180" font-weight="700">AI</text>
+  <rect x="234" y="432" width="420" height="18" rx="9" fill="#34475A"/>
+  <rect x="234" y="524" width="420" height="18" rx="9" fill="#34475A"/>
+  <rect x="234" y="616" width="420" height="18" rx="9" fill="#34475A"/>
+  <rect x="234" y="708" width="420" height="18" rx="9" fill="#34475A"/>
+  <rect x="408" y="336" width="424" height="304" rx="72" fill="#34475A" stroke="#F7F7F7" stroke-width="18"/>
+  <path d="M546 438C538.2 433.5 528 439.1 528 448V550C528 558.9 538.2 564.5 546 560L634 509C641.8 504.5 641.8 493.5 634 489L546 438Z" fill="#F7F7F7"/>
 </svg>
