@@ -1,6 +1,11 @@
 package models
 
-import "encoding/json"
+// 字幕定义
+type Utterance struct {
+	StartTime int    `json:"start_time"`
+	EndTime   int    `json:"end_time"`
+	Text      string `json:"text"`
+}
 
 // 任务进度枚举
 type TaskProgress int
@@ -21,18 +26,54 @@ const (
 type TaskRecord struct {
 	ID		  int    `json:"id"`
 	Title	 string `json:"title"`
-	FileName  string `json:"file_name"`
+	FilePath  string `json:"file_path"`
 	ContentStyle string `json:"content_style"`
 	CreatedAt string `json:"created_at"`
 	UpdatedAt string `json:"updated_at"`
 	Progress TaskProgress `json:"progress"`
-	TranscriptionText json.RawMessage `json:"transcription_text"` 
+	TranscriptionText []Utterance `json:"transcription_text"` 
 	MarkdownContent string `json:"markdown_content"` 
 }
 
+// 配置项枚举
+type ConfigKey string
+const (
+	StorageAccessKey ConfigKey = "StorageAccessKey"
+	StorageSecretKey ConfigKey = "StorageSecretKey"
+	StorageEndpoint ConfigKey = "StorageEndpoint"
+	StorageRegion ConfigKey = "StorageRegion"
+	StorageBucket ConfigKey = "StorageBucket"
+	AucAppID ConfigKey = "AucAppID"
+	AucAccessToken ConfigKey = "AucAccessToken"
+	AucClusterID ConfigKey = "AucClusterID"
+	LlmBaseURL ConfigKey = "LlmBaseURL"
+	LlmModelID ConfigKey = "LlmModelID"
+	LlmApiKey ConfigKey = "LlmApiKey"
+	RunInBackground ConfigKey = "RunInBackground"
+	DesktopNotifications ConfigKey = "DesktopNotifications"
+)
+
 type AppConfig struct {
 	ID int `json:"id"`
-	Key string `json:"key"`
+	Key ConfigKey `json:"key"`
 	Value string `json:"value"`
 	UpdateAt string `json:"updated_at"`
+}
+
+// 日志级别枚举
+type LogLevel string
+const (
+	LogLevelInfo LogLevel = "info"
+	LogLevelWarning LogLevel = "warning"
+	LogLevelError LogLevel = "error"
+)
+
+// 日志消息定义
+type LogMessage struct {
+	Level LogLevel `json:"level"`
+	Message string `json:"message"`
+}
+
+// 任务更新消息定义
+type TaskUpdateMessage struct {
 }
