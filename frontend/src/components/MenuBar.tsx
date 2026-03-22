@@ -1,5 +1,4 @@
-import React from 'react';
-import { Settings, HelpCircle, FileVideo } from 'lucide-react';
+import { Settings, HelpCircle } from 'lucide-react';
 import { Button } from './ui/Button';
 
 interface MenuBarProps {
@@ -10,9 +9,7 @@ export function MenuBar({ onOpenSettings }: MenuBarProps) {
   return (
     <div className="h-14 bg-white border-b border-gray-200 flex items-center px-4 gap-6">
       <div className="flex items-center gap-2">
-        <div className="w-8 h-8 bg-gray-900 rounded-lg flex items-center justify-center">
-          <FileVideo className="w-4 h-4 text-white" strokeWidth={2} />
-        </div>
+        <img src="/appicon.png" alt="AI ViewNote" className="w-8 h-8 object-contain shrink-0" />
         <span className="font-semibold text-gray-900">视频转文档</span>
       </div>
 
