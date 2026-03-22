@@ -50,7 +50,7 @@ func main() {
 	taskRepo := repository.NewTaskRepository(db)
 	confRepo := repository.NewConfigRepository(db)
 
-	taskService := service.NewTaskService(taskRepo,confRepo, wailsEmitter)
+	taskService := service.NewTaskService(taskRepo, confRepo, wailsEmitter)
 	confService := service.NewConfigService(confRepo)
 
 	// 确保默认配置项存在
@@ -79,7 +79,7 @@ func main() {
 	})
 
 	mainWindow := app.Window.NewWithOptions(application.WebviewWindowOptions{
-		Title: "Window 1",
+		Title: "AI-ViewNote - AI Powered Video Note Taking",
 		Mac: application.MacWindow{
 			InvisibleTitleBarHeight: 50,
 			Backdrop:                application.MacBackdropTranslucent,
@@ -87,6 +87,10 @@ func main() {
 		},
 		BackgroundColour: application.NewRGB(27, 38, 54),
 		URL:              "/",
+		Width:            1200,
+		Height:           800,
+		MinWidth:        800,
+		MinHeight:       600,
 	})
 
 	// 托盘模式下拦截关闭按钮，改为隐藏窗口。
