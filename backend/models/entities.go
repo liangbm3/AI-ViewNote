@@ -17,9 +17,9 @@ const (
 	ExtractingText // 提取文本中
 	ExtractingTextSuccess // 提取文本成功
 	ExtractingTextFailed // 提取文本失败
-	GeneratingStyle // 生成目标样式中
-	GeneratingStyleSuccess // 生成目标样式成功
-	GeneratingStyleFailed // 生成目标样式失败
+	GeneratingMarkdown // 生成Markdown中
+	GeneratingMarkdownSuccess // 生成Markdown成功
+	GeneratingMarkdownFailed // 生成Markdown失败
 )
 
 // 内容风格枚举
