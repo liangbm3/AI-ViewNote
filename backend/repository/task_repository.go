@@ -3,6 +3,7 @@ package repository
 import (
 	"AI-ViewNote/backend/models"
 	"database/sql"
+	"encoding/json"
 )
 
 type TaskRepository struct {
@@ -16,10 +17,15 @@ func NewTaskRepository(db *sql.DB) *TaskRepository {
 }
 
 func (r *TaskRepository) Create(task *models.TaskRecord) (int, error) {
-	query := `INSERT INTO tasks (title, file_name, content_style, created_at, updated_at, progress, 
+	utterancesJSON, err := json.Marshal(task.TranscriptionText)
+	if err != nil {
+		return 0, err
+	}
+
+	query := `INSERT INTO tasks (title, file_path, content_style, created_at, updated_at, progress, 
 	transcription_text, markdown_content) VALUES (?, ?, ?, ?, ?, ?, ?, ?)`
-	res, err := r.DB.Exec(query, task.Title, task.FileName, task.ContentStyle, task.CreatedAt,
-		task.UpdatedAt, task.Progress, task.TranscriptionText, task.MarkdownContent)
+	res, err := r.DB.Exec(query, task.Title, task.FilePath, task.ContentStyle, task.CreatedAt,
+		task.UpdatedAt, task.Progress, string(utterancesJSON), task.MarkdownContent)
 	if err != nil {
 		return 0, err
 	}
@@ -31,7 +37,7 @@ func (r *TaskRepository) Create(task *models.TaskRecord) (int, error) {
 }
 
 func (r *TaskRepository) GetAll() ([]*models.TaskRecord, error) {
-	query := `SELECT id, title, file_name, content_style, created_at, updated_at, 
+	query := `SELECT id, title, file_path, content_style, created_at, updated_at, 
 	progress, transcription_text, markdown_content FROM tasks ORDER BY created_at DESC`
 	rows, err := r.DB.Query(query)
 	if err != nil {
@@ -41,17 +47,19 @@ func (r *TaskRepository) GetAll() ([]*models.TaskRecord, error) {
 	var tasks []*models.TaskRecord
 	for rows.Next() {
 		task := &models.TaskRecord{}
-		var transcriptionText sql.NullString
-		var markdownContent sql.NullString
-		if err := rows.Scan(&task.ID, &task.Title, &task.FileName, &task.ContentStyle, &task.CreatedAt,
-			&task.UpdatedAt, &task.Progress, &transcriptionText, &markdownContent); err != nil {
+		var utterancesJSON string
+		if err := rows.Scan(&task.ID, &task.Title, &task.FilePath, &task.ContentStyle, &task.CreatedAt,
+			&task.UpdatedAt, &task.Progress, &utterancesJSON, &task.MarkdownContent); err != nil {
 			return nil, err
 		}
-		if transcriptionText.Valid {
-			task.TranscriptionText = []byte(transcriptionText.String)
+		if err != nil {
+			return nil, err
 		}
-		if markdownContent.Valid {
-			task.MarkdownContent = markdownContent.String
+		if utterancesJSON != "" {
+			err = json.Unmarshal([]byte(utterancesJSON), &task.TranscriptionText)
+			if err != nil {
+				return nil, err
+			}
 		}
 		tasks = append(tasks, task)
 	}
@@ -61,40 +69,21 @@ func (r *TaskRepository) GetAll() ([]*models.TaskRecord, error) {
 	return tasks, nil
 }
 
-func (r *TaskRepository) UpdateProgress(id int, progress models.TaskProgress) error {
-	query := `UPDATE tasks SET progress = ? WHERE id = ?`
-	_, err := r.DB.Exec(query, progress, id)
-	return err
-}
-
-func (r *TaskRepository) UpdateTranscriptionText(id int, text string) error {
-	query := `UPDATE tasks SET transcription_text = ?, updated_at = datetime('now') WHERE id = ?`
-	_, err := r.DB.Exec(query, text, id)
-	return err
-}
-
-func (r *TaskRepository) UpdateMarkdownContent(id int, content string) error {
-	query := `UPDATE tasks SET markdown_content = ?, updated_at = datetime('now') WHERE id = ?`
-	_, err := r.DB.Exec(query, content, id)
-	return err
-}
-
 func (r *TaskRepository) GetByID(id int) (*models.TaskRecord, error) {
-	query := `SELECT id, title, file_name, content_style, created_at, updated_at, 
+	query := `SELECT id, title, file_path, content_style, created_at, updated_at, 
 	progress, transcription_text, markdown_content FROM tasks WHERE id = ?`
 	row := r.DB.QueryRow(query, id)
 	task := &models.TaskRecord{}
-	var transcriptionText sql.NullString
-	var markdownContent sql.NullString
-	if err := row.Scan(&task.ID, &task.Title, &task.FileName, &task.ContentStyle, &task.CreatedAt,
-		&task.UpdatedAt, &task.Progress, &transcriptionText, &markdownContent); err != nil {
+	var utterancesJSON string
+	if err := row.Scan(&task.ID, &task.Title, &task.FilePath, &task.ContentStyle, &task.CreatedAt,
+		&task.UpdatedAt, &task.Progress, &utterancesJSON, &task.MarkdownContent); err != nil {
 		return nil, err
 	}
-	if transcriptionText.Valid {
-		task.TranscriptionText = []byte(transcriptionText.String)
-	}
-	if markdownContent.Valid {
-		task.MarkdownContent = markdownContent.String
+	if utterancesJSON != "" {
+		err := json.Unmarshal([]byte(utterancesJSON), &task.TranscriptionText)
+		if err != nil {
+			return nil, err
+		}
 	}
 	return task, nil
 }
@@ -103,4 +92,20 @@ func (r *TaskRepository) DeleteByID(id int) error {
 	query := `DELETE FROM tasks WHERE id = ?`
 	_, err := r.DB.Exec(query, id)
 	return err
+}
+
+func (r *TaskRepository) Update(task *models.TaskRecord) error {
+	utterancesJSON, err := json.Marshal(task.TranscriptionText)
+	if err != nil {
+		return err
+	}
+
+	query := `UPDATE tasks SET title = ?, file_path = ?, content_style = ?, created_at = ?,
+	updated_at = ?, progress = ?, transcription_text = ?, markdown_content = ? WHERE id = ?`
+	_, err = r.DB.Exec(query, task.Title, task.FilePath, task.ContentStyle, task.CreatedAt,
+		task.UpdatedAt, task.Progress, string(utterancesJSON), task.MarkdownContent, task.ID)
+	if err != nil {
+		return err
+	}
+	return nil
 }

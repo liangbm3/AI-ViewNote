@@ -40,7 +40,7 @@ func InitDB(dbPath string) (*sql.DB, error) {
 	createTasksTable := `CREATE TABLE IF NOT EXISTS tasks (
 			id INTEGER PRIMARY KEY AUTOINCREMENT,
 			title TEXT NOT NULL,
-			file_name TEXT NOT NULL,
+			file_path TEXT NOT NULL,
 			content_style TEXT NOT NULL,
 			created_at TEXT NOT NULL,
 			updated_at TEXT NOT NULL,

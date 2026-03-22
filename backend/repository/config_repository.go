@@ -15,7 +15,7 @@ func NewConfigRepository(db *sql.DB) *ConfigRepository {
 	}
 }
 
-func (r *ConfigRepository) GetConfig(key string) (models.AppConfig, error) {
+func (r *ConfigRepository) GetConfig(key models.ConfigKey) (models.AppConfig, error) {
 	query := `SELECT id, key, value, updated_at FROM configs WHERE key = ?`
 	row := r.DB.QueryRow(query, key)
 	config := &models.AppConfig{}
@@ -28,7 +28,7 @@ func (r *ConfigRepository) GetConfig(key string) (models.AppConfig, error) {
 	return *config, nil
 }
 
-func (r *ConfigRepository) SaveConfig(key string, value string) error {
+func (r *ConfigRepository) SaveConfig(key models.ConfigKey, value string) error {
 	// 先检查是否存在
 	existingConfig, err := r.GetConfig(key)
 	if err != nil {
@@ -46,7 +46,7 @@ func (r *ConfigRepository) SaveConfig(key string, value string) error {
 	return err
 }
 
-func (r *ConfigRepository) DeleteConfig(key string) error {
+func (r *ConfigRepository) DeleteConfig(key models.ConfigKey) error {
 	query := `DELETE FROM configs WHERE key = ?`
 	_, err := r.DB.Exec(query, key)
 	return err
