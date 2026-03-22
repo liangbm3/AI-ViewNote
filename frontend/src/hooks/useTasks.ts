@@ -82,7 +82,7 @@ export function useTasks() {
 
     const mapped: Task[] = resp.data.map((t) => ({
       id: String(t.id),
-      fileName: t.file_path ? t.file_path.split('/').pop() || t.file_path : 'Unknown',
+      fileName: t.file_path ? t.file_path.split(/[/\\]/).pop() || t.file_path : 'Unknown',
       status: mapProgressToStatus(t.progress),
       progress: mapProgressToPercent(t.progress),
       formats: t.style ? [t.style] : [],
