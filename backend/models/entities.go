@@ -28,7 +28,7 @@ const (
 	NoteStyle ContentStyle = "note"
 	XiaohongshuStyle ContentStyle = "xiaohongshu"
 	WeChatStyle ContentStyle = "wechat"
-	summaryStyle ContentStyle = "summary"
+	SummaryStyle ContentStyle = "summary"
 )
 
 // 任务定义
