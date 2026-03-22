@@ -23,14 +23,7 @@ export function useConversion(addLog: (message: string, type?: LogEntry['type'])
     const primaryFormat = selectedFormats[0];
     const fileWithPath = selectedFile as File & { path?: string };
     const filePath = (fileWithPath as any).path || selectedFile.name;
-    // 映射前端格式ID到后端内容风格枚举值
-    const formatToStyleMap: { [key: string]: string } = {
-      'knowledge': 'note',
-      'xiaohongshu': 'xiaohongshu',
-      'mp': 'wechat',
-      'summary': 'summary'
-    };
-    const contentStyle = formatToStyleMap[primaryFormat.id] || 'note';
+    const contentStyle = primaryFormat.id;
 
     addLog(`开始转换: ${selectedFile.name}`, 'info');
     addLog(`输出格式: ${primaryFormat.extension.toUpperCase()}`, 'info');
