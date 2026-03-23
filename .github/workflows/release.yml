@@ -34,7 +34,7 @@ jobs:
         uses: actions/setup-go@v5
         with:
           # 对齐项目的 Go 版本要求。
-          go-version: '1.20.x'
+          go-version: '1.26.x'
 
       - name: Set up Node
         uses: actions/setup-node@v4
@@ -49,7 +49,7 @@ jobs:
         # Wails 在 Linux 上需要 GTK/WebKit 的开发依赖。
         run: |
           sudo apt-get update
-          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.0-dev
+          sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
 
       - name: Install NSIS
         if: runner.os == 'Windows'
