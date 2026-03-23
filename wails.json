@@ -17,5 +17,5 @@
   "platform": "darwin/arm64,darwin/amd64,linux/amd64,windows/amd64",
   "version": "0.1.0",
   "wailsjsdir": "frontend/src",
-  "website": "https://liangbm3.site"
+  "website": "https://github.com/liangbm3/AI-ViewNote"
 }
