@@ -533,15 +533,24 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                       </div>
 
                       <div className="space-y-3 pt-6 border-t border-gray-200">
-                        <button className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-between">
+                        <button
+                          onClick={() => window.open('https://github.com/liangbm3/AI-ViewNote/releases/', '_blank')}
+                          className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-between"
+                        >
                           <span>检查更新</span>
                           <ChevronRight className="w-4 h-4 text-gray-400" strokeWidth={1.5} />
                         </button>
-                        <button className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-between">
+                        <button
+                          onClick={() => window.open('https://github.com/liangbm3/AI-ViewNote/blob/main/TERMS.md', '_blank')}
+                          className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-between"
+                        >
                           <span>用户协议</span>
                           <ChevronRight className="w-4 h-4 text-gray-400" strokeWidth={1.5} />
                         </button>
-                        <button className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-between">
+                        <button
+                          onClick={() => window.open('https://github.com/liangbm3/AI-ViewNote/blob/main/PRIVACY.md', '_blank')}
+                          className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-between"
+                        >
                           <span>隐私政策</span>
                           <ChevronRight className="w-4 h-4 text-gray-400" strokeWidth={1.5} />
                         </button>
