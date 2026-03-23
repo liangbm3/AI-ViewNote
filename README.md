@@ -72,7 +72,7 @@ AI-ViewNote 兼容任何支持 OpenAI 接口的大模型服务。以下以火山
 
    ![存储桶信息](./docs/images/image-6.png)
 
-4. Region 设置：如果地域节点是北京，则 Region 填写"北京"，其他地域同理
+4. Region 设置：如果地域节点是北京，则 Region 填写 `cn-beijing`，其他地域同理
 
 5. 进入 [IAM 控制台](https://console.volcengine.com/iam/keymanage)，新建密钥获取 Access Key 和 Secret Key
 
