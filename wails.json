@@ -1,24 +1,21 @@
 {
-  "name": "AI-ViewNote",
+  "apptype": "rich",
   "assetdir": "frontend/dist",
-  "frontend:install": "npm install",
+  "author": "bemon",
+  "build:mode": "production",
+  "copyright": "(c) 2026, AI-ViewNote",
+  "description": "AI powered video note taking application",
+  "email": "3095088766@qq.com",
   "frontend:build": "npm run build",
   "frontend:dev": "npm run dev",
   "frontend:devwatch": "npm run dev",
-  "wailsjsdir": "frontend/src",
-  "apptype": "rich",
-  "outputfilename": "AI-ViewNote",
-  "outputdir": ".",
-  "build:mode": "production",
-  "platform": "darwin/arm64,darwin/amd64,linux/amd64,windows/amd64",
-  "version": "0.0.1",
-  "description": "A demo of using raw HTML & CSS",
-  "author": "bemon",
-  "email": "",
-  "copyright": "",
-  "website": "",
+  "frontend:install": "npm install",
   "icon": "",
-  "bind": [
-    "main.GreetService"
-  ]
+  "name": "AI-ViewNote",
+  "outputdir": ".",
+  "outputfilename": "AI-ViewNote",
+  "platform": "darwin/arm64,darwin/amd64,linux/amd64,windows/amd64",
+  "version": "0.1.0",
+  "wailsjsdir": "frontend/src",
+  "website": "https://liangbm3.site"
 }

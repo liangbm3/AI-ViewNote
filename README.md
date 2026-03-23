@@ -1,5 +1,7 @@
 ﻿# AI-ViewNote
 
+AI powered video note taking application.
+
 AI-ViewNote 是一款基于 Wails v3 构建的现代化桌面应用程序。它集成了本地音视频处理、云端语音识别（ASR）以及大语言模型（LLM）能力，能够帮助用户一键将视频或音频内容转化为结构化的文字笔记和各种风格笔记。
 
 ##  功能特性

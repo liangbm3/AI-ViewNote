@@ -30,10 +30,16 @@ func main() {
 	if err := updateNfpm(filepath.Join(root, "build", "linux", "nfpm", "nfpm-with-ffmpeg.yaml"), version); err != nil {
 		exitWithError(err)
 	}
+	if err := updateDesktopEntry(filepath.Join(root, "build", "linux", "desktop"), version); err != nil {
+		exitWithError(err)
+	}
 	if err := updateBuildConfig(filepath.Join(root, "build", "config.yml"), version); err != nil {
 		exitWithError(err)
 	}
 	if err := updatePackageJSON(filepath.Join(root, "frontend", "package.json"), version); err != nil {
+		exitWithError(err)
+	}
+	if err := updateWailsJSON(filepath.Join(root, "wails.json"), version); err != nil {
 		exitWithError(err)
 	}
 
@@ -153,6 +159,36 @@ func updateNfpm(path, version string) error {
 	return os.WriteFile(path, []byte(output), 0o644)
 }
 
+func updateDesktopEntry(path, version string) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+
+	var lines []string
+	scanner := bufio.NewScanner(strings.NewReader(string(data)))
+	replaced := false
+
+	for scanner.Scan() {
+		line := scanner.Text()
+		trimmed := strings.TrimSpace(line)
+		if !replaced && !strings.HasPrefix(trimmed, "#") && strings.HasPrefix(trimmed, "Version=") {
+			line = "Version=" + version
+			replaced = true
+		}
+		lines = append(lines, line)
+	}
+	if err := scanner.Err(); err != nil {
+		return err
+	}
+	if !replaced {
+		return errors.New("desktop Version field not found")
+	}
+
+	output := strings.Join(lines, "\n") + "\n"
+	return os.WriteFile(path, []byte(output), 0o644)
+}
+
 func updateBuildConfig(path, version string) error {
 	data, err := os.ReadFile(path)
 	if err != nil {
@@ -233,6 +269,31 @@ func updatePackageJSON(path, version string) error {
 
 	output := strings.Join(lines, "\n") + "\n"
 	return os.WriteFile(path, []byte(output), 0o644)
+}
+
+func updateWailsJSON(path, version string) error {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return err
+	}
+
+	var config map[string]any
+	if err := json.Unmarshal(data, &config); err != nil {
+		return err
+	}
+
+	if _, ok := config["version"]; !ok {
+		return errors.New("wails.json version not found")
+	}
+	config["version"] = version
+
+	updated, err := json.MarshalIndent(config, "", "  ")
+	if err != nil {
+		return err
+	}
+	updated = append(updated, '\n')
+
+	return os.WriteFile(path, updated, 0o644)
 }
 
 func isTopLevelKey(line string) bool {

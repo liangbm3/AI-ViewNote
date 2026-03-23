@@ -8,27 +8,27 @@
         AllowPromptForPassword="false">
     </Settings>
     <Installer
-        Path="ai-viewnote.exe"
+        Path="AI-ViewNote.exe"
         Arguments=""
-        InstallLocation="C:\Program Files\My Company\My Product">
+        InstallLocation="C:\Program Files\AI-ViewNote\AI-ViewNote">
     </Installer>
     <PackageInformation
-        PackageName="My Product"
-        PackageDisplayName="My Product"
-        PublisherName="CN=My Company"
-        PublisherDisplayName="My Company"
+        PackageName="AI-ViewNote"
+        PackageDisplayName="AI-ViewNote"
+        PublisherName="CN=AI-ViewNote"
+        PublisherDisplayName="AI-ViewNote"
         Version="0.1.0.0"
-        PackageDescription="A AI-ViewNote application">
+        PackageDescription="AI powered video note taking application">
         <Capabilities>
             <Capability Name="runFullTrust" />
             
         </Capabilities>
         <Applications>
             <Application
-                Id="com.example.aiviewnote"
-                Description="A AI-ViewNote application"
-                DisplayName="My Product"
-                ExecutableName="ai-viewnote.exe"
+                Id="com.aiviewnote.aiviewnote"
+                Description="AI powered video note taking application"
+                DisplayName="AI-ViewNote"
+                ExecutableName="AI-ViewNote.exe"
                 EntryPoint="Windows.FullTrustApplication">
                 
             </Application>
@@ -41,13 +41,13 @@
         </Dependencies>
         <Properties>
             <Framework>false</Framework>
-            <DisplayName>My Product</DisplayName>
-            <PublisherDisplayName>My Company</PublisherDisplayName>
-            <Description>A AI-ViewNote application</Description>
+            <DisplayName>AI-ViewNote</DisplayName>
+            <PublisherDisplayName>AI-ViewNote</PublisherDisplayName>
+            <Description>AI powered video note taking application</Description>
             <Logo>Assets\AppIcon.png</Logo>
         </Properties>
     </PackageInformation>
-    <SaveLocation PackagePath="ai-viewnote.msix" />
+    <SaveLocation PackagePath="AI-ViewNote.msix" />
     <PackageIntegrity>
         <CertificatePath></CertificatePath>
     </PackageIntegrity>

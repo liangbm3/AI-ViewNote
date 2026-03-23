@@ -1,13 +1,13 @@
 [Desktop Entry]
-Version=1.0
-Name=My Product
-Comment=A AI-ViewNote application
+Version=0.1.0
+Name=AI-ViewNote
+Comment=AI powered video note taking application
 # The Exec line includes %u to pass the URL to the application
-Exec=/usr/local/bin/ai-viewnote.exe %u
+Exec=/usr/local/bin/AI-ViewNote %u
 Terminal=false
 Type=Application
-Icon=ai-viewnote.exe
+Icon=AI-ViewNote
 Categories=Utility;
-StartupWMClass=ai-viewnote.exe
+StartupWMClass=AI-ViewNote
 
  

@@ -59,7 +59,7 @@ func main() {
 
 	app := application.New(application.Options{
 		Name:        "AI-ViewNote",
-		Description: "A demo of using raw HTML & CSS",
+		Description: "AI powered video note taking application",
 		Services: []application.Service{
 			application.NewService(taskService),
 			application.NewService(confService),
@@ -89,8 +89,8 @@ func main() {
 		URL:              "/",
 		Width:            1200,
 		Height:           800,
-		MinWidth:        800,
-		MinHeight:       600,
+		MinWidth:         800,
+		MinHeight:        600,
 	})
 
 	// 托盘模式下拦截关闭按钮，改为隐藏窗口。

@@ -3,16 +3,16 @@
 #
 # The lines below are called `modelines`. See `:help modeline`
 
-name: "ai-viewnote"
+name: "AI-ViewNote"
 arch: ${GOARCH}
 platform: "linux"
 version: "0.1.0"
 section: "default"
 priority: "extra"
 maintainer: ${GIT_COMMITTER_NAME} <${GIT_COMMITTER_EMAIL}>
-description: "A AI-ViewNote application"
-vendor: "My Company"
-homepage: "https://wails.io"
+description: "AI powered video note taking application"
+vendor: "AI-ViewNote"
+homepage: "https://liangbm3.site"
 license: "MIT"
 release: "1"
 
