@@ -97,7 +97,10 @@ export function useTasks() {
       status: mapProgressToStatus(t.progress),
       progress: mapProgressToPercent(t.progress),
       formats: t.style ? [mapFormatToChinese(t.style)] : [],
-      timestamp: new Date(t.created_at).toLocaleTimeString('zh-CN', {
+      timestamp: new Date(t.created_at).toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
         hour: '2-digit',
         minute: '2-digit',
         hour12: false,
@@ -147,7 +150,14 @@ export function useTasks() {
       status: 'pending',
       progress: 0,
       formats: formats.map(format => mapFormatToChinese(format)),
-      timestamp: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false }),
+      timestamp: new Date().toLocaleString('zh-CN', {
+        year: 'numeric',
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }),
     };
     setTasks(prev => [newTask, ...prev]);
   }, []);
