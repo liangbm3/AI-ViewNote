@@ -120,6 +120,11 @@ tasks:
     cmds:
       - cp "{{.APP_BINARY}}" "{{.APP_NAME}}"
       - cp ../../appicon.png "{{.APP_NAME}}.png"
+      - |
+        if [ -f "../../../bin/ffmpeg" ]; then
+          cp "../../../bin/ffmpeg" "./ffmpeg"
+          chmod +x "./ffmpeg"
+        fi
       - wails3 generate appimage -binary "{{.APP_NAME}}" -icon {{.ICON}} -desktopfile {{.DESKTOP_FILE}} -outputdir {{.OUTPUT_DIR}} -builddir {{.ROOT_DIR}}/build/linux/appimage/build
     vars:
       APP_NAME: '{{.APP_NAME}}'
@@ -155,17 +160,23 @@ tasks:
   generate:deb:
     summary: Creates a deb package
     cmds:
-      - wails3 tool package -name "{{.APP_NAME}}" -format deb -config ./build/linux/nfpm/nfpm.yaml -out {{.ROOT_DIR}}/bin
+      - wails3 tool package -name "{{.APP_NAME}}" -format deb -config {{.NFPM_CONFIG}} -out {{.ROOT_DIR}}/bin
+    vars:
+      NFPM_CONFIG: '{{.NFPM_CONFIG | default "./build/linux/nfpm/nfpm.yaml"}}'
 
   generate:rpm:
     summary: Creates a rpm package
     cmds:
-      - wails3 tool package -name "{{.APP_NAME}}" -format rpm -config ./build/linux/nfpm/nfpm.yaml -out {{.ROOT_DIR}}/bin
+      - wails3 tool package -name "{{.APP_NAME}}" -format rpm -config {{.NFPM_CONFIG}} -out {{.ROOT_DIR}}/bin
+    vars:
+      NFPM_CONFIG: '{{.NFPM_CONFIG | default "./build/linux/nfpm/nfpm.yaml"}}'
 
   generate:aur:
     summary: Creates a arch linux packager package
     cmds:
-      - wails3 tool package -name "{{.APP_NAME}}" -format archlinux -config ./build/linux/nfpm/nfpm.yaml -out {{.ROOT_DIR}}/bin
+      - wails3 tool package -name "{{.APP_NAME}}" -format archlinux -config {{.NFPM_CONFIG}} -out {{.ROOT_DIR}}/bin
+    vars:
+      NFPM_CONFIG: '{{.NFPM_CONFIG | default "./build/linux/nfpm/nfpm.yaml"}}'
 
   generate:dotdesktop:
     summary: Generates a `.desktop` file

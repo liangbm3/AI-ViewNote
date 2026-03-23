@@ -88,6 +88,9 @@ Section
     
     !insertmacro wails.files
 
+    IfFileExists "..\..\..\bin\ffmpeg.exe" 0 +2
+    File "/oname=ffmpeg.exe" "..\..\..\bin\ffmpeg.exe"
+
     CreateShortcut "$SMPROGRAMS\${INFO_PRODUCTNAME}.lnk" "$INSTDIR\${PRODUCT_EXECUTABLE}"
     CreateShortCut "$DESKTOP\${INFO_PRODUCTNAME}.lnk" "$INSTDIR\${PRODUCT_EXECUTABLE}"
 

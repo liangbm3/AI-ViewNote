@@ -109,6 +109,29 @@ tasks:
     cmds:
       - wails3 generate icons -input appicon.png -macfilename darwin/icons.icns -windowsfilename windows/icon.ico -iconcomposerinput appicon.icon -macassetdir darwin
 
+  bundle:ffmpeg:copy:
+    summary: Copies platform FFmpeg into bin for bundling
+    cmds:
+      - cmd: powershell Copy-Item -Force "{{.BIN_DIR}}\\{{.FFMPEG_SRC}}" "{{.BIN_DIR}}\\{{.FFMPEG_DST}}"
+        platforms: [windows]
+      - cmd: cp -f "{{.BIN_DIR}}/{{.FFMPEG_SRC}}" "{{.BIN_DIR}}/{{.FFMPEG_DST}}"
+        platforms: [linux, darwin]
+      - cmd: chmod +x "{{.BIN_DIR}}/{{.FFMPEG_DST}}"
+        platforms: [linux, darwin]
+    vars:
+      FFMPEG_SRC: '{{if eq OS "windows"}}ffmpeg-windows-{{.ARCH | default ARCH}}.exe{{else}}ffmpeg-{{OS}}-{{.ARCH | default ARCH}}{{end}}'
+      FFMPEG_DST: '{{if eq OS "windows"}}ffmpeg.exe{{else}}ffmpeg{{end}}'
+
+  bundle:ffmpeg:clean:
+    summary: Removes bundled FFmpeg from bin
+    cmds:
+      - cmd: powershell Remove-Item -Force "{{.BIN_DIR}}\\{{.FFMPEG_DST}}" -ErrorAction SilentlyContinue
+        platforms: [windows]
+      - cmd: rm -f "{{.BIN_DIR}}/{{.FFMPEG_DST}}"
+        platforms: [linux, darwin]
+    vars:
+      FFMPEG_DST: '{{if eq OS "windows"}}ffmpeg.exe{{else}}ffmpeg{{end}}'
+
   dev:frontend:
     summary: Runs the frontend in development mode
     dir: frontend

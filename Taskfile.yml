@@ -24,6 +24,23 @@ tasks:
     cmds:
       - task: "{{OS}}:package"
 
+  package:no-ffmpeg:
+    summary: Packages without bundled FFmpeg
+    cmds:
+      - task: "{{OS}}:package"
+
+  package:with-ffmpeg:
+    summary: Packages with bundled FFmpeg
+    cmds:
+      - task: common:bundle:ffmpeg:copy
+        vars:
+          ARCH: '{{.ARCH}}'
+      - task: "{{OS}}:package"
+        vars:
+          ARCH: '{{.ARCH}}'
+          NFPM_CONFIG: '{{.NFPM_CONFIG}}'
+      - task: common:bundle:ffmpeg:clean
+
   run:
     summary: Runs the application
     cmds:

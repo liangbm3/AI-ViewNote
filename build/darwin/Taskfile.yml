@@ -147,6 +147,10 @@ tasks:
           cp build/darwin/Assets.car "{{.BIN_DIR}}/{{.APP_NAME}}.app/Contents/Resources"
         fi
       - cp "{{.BIN_DIR}}/{{.APP_NAME}}" "{{.BIN_DIR}}/{{.APP_NAME}}.app/Contents/MacOS"
+      - |
+        if [ -f "{{.BIN_DIR}}/ffmpeg" ]; then
+          cp "{{.BIN_DIR}}/ffmpeg" "{{.BIN_DIR}}/{{.APP_NAME}}.app/Contents/MacOS/ffmpeg"
+        fi
       - cp build/darwin/Info.plist "{{.BIN_DIR}}/{{.APP_NAME}}.app/Contents"
       - task: '{{if eq OS "darwin"}}codesign:adhoc{{else}}codesign:skip{{end}}'
 
