@@ -19,6 +19,13 @@ import packageJson from '../../package.json';
 export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   const [activeCategory, setActiveCategory] = useState<SettingsCategory>('general');
 
+  // 如果当前选中的是高级设置，自动切换到通用设置
+  useEffect(() => {
+    if (activeCategory === 'advanced') {
+      setActiveCategory('general');
+    }
+  }, [activeCategory]);
+
   // General Settings
   const [closeAction, setCloseAction] = useState<'background' | 'close'>('background');
   const [notifications, setNotifications] = useState(true);
@@ -189,7 +196,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                 </div>
 
                 <nav className="flex-1 space-y-1">
-                  {categories.map((category) => {
+                  {categories.filter(cat => cat.id !== 'advanced').map((category) => {
                     const Icon = category.icon;
                     return (
                       <button
