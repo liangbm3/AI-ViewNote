@@ -50,6 +50,7 @@ export function ErrorPrompt({ task, onRetry, onBack }: ErrorPromptProps) {
           </div>
 
           <div className="flex gap-3 justify-center">
+            {/* 重试按钮暂时隐藏
             {onRetry && (
               <Button
                 variant="primary"
@@ -60,7 +61,7 @@ export function ErrorPrompt({ task, onRetry, onBack }: ErrorPromptProps) {
                 <RotateCcw className="w-4 h-4" />
                 重试
               </Button>
-            )}
+            )} */}
             {onBack && (
               <Button
                 variant="secondary"
