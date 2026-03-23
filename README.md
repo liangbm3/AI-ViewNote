@@ -1,59 +1,60 @@
-# Welcome to Your New Wails3 Project!
+﻿# AI-ViewNote
 
-Congratulations on generating your Wails3 application! This README will guide you through the next steps to get your project up and running.
+AI-ViewNote 是一款基于 Wails v3 构建的现代化桌面应用程序。它集成了本地音视频处理、云端语音识别（ASR）以及大语言模型（LLM）能力，能够帮助用户一键将视频或音频内容转化为结构化的文字笔记和各种风格笔记。
 
-## Getting Started
+##  功能特性
 
-1. Navigate to your project directory in the terminal.
+-  **本地音视频处理**：集成了 FFmpeg，支持音视频格式的快速转换与音频提取。
+-  **语音转写提取**：结合火山引擎（Volcengine）等云服务，实现高精度的语音到文本（Speech-to-Text）转换。
+-  **AI 智能笔记**：通过标准的 OpenAI 接口（支持多种大模型），快速对转写文本进行深加工，生成核心摘要、结构化大纲和总结笔记。
+-  **现代化桌面 UI**：前端采用 React + TypeScript + Vite + Tailwind CSS / Radix UI 构建，提供流畅美观的本地用户体验。
 
-2. To run your application in development mode, use the following command:
+##  技术栈选型
 
-   ```
-   wails3 dev
-   ```
+- **桌面端框架**：[Wails v3](https://v3.wails.io/)
+- **后端 (Backend)**：Go
+- **前端 (Frontend)**：React, TypeScript, Vite, Tailwind CSS, Radix UI 组件库
+- **核心依赖包**：
+  - github.com/sashabaranov/go-openai：用于对话和提取笔记过程的 AI 交互。
+  - github.com/volcengine/ve-tos-golang-sdk/v2：用于对接火山引擎的对象存储与相关云服务。
+  - 内部集成的 FFmpeg 库用于本地音视频剪辑及抽取音频。
 
-   This will start your application and enable hot-reloading for both frontend and backend changes.
+##  环境要求
 
-3. To build your application for production, use:
+开发本项目前，您的开发环境需要具备以下要求：
 
-   ```
-   wails3 build
-   ```
+- [Go](https://go.dev/) 1.20 或更高版本
+- [Node.js](https://nodejs.org/) & npm (用于安装前端依赖)
+- [Wails v3 CLI](https://v3.wails.io/) 命令行工具包
+- [FFmpeg](https://ffmpeg.org/)（应用执行音视频转换相关功能需要系统或内置存在可用依赖）
 
-   This will create a production-ready executable in the `build` directory.
+##  快速开始
 
-## Exploring Wails3 Features
+### 1. 克隆代码至本地
 
-Now that you have your project set up, it's time to explore the features that Wails3 offers:
+`sh
+git clone https://github.com/your-repo/AI-ViewNote.git
+cd AI-ViewNote
+`
 
-1. **Check out the examples**: The best way to learn is by example. Visit the `examples` directory in the `v3/examples` directory to see various sample applications.
+### 2. 启动开发环境
 
-2. **Run an example**: To run any of the examples, navigate to the example's directory and use:
+通过执行以下命令即可启动热重载开发服务器（将同时启动前、后端服务）：
 
-   ```
-   go run .
-   ```
+`sh
+wails3 dev
+`
 
-   Note: Some examples may be under development during the alpha phase.
+### 3. 构建发布版本
 
-3. **Explore the documentation**: Visit the [Wails3 documentation](https://v3.wails.io/) for in-depth guides and API references.
+执行以下命令将代码打包为对应操作系统（当前平台）的独立可执行程序：
 
-4. **Join the community**: Have questions or want to share your progress? Join the [Wails Discord](https://discord.gg/JDdSxwjhGf) or visit the [Wails discussions on GitHub](https://github.com/wailsapp/wails/discussions).
+`sh
+wails3 build
+`
 
-## Project Structure
+编译产物将生成在您的工程结构目录下。
 
-Take a moment to familiarize yourself with your project structure:
+##  开源协议
 
-- `frontend/`: Contains your frontend code (HTML, CSS, JavaScript/TypeScript)
-- `main.go`: The entry point of your Go backend
-- `app.go`: Define your application structure and methods here
-- `wails.json`: Configuration file for your Wails project
-
-## Next Steps
-
-1. Modify the frontend in the `frontend/` directory to create your desired UI.
-2. Add backend functionality in `main.go`.
-3. Use `wails3 dev` to see your changes in real-time.
-4. When ready, build your application with `wails3 build`.
-
-Happy coding with Wails3! If you encounter any issues or have questions, don't hesitate to consult the documentation or reach out to the Wails community.
+本项目基于 [MIT License](LICENSE) 协议发布。
