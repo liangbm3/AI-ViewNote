@@ -75,3 +75,8 @@ tasks:
     summary: Builds and runs the Docker image
     cmds:
       - task: common:run:docker
+
+  sync:version:
+    summary: Syncs VERSION to platform configs
+    cmds:
+      - go run ./build/scripts/sync_version.go

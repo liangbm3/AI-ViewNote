@@ -70,6 +70,11 @@ jobs:
           go install github.com/go-task/task/v3/cmd/task@latest
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
 
+      - name: Sync version
+        shell: bash
+        run: |
+          task sync:version
+
       - name: Build packages (no ffmpeg)
         shell: bash
         # 产出依赖系统 FFmpeg 的版本。
