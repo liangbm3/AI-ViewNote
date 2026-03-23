@@ -1,4 +1,4 @@
-import { Settings, HelpCircle } from 'lucide-react';
+import { Settings, Github } from 'lucide-react';
 import { Button } from './ui/Button';
 
 interface MenuBarProps {
@@ -20,8 +20,11 @@ export function MenuBar({ onOpenSettings }: MenuBarProps) {
         >
           <Settings className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
         </button>
-        <button className="w-8 h-8 hover:bg-gray-100 rounded-lg flex items-center justify-center transition-colors">
-          <HelpCircle className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
+        <button
+          onClick={() => window.open('https://github.com/liangbm3/AI-ViewNote', '_blank')}
+          className="w-8 h-8 hover:bg-gray-100 rounded-lg flex items-center justify-center transition-colors"
+        >
+          <Github className="w-4 h-4 text-gray-600" strokeWidth={1.5} />
         </button>
       </div>
     </div>
