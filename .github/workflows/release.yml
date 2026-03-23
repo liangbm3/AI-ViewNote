@@ -77,6 +77,24 @@ jobs:
         run: |
           task sync:version
 
+      - name: Resolve package version
+        shell: bash
+        # 优先使用发布 tag，其次回退到 VERSION 文件。
+        run: |
+          if [ "${GITHUB_EVENT_NAME}" = "release" ] && [ -n "${GITHUB_REF_NAME}" ]; then
+            raw="${GITHUB_REF_NAME}"
+          elif [ "${GITHUB_REF_TYPE}" = "tag" ] && [ -n "${GITHUB_REF_NAME}" ]; then
+            raw="${GITHUB_REF_NAME}"
+          elif [ -f "VERSION" ]; then
+            raw="$(tr -d ' \n\r' < VERSION)"
+          else
+            raw="dev-${GITHUB_SHA::7}"
+          fi
+
+          version="${raw#v}"
+          echo "PACKAGE_VERSION=${version}" >> "$GITHUB_ENV"
+          echo "Resolved package version: ${version}"
+
       - name: Build packages (no ffmpeg)
         shell: bash
         # 产出依赖系统 FFmpeg 的版本。
@@ -89,42 +107,43 @@ jobs:
         run: |
           mkdir -p dist
           shopt -s nullglob
+          version="${PACKAGE_VERSION}"
           suffix="no-ffmpeg"
           if [ "$RUNNER_OS" = "Windows" ]; then
             if [ -f "bin/AI-ViewNote.exe" ]; then
-              cp "bin/AI-ViewNote.exe" "dist/AI-ViewNote-$suffix.exe"
+              cp "bin/AI-ViewNote.exe" "dist/AI-ViewNote-${version}-$suffix.exe"
             fi
             for f in bin/AI-ViewNote-*-installer.exe; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.exe}-$suffix.exe"
+              cp "$f" "dist/${base%.exe}-${version}-$suffix.exe"
             done
             for f in bin/*.msix; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.msix}-$suffix.msix"
+              cp "$f" "dist/${base%.msix}-${version}-$suffix.msix"
             done
           elif [ "$RUNNER_OS" = "macOS" ]; then
             if [ -d "bin/AI-ViewNote.app" ]; then
-              ditto -c -k --sequesterRsrc --keepParent "bin/AI-ViewNote.app" "dist/AI-ViewNote-macos-$suffix.app.zip"
+              ditto -c -k --sequesterRsrc --keepParent "bin/AI-ViewNote.app" "dist/AI-ViewNote-macos-${version}-$suffix.app.zip"
             fi
           else
             if [ -f "bin/AI-ViewNote" ]; then
-              cp "bin/AI-ViewNote" "dist/AI-ViewNote-$suffix"
+              cp "bin/AI-ViewNote" "dist/AI-ViewNote-${version}-$suffix"
             fi
             for f in bin/*.AppImage; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.AppImage}-$suffix.AppImage"
+              cp "$f" "dist/${base%.AppImage}-${version}-$suffix.AppImage"
             done
             for f in bin/*.deb; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.deb}-$suffix.deb"
+              cp "$f" "dist/${base%.deb}-${version}-$suffix.deb"
             done
             for f in bin/*.rpm; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.rpm}-$suffix.rpm"
+              cp "$f" "dist/${base%.rpm}-${version}-$suffix.rpm"
             done
             for f in bin/*.pkg.tar.zst; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.pkg.tar.zst}-$suffix.pkg.tar.zst"
+              cp "$f" "dist/${base%.pkg.tar.zst}-${version}-$suffix.pkg.tar.zst"
             done
           fi
 
@@ -157,42 +176,43 @@ jobs:
         run: |
           mkdir -p dist
           shopt -s nullglob
+          version="${PACKAGE_VERSION}"
           suffix="ffmpeg"
           if [ "$RUNNER_OS" = "Windows" ]; then
             if [ -f "bin/AI-ViewNote.exe" ]; then
-              cp "bin/AI-ViewNote.exe" "dist/AI-ViewNote-$suffix.exe"
+              cp "bin/AI-ViewNote.exe" "dist/AI-ViewNote-${version}-$suffix.exe"
             fi
             for f in bin/AI-ViewNote-*-installer.exe; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.exe}-$suffix.exe"
+              cp "$f" "dist/${base%.exe}-${version}-$suffix.exe"
             done
             for f in bin/*.msix; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.msix}-$suffix.msix"
+              cp "$f" "dist/${base%.msix}-${version}-$suffix.msix"
             done
           elif [ "$RUNNER_OS" = "macOS" ]; then
             if [ -d "bin/AI-ViewNote.app" ]; then
-              ditto -c -k --sequesterRsrc --keepParent "bin/AI-ViewNote.app" "dist/AI-ViewNote-macos-$suffix.app.zip"
+              ditto -c -k --sequesterRsrc --keepParent "bin/AI-ViewNote.app" "dist/AI-ViewNote-macos-${version}-$suffix.app.zip"
             fi
           else
             if [ -f "bin/AI-ViewNote" ]; then
-              cp "bin/AI-ViewNote" "dist/AI-ViewNote-$suffix"
+              cp "bin/AI-ViewNote" "dist/AI-ViewNote-${version}-$suffix"
             fi
             for f in bin/*.AppImage; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.AppImage}-$suffix.AppImage"
+              cp "$f" "dist/${base%.AppImage}-${version}-$suffix.AppImage"
             done
             for f in bin/*.deb; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.deb}-$suffix.deb"
+              cp "$f" "dist/${base%.deb}-${version}-$suffix.deb"
             done
             for f in bin/*.rpm; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.rpm}-$suffix.rpm"
+              cp "$f" "dist/${base%.rpm}-${version}-$suffix.rpm"
             done
             for f in bin/*.pkg.tar.zst; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.pkg.tar.zst}-$suffix.pkg.tar.zst"
+              cp "$f" "dist/${base%.pkg.tar.zst}-${version}-$suffix.pkg.tar.zst"
             done
           fi
 
