@@ -11,19 +11,6 @@ import (
 	"strings"
 )
 
-type windowsFixed struct {
-	FileVersion string `json:"file_version"`
-}
-
-type windowsInfoBlock struct {
-	ProductVersion string `json:"ProductVersion"`
-}
-
-type windowsInfo struct {
-	Fixed windowsFixed                `json:"fixed"`
-	Info  map[string]windowsInfoBlock `json:"info"`
-}
-
 func main() {
 	root := "."
 	version, err := readVersion(filepath.Join(root, "VERSION"))
@@ -76,15 +63,30 @@ func updateWindowsInfo(path, version string) error {
 		return err
 	}
 
-	var info windowsInfo
+	var info map[string]any
 	if err := json.Unmarshal(data, &info); err != nil {
 		return err
 	}
 
-	info.Fixed.FileVersion = version
-	for key, block := range info.Info {
-		block.ProductVersion = version
-		info.Info[key] = block
+	fixed, ok := info["fixed"].(map[string]any)
+	if !ok {
+		fixed = map[string]any{}
+		info["fixed"] = fixed
+	}
+	fixed["file_version"] = version
+
+	blocks, ok := info["info"].(map[string]any)
+	if !ok {
+		blocks = map[string]any{}
+		info["info"] = blocks
+	}
+	for key, value := range blocks {
+		block, ok := value.(map[string]any)
+		if !ok {
+			continue
+		}
+		block["ProductVersion"] = version
+		blocks[key] = block
 	}
 
 	updated, err := json.MarshalIndent(info, "", "  ")
