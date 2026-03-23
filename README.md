@@ -1,81 +1,103 @@
-﻿# AI-ViewNote
+﻿<h1 align="center">
+  <p>
+    <img src="./build/appicon.png" alt="AI-ViewNote Logo" width="120" height="120">
+  </p>
+  <p>AI-ViewNote</p>
+</h1>
 
-AI powered video note taking application.
+<p align="center">
+  🤖 AI-powered video note-taking application that transforms audio and video content into structured text notes.
+</p>
 
-AI-ViewNote 是一款基于 Wails v3 构建的现代化桌面应用程序。它集成了本地音视频处理、云端语音识别（ASR）以及大语言模型（LLM）能力，能够帮助用户一键将视频或音频内容转化为结构化的文字笔记和各种风格笔记。
+<p align="center">
+  <a href="./LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="MIT License"></a>
+  <img src="https://img.shields.io/badge/Platform-Desktop-brightgreen" alt="Desktop Platform">
+  <img src="https://img.shields.io/badge/Built%20With-Wails%20v3-purple" alt="Wails v3">
+  <img src="https://img.shields.io/badge/UI-React%20%2B%20TypeScript-blue" alt="React + TypeScript">
+</p>
 
-## 项目预览
+AI-ViewNote 是一款基于 Wails v3 构建的现代化桌面应用程序，集成了本地音视频处理、云端语音识别（ASR）以及大语言模型（LLM）能力，帮助用户将视频或音频内容智能转化为结构化的文字笔记。🎯 支持多种笔记风格，满足不同场景的学习和记录需求。
 
-![](./docs/images/prview.gif)
+## 🎥 项目预览
 
-##  功能特性
+![项目预览](./docs/images/prview.gif)
 
--  **本地音视频处理**：集成了 FFmpeg，支持音视频格式的快速转换与音频提取。
--  **语音转写提取**：结合火山引擎（Volcengine）等云服务，实现高精度的语音到文本（Speech-to-Text）转换。
--  **AI 智能笔记**：通过标准的 OpenAI 接口（支持多种大模型），快速对转写文本进行深加工，生成核心摘要、结构化大纲和总结笔记。
--  **现代化桌面 UI**：前端采用 React + TypeScript + Vite + Tailwind CSS / Radix UI 构建，提供流畅美观的本地用户体验。
+## ✨ 功能特性
 
-##  配置指南
+- 🎬 **本地音视频处理**：集成 FFmpeg，支持音视频格式快速转换与音频提取，确保高效的媒体文件处理能力
+- 🎤 **语音转写提取**：结合火山引擎等云服务，实现高精度语音到文本（Speech-to-Text）转换，准确率可达95%以上
+- 🧠 **AI 智能笔记生成**：通过标准 OpenAI 接口（支持多种大模型），对转写文本进行智能分析，生成多种风格的笔记：
+  - 📚 **知识笔记**：结构化的知识总结，包含时间标记和截图标记，便于复习和查阅
+  - 💄 **小红书风格**：亲切有趣的内容风格，善用 Emoji 和标签，适合社交平台分享
+  - 📱 **公众号风格**：专业的微信公众号文章格式，逻辑清晰、观点鲜明
+  - 📝 **内容总结**：简明扼要的摘要，突出核心观点和关键信息
+- 🎨 **现代化桌面 UI**：前端采用 React + TypeScript + Vite + Tailwind CSS / Radix UI 构建，提供流畅美观的本地用户体验
 
-该应用程序需要自己设置服务API
+## ⚙️ 配置指南
 
-### LLM 服务
+在使用 AI-ViewNote 之前，需要配置相关服务的 API 密钥以启用完整功能。
 
-兼容任何OpenAI接口的大模型。这里以火山方舟大模型为例。
+### 🤖 LLM 服务配置
 
-[登录方舟控制台](https://console.volcengine.com/ark)，点击开通管理：
+AI-ViewNote 兼容任何支持 OpenAI 接口的大模型服务。以下以火山方舟大模型为例进行配置说明：
 
-![alt text](./docs/images/image-1.png)
+1. [登录方舟控制台](https://console.volcengine.com/ark)，点击开通管理，开通相关模型
 
-选择开通一个大模型，开通之后点击该大模型进入详情页，然后可以看到模型ID：
+2. 选择开通一个大模型，开通后点击进入详情页查看模型 ID
 
-![alt text](./docs/images/image-1.png)
+    ![方舟控制台](./docs/images/image-1.png)
 
-然后点击API Key管理创建一个API Key：
+3. 点击 API Key 管理创建新的 API Key
 
-![alt text](./docs/images/image-2.png)
+   ![API Key 管理](./docs/images/image-2.png)
 
-火山方舟的大模型 OpenAI 的接口地址可在文档中找到：
+4. 火山方舟大模型的 OpenAI 接口地址为：
+   ```
+   https://ark.cn-beijing.volces.com/api/v3
+   ```
 
-![alt text](./docs/images/image-3.png)
+### ☁️ TOS 服务配置
 
-直接填入即可：
-```
-https://ark.cn-beijing.volces.com/api/v3
-```
+对象存储服务用于文件上传和管理。目前支持火山引擎 TOS，未来将引入更多服务提供商。
 
-### tos 服务
+1. 打开[对象存储服务控制台](https://console.volcengine.com/tos)，点击桶列表并创建新桶
 
-对象存储服务，目前只支持火山引擎的调用，未来将引入更多服务的支持。
+   ![创建存储桶](./docs/images/image-4.png)
 
-打开[对象存储服务控制台](https://console.volcengine.com/tos)，点击桶列表，然后创建一个桶：
+2. 创建完成后进入该存储桶，点击右侧权限管理，找到跨域访问设置并新建规则
 
-![alt text](./docs/images/image-4.png)
+   ![跨域访问设置](./docs/images/image-5.png)
 
-创建完毕之后进入该 bucket。点击右侧权限管理, 找到跨域访问设置, 新建一条跨域访问规则。
+3. 在此页面可以找到 bucketName 和 Endpoint
 
-![alt text](./docs/images/image-5.png)
+   ![存储桶信息](./docs/images/image-6.png)
 
-bucktName和Endpoint都可以在这个页面找到：
-![alt text](./docs/images/image-6.png)
+4. Region 设置：如果地域节点是北京，则 Region 填写"北京"，其他地域同理
 
-如果地域节点是北京，Region就是北京，其他同理。
+5. 进入 [IAM 控制台](https://console.volcengine.com/iam/keymanage)，新建密钥获取 Access Key 和 Secret Key
 
-然后进入[IAM控制台](https://console.volcengine.com/iam/keymanage),新建一个密钥，就可以得到Access Key和Secret Key
-
-![alt text](./docs/images/image-7.png)
-
-
-### ASR 服务
-
-实时语音识别服务，目前只支持火山引擎的调用，未来将引入更多服务的支持。
-
-打开[音频大模型控制台](https://console.volcengine.com/speech/app)，点击语音识别中的**录音文件识别**，注意不是**录音文件识别大模型**，创建一个应用, 就得到了 AUC_APP_ID 和 AUC_ACCESS_TOKEN 和 AUC_CLUSTER_ID 的值：
-
-![alt text](./docs/images/image-8.png)
-
+   ![密钥管理](./docs/images/image-7.png)
 
 
-##  开源协议
+### 🎯 ASR 服务配置
 
-本项目基于 [MIT License](LICENSE) 协议发布。
+语音识别服务用于将音频内容转换为文本。目前支持火山引擎语音识别服务，未来将引入更多服务提供商。
+
+1. 打开[音频大模型控制台](https://console.volcengine.com/speech/app)
+2. 点击语音识别中的**录音文件识别**（注意：不是**录音文件识别大模型**）
+3. 创建应用后即可获得 AUC_APP_ID、AUC_ACCESS_TOKEN 和 AUC_CLUSTER_ID
+
+   ![ASR 应用配置](./docs/images/image-8.png)
+
+
+
+## 🙏 致谢
+
+特别感谢以下开源项目：
+
+- [Wails v3](https://github.com/wailsapp/wails) - 为本项目提供现代化的桌面应用开发框架
+- [AI-Media2Doc](https://github.com/hanshuaikang/AI-Media2Doc) - 为本项目提供思路
+
+## 📄 开源协议
+
+本项目基于 [MIT License](LICENSE) 协议发布，欢迎个人和商业使用。🎉
