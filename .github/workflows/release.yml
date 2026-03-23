@@ -16,6 +16,8 @@ jobs:
     name: Build (${{ matrix.os }})
     runs-on: ${{ matrix.os }}
     env:
+      # 提前切换到 Node.js 24 运行 JavaScript actions，避免 Node.js 20 弃用警告。
+      FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
       # FFmpeg 下载源（使用仓库环境变量/密钥可覆盖）。
       FFMPEG_BASE_URL: https://dl.liangbm3.site/downloads/ffmpeg
       # 如果需要鉴权，请在仓库 Secrets 里配置 FFMPEG_TOKEN。
