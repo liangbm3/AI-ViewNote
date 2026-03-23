@@ -54,7 +54,13 @@ jobs:
       - name: Install NSIS
         if: runner.os == 'Windows'
         # 生成 Windows 安装包需要 NSIS。
-        run: choco install -y nsis
+        shell: powershell
+        run: |
+          choco install -y nsis
+          $nsisPath = "C:\Program Files (x86)\NSIS"
+          if (Test-Path $nsisPath) {
+            $nsisPath | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
+          }
 
       - name: Install Wails and Task
         shell: bash
