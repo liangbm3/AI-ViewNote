@@ -4,6 +4,8 @@ on:
   release:
     # 仅在 GitHub Release 发布时触发。
     types: [published]
+  # 允许手动触发（用于测试）。
+  workflow_dispatch:
 
 permissions:
   # 用于上传构建产物到 Release。
@@ -183,6 +185,15 @@ jobs:
 
       - name: Upload release assets
         uses: softprops/action-gh-release@v2
+        if: github.event_name == 'release'
         with:
           # 上传 dist 中的所有产物到 Release。
           files: dist/**
+
+      - name: Upload artifacts (manual)
+        uses: actions/upload-artifact@v4
+        if: github.event_name == 'workflow_dispatch'
+        with:
+          # 手动触发时上传到 Actions 产物。
+          name: dist-${{ runner.os }}
+          path: dist/**
