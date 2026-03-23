@@ -9,7 +9,7 @@ interface LogPanelProps {
 }
 
 export function LogPanel({ logs, onClearLogs, getLogColor }: LogPanelProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isCollapsed, setIsCollapsed] = useState(true);
 
   return (
     <div className={`bg-white border-t border-gray-200 flex flex-col transition-all duration-300 ease-in-out ${isCollapsed ? 'h-10' : 'h-40'} overflow-hidden`}>
