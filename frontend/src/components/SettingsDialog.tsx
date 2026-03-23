@@ -17,12 +17,12 @@ import { SaveConfig, GetConfig, GetAllConfigs } from '../../bindings/AI-ViewNote
 import packageJson from '../../package.json';
 
 export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
-  const [activeCategory, setActiveCategory] = useState<SettingsCategory>('general');
+  const [activeCategory, setActiveCategory] = useState<SettingsCategory>('service');
 
-  // 如果当前选中的是高级设置，自动切换到通用设置
+  // 如果当前选中的是高级设置或通用设置，自动切换到服务设置
   useEffect(() => {
-    if (activeCategory === 'advanced') {
-      setActiveCategory('general');
+    if (activeCategory === 'advanced' || activeCategory === 'general') {
+      setActiveCategory('service');
     }
   }, [activeCategory]);
 
@@ -196,7 +196,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                 </div>
 
                 <nav className="flex-1 space-y-1">
-                  {categories.filter(cat => cat.id !== 'advanced').map((category) => {
+                  {categories.filter(cat => cat.id !== 'advanced' && cat.id !== 'general').map((category) => {
                     const Icon = category.icon;
                     return (
                       <button
