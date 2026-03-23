@@ -298,7 +298,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
 
                       {/* Toggle Settings */}
                       <div className="space-y-4">
-                        <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                        <div className="flex items-center justify-between py-3 border-b border-gray-100 hidden">
                           <div>
                             <div className="text-sm font-medium text-gray-900">桌面通知</div>
                             <div className="text-xs text-gray-500 mt-0.5">转换完成时显示通知</div>
