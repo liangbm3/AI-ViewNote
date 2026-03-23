@@ -531,8 +531,12 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                   {activeCategory === 'about' && (
                     <div className="space-y-6">
                       <div className="text-center py-8">
-                        <div className="w-20 h-20 bg-gray-900 rounded-2xl flex items-center justify-center mx-auto mb-4">
-                          <Sparkles className="w-10 h-10 text-white" strokeWidth={1.5} />
+                        <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                          <img
+                            src="/appicon.png"
+                            alt="AI-ViewNote"
+                            className="w-20 h-20 object-contain"
+                          />
                         </div>
                         <h3 className="text-xl font-semibold text-gray-900 mb-2">AI-ViewNote</h3>
                         <p className="text-gray-500 mb-1">版本 {packageJson.version}</p>

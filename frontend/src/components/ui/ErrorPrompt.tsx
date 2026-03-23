@@ -76,7 +76,7 @@ export function ErrorPrompt({ task, onRetry, onBack }: ErrorPromptProps) {
           </div>
 
           <div className="mt-6 text-xs text-gray-500">
-            <p>如果问题持续存在，请检查文件格式是否正确或联系技术支持。</p>
+            <p>请查看输出日志以获取更多信息。或在 Github issues 中报告问题。</p>
           </div>
         </div>
       </div>

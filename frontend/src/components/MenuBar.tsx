@@ -10,7 +10,7 @@ export function MenuBar({ onOpenSettings }: MenuBarProps) {
     <div className="h-14 bg-white border-b border-gray-200 flex items-center px-4 gap-6">
       <div className="flex items-center gap-2">
         <img src="/appicon.png" alt="AI ViewNote" className="w-8 h-8 object-contain shrink-0" />
-        <span className="font-semibold text-gray-900">视频转文档</span>
+        <span className="font-semibold text-gray-900">AI-ViewNote</span>
       </div>
 
       <div className="ml-auto flex items-center gap-2">
