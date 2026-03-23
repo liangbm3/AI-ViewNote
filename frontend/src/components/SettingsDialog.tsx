@@ -567,7 +567,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                 <div className="h-16 px-6 border-t border-gray-200 flex items-center justify-between">
                   <button
                     onClick={handleReset}
-                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors"
+                    className="text-sm text-gray-600 hover:text-gray-900 transition-colors hidden"
                   >
                     恢复默认设置
                   </button>
