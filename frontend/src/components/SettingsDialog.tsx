@@ -14,6 +14,7 @@ import {
 import { toast } from 'sonner';
 import { SettingsDialogProps, SettingsCategory, Language, QualityOption } from '../types';
 import { SaveConfig, GetConfig, GetAllConfigs } from '../../bindings/AI-ViewNote/backend/service/configservice';
+import packageJson from '../../package.json';
 
 export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   const [activeCategory, setActiveCategory] = useState<SettingsCategory>('general');
@@ -210,7 +211,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                 </nav>
 
                 <div className="pt-4 border-t border-gray-200 text-xs text-gray-500">
-                  版本 1.0.0
+                  版本 {packageJson.version}
                 </div>
               </div>
 
@@ -526,9 +527,9 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                         <div className="w-20 h-20 bg-gray-900 rounded-2xl flex items-center justify-center mx-auto mb-4">
                           <Sparkles className="w-10 h-10 text-white" strokeWidth={1.5} />
                         </div>
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">视频转文档</h3>
-                        <p className="text-gray-500 mb-1">版本 1.0.0</p>
-                        <p className="text-sm text-gray-400">简单、快速、高效的视频转换工具</p>
+                        <h3 className="text-xl font-semibold text-gray-900 mb-2">AI-ViewNote</h3>
+                        <p className="text-gray-500 mb-1">版本 {packageJson.version}</p>
+                        <p className="text-sm text-gray-400">AI驱动的视频笔记工具</p>
                       </div>
 
                       <div className="space-y-3 pt-6 border-t border-gray-200">
@@ -547,7 +548,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                       </div>
 
                       <div className="text-center text-xs text-gray-400 pt-6 border-t border-gray-200">
-                        © 2026 视频转文档. All rights reserved.
+                        © 2026 AI-ViewNote. All rights reserved.
                       </div>
                     </div>
                   )}
