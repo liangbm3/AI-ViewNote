@@ -10,7 +10,6 @@ import (
 	"runtime"
 	"strings"
 	"time"
-	"syscall"
 )
 
 func GetFFmpegPath() string {
@@ -63,11 +62,7 @@ func GetFFmpegVersion() (string, error) {
 	cmd := exec.Command("ffmpeg", "-version")
 
 	// 在Windows上隐藏控制台窗口
-	if runtime.GOOS == "windows" {
-		cmd.SysProcAttr = &syscall.SysProcAttr{
-			HideWindow: true,
-		}
-	}
+	setHideWindowAttr(cmd)
 
 	output, err := cmd.Output()
 	if err != nil {
@@ -97,11 +92,7 @@ func ExtractAudioWithFFmpeg(videoPath string, audioPath string) error {
 	)
 
 	// 在Windows上隐藏控制台窗口
-	if runtime.GOOS == "windows" {
-		cmd.SysProcAttr = &syscall.SysProcAttr{
-			HideWindow: true,
-		}
-	}
+	setHideWindowAttr(cmd)
 
 	var stderr bytes.Buffer
 	cmd.Stderr = &stderr
