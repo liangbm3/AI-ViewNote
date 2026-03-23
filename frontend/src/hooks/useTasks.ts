@@ -69,6 +69,17 @@ function mapProgressToPercent(p: number): number {
   }
 }
 
+// 将英文格式名称映射为中文
+function mapFormatToChinese(format: string): string {
+  const formatMap: { [key: string]: string } = {
+    'note': '知识笔记',
+    'xiaohongshu': '小红书',
+    'wechat': '公众号',
+    'summary': '内容总结'
+  };
+  return formatMap[format] || format;
+}
+
 export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
 
@@ -85,7 +96,7 @@ export function useTasks() {
       fileName: t.file_path ? t.file_path.split(/[/\\]/).pop() || t.file_path : 'Unknown',
       status: mapProgressToStatus(t.progress),
       progress: mapProgressToPercent(t.progress),
-      formats: t.style ? [t.style] : [],
+      formats: t.style ? [mapFormatToChinese(t.style)] : [],
       timestamp: new Date(t.created_at).toLocaleTimeString('zh-CN', {
         hour: '2-digit',
         minute: '2-digit',
@@ -135,7 +146,7 @@ export function useTasks() {
       fileName,
       status: 'pending',
       progress: 0,
-      formats,
+      formats: formats.map(format => mapFormatToChinese(format)),
       timestamp: new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit', hour12: false }),
     };
     setTasks(prev => [newTask, ...prev]);
