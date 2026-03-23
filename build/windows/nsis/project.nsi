@@ -88,7 +88,7 @@ Section
     
     !insertmacro wails.files
 
-        !ifexist "..\..\..\bin\ffmpeg.exe"
+        !if /FileExists "..\..\..\bin\ffmpeg.exe"
             File "/oname=ffmpeg.exe" "..\..\..\bin\ffmpeg.exe"
         !endif
 
