@@ -44,7 +44,11 @@ export function ErrorPrompt({ task, onRetry, onBack }: ErrorPromptProps) {
               </div>
               <div className="flex justify-between">
                 <span>状态:</span>
-                <span className="text-red-600">失败</span>
+                <span className="text-red-600">
+                  {task.errorStage === 'ExtractingAudioFailed' ? '提取音频失败' :
+                   task.errorStage === 'ExtractingTextFailed' ? '提取文本失败' :
+                   task.errorStage === 'GeneratingMarkdownFailed' ? '生成Markdown失败' : '失败'}
+                </span>
               </div>
             </div>
           </div>

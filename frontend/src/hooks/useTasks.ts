@@ -35,10 +35,23 @@ function mapProgressToStatus(p: number): Task['status'] {
       return 'completed';
     case 3: // ExtractingAudioFailed
     case 6: // ExtractingTextFailed
-    case 9: // GeneratingMarkdownFailed (如果存在)
+    case 9: // GeneratingMarkdownFailed
       return 'error';
     default:
       return 'processing';
+  }
+}
+
+function mapProgressToErrorStage(p: number): Task['errorStage'] {
+  switch (p) {
+    case 3: // ExtractingAudioFailed
+      return 'ExtractingAudioFailed';
+    case 6: // ExtractingTextFailed
+      return 'ExtractingTextFailed';
+    case 9: // GeneratingMarkdownFailed
+      return 'GeneratingMarkdownFailed';
+    default:
+      return undefined;
   }
 }
 
@@ -107,6 +120,7 @@ export function useTasks() {
       }),
       markdownContent: t.markdown_content,
       transcriptionText: t.transcription_text ? t.transcription_text : [],
+      errorStage: mapProgressToErrorStage(t.progress),
     }));
 
     console.log('更新任务列表，新任务数量:', mapped.length);
@@ -171,12 +185,24 @@ export function useTasks() {
     }
   }, []);
 
-  const getStatusText = useCallback((status: Task['status']) => {
+  const getStatusText = useCallback((status: Task['status'], errorStage?: Task['errorStage']) => {
+    // 任务列表只显示"失败"，详情页面才显示具体失败阶段
     switch (status) {
       case 'completed': return '已完成';
       case 'processing': return '处理中';
-      case 'error': return '错误';
+      case 'error': return '失败';
       default: return '等待中';
+    }
+  }, []);
+
+  const getErrorStageText = useCallback((errorStage?: Task['errorStage']) => {
+    if (!errorStage) return '';
+
+    switch (errorStage) {
+      case 'ExtractingAudioFailed': return '提取音频失败';
+      case 'ExtractingTextFailed': return '提取文本失败';
+      case 'GeneratingMarkdownFailed': return '生成Markdown失败';
+      default: return '';
     }
   }, []);
 
