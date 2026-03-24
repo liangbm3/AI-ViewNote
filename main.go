@@ -12,6 +12,7 @@ import (
 
 	"github.com/wailsapp/wails/v3/pkg/application"
 	"github.com/wailsapp/wails/v3/pkg/events"
+	wnotifications "github.com/wailsapp/wails/v3/pkg/services/notifications"
 )
 
 type WailsEventEmitter struct{}
@@ -46,11 +47,12 @@ func main() {
 	defer db.Close()
 
 	wailsEmitter := &WailsEventEmitter{}
+	notificationService := wnotifications.New()
 
 	taskRepo := repository.NewTaskRepository(db)
 	confRepo := repository.NewConfigRepository(db)
 
-	taskService := service.NewTaskService(taskRepo, confRepo, wailsEmitter)
+	taskService := service.NewTaskService(taskRepo, confRepo, wailsEmitter, notificationService)
 	confService := service.NewConfigService(confRepo)
 
 	// 确保默认配置项存在
@@ -67,6 +69,7 @@ func main() {
 		Services: []application.Service{
 			application.NewService(taskService),
 			application.NewService(confService),
+			application.NewService(notificationService),
 		},
 		Assets: application.AssetOptions{
 			Handler: application.AssetFileServerFS(assets),

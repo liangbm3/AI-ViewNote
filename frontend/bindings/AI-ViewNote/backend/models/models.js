@@ -30,6 +30,7 @@ export const ConfigKey = {
     LlmApiKey: "LlmApiKey",
     RunInBackground: "RunInBackground",
     DesktopNotifications: "DesktopNotifications",
+    LogFolding: "LogFolding",
 };
 
 /**

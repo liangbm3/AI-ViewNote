@@ -25,7 +25,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
 
   // General Settings
   const [runInBackground, setRunInBackground] = useState(false);
-  const [notifications, setNotifications] = useState(true);
+  const [notifications, setNotifications] = useState(false);
   const [logFolding, setLogFolding] = useState(true);
 
   // Service Settings
@@ -70,7 +70,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
 
       // 加载各个配置项
       setRunInBackground(await loadConfig('RunInBackground', 'false') === 'true');
-      setNotifications(await loadConfig('DesktopNotifications', 'true') === 'true');
+      setNotifications(await loadConfig('DesktopNotifications', 'false') === 'true');
       setLogFolding(await loadConfig('LogFolding', 'true') === 'true');
       setLlmBaseUrl(await loadConfig('LlmBaseURL', ''));
       setLlmModelId(await loadConfig('LlmModelID', ''));
@@ -144,7 +144,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
 
   const handleReset = () => {
     setRunInBackground(false);
-    setNotifications(true);
+    setNotifications(false);
     setLogFolding(true);
     setLlmBaseUrl('');
     setLlmModelId('');
@@ -318,7 +318,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                           </button>
                         </div>
 
-                        <div className="flex items-center justify-between py-3 border-b border-gray-100 hidden">
+                        <div className="flex items-center justify-between py-3 border-b border-gray-100">
                           <div>
                             <div className="text-sm font-medium text-gray-900">桌面通知</div>
                             <div className="text-xs text-gray-500 mt-0.5">转换完成时显示通知</div>

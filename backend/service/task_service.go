@@ -17,6 +17,7 @@ import (
 	ark "github.com/sashabaranov/go-openai"
 	"github.com/volcengine/ve-tos-golang-sdk/v2/tos"
 	"github.com/volcengine/ve-tos-golang-sdk/v2/tos/enum"
+	wnotifications "github.com/wailsapp/wails/v3/pkg/services/notifications"
 )
 
 type submitResponse struct {
@@ -41,16 +42,18 @@ type EventEmitter interface {
 }
 
 type TaskService struct {
-	task_repo     *repository.TaskRepository
-	config_repo   *repository.ConfigRepository
-	event_emitter EventEmitter
+	task_repo            *repository.TaskRepository
+	config_repo          *repository.ConfigRepository
+	event_emitter        EventEmitter
+	notification_service *wnotifications.NotificationService
 }
 
-func NewTaskService(repo *repository.TaskRepository, config_repo *repository.ConfigRepository, emitter EventEmitter) *TaskService {
+func NewTaskService(repo *repository.TaskRepository, config_repo *repository.ConfigRepository, emitter EventEmitter, notification_service *wnotifications.NotificationService) *TaskService {
 	return &TaskService{
-		task_repo:     repo,
-		config_repo:   config_repo,
-		event_emitter: emitter,
+		task_repo:            repo,
+		config_repo:          config_repo,
+		event_emitter:        emitter,
+		notification_service: notification_service,
 	}
 }
 
@@ -178,6 +181,75 @@ func (s *TaskService) task(taskID int) {
 	task.Progress = models.GeneratingMarkdownSuccess
 	s.task_repo.Update(task)
 	s.event_emitter.Emit("task_update", nil) // 触发前端更新
+	go s.sendTaskCompletedNotification(*task)
+}
+
+func (s *TaskService) sendTaskCompletedNotification(task models.TaskRecord) {
+	if s.notification_service == nil {
+		return
+	}
+
+	desktopNotificationsCfg, err := s.config_repo.GetConfig(models.DesktopNotifications)
+	if err != nil {
+		s.event_emitter.Emit("log", models.LogMessage{
+			Level:   models.LogLevelWarning,
+			Message: "Failed to get desktop notification config: " + err.Error(),
+		})
+		return
+	}
+
+	if !strings.EqualFold(strings.TrimSpace(desktopNotificationsCfg.Value), "true") {
+		return
+	}
+
+	authorized, err := s.notification_service.CheckNotificationAuthorization()
+	if err != nil {
+		s.event_emitter.Emit("log", models.LogMessage{
+			Level:   models.LogLevelWarning,
+			Message: "Failed to check notification authorization: " + err.Error(),
+		})
+		return
+	}
+
+	if !authorized {
+		granted, requestErr := s.notification_service.RequestNotificationAuthorization()
+		if requestErr != nil {
+			s.event_emitter.Emit("log", models.LogMessage{
+				Level:   models.LogLevelWarning,
+				Message: "Failed to request notification authorization: " + requestErr.Error(),
+			})
+			return
+		}
+		if !granted {
+			s.event_emitter.Emit("log", models.LogMessage{
+				Level:   models.LogLevelWarning,
+				Message: "Desktop notification authorization not granted",
+			})
+			return
+		}
+	}
+
+	fileName := filepath.Base(strings.TrimSpace(task.FilePath))
+	if fileName == "" || fileName == "." || fileName == string(filepath.Separator) {
+		fileName = "video"
+	}
+
+	err = s.notification_service.SendNotification(wnotifications.NotificationOptions{
+		ID:    fmt.Sprintf("task-%d-%d", task.ID, time.Now().UnixNano()),
+		Title: "AI-ViewNote 转换完成",
+		Body:  fmt.Sprintf("%s 已处理完成。", fileName),
+		Data: map[string]interface{}{
+			"task_id":   task.ID,
+			"file_path": task.FilePath,
+			"style":     task.Style,
+		},
+	})
+	if err != nil {
+		s.event_emitter.Emit("log", models.LogMessage{
+			Level:   models.LogLevelWarning,
+			Message: "Failed to send desktop notification: " + err.Error(),
+		})
+	}
 }
 
 // 提取音频
