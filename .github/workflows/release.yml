@@ -2,31 +2,42 @@ name: Release Packages
 
 on:
   release:
-    # 仅在 GitHub Release 发布时触发。
     types: [published]
-  # 允许手动触发（用于测试）。
   workflow_dispatch:
 
 permissions:
-  # 用于上传构建产物到 Release。
   contents: write
 
 jobs:
   build:
-    name: Build (${{ matrix.os }})
-    runs-on: ${{ matrix.os }}
+    name: Build (${{ matrix.target_os }}-${{ matrix.arch }})
+    runs-on: ${{ matrix.runner }}
     env:
-      # 提前切换到 Node.js 24 运行 JavaScript actions，避免 Node.js 20 弃用警告。
+      # Use Node.js 24 to run JavaScript actions and avoid Node 20 deprecation warnings.
       FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-      # FFmpeg 下载源（使用仓库环境变量/密钥可覆盖）。
       FFMPEG_BASE_URL: https://dl.liangbm3.site/downloads/ffmpeg
-      # 如果需要鉴权，请在仓库 Secrets 里配置 FFMPEG_TOKEN。
       FFMPEG_TOKEN: ${{ secrets.FFMPEG_TOKEN }}
+      TARGET_OS: ${{ matrix.target_os }}
+      TARGET_ARCH: ${{ matrix.arch }}
     strategy:
-      # 允许某个平台失败时其它平台继续构建。
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        include:
+          - runner: ubuntu-latest
+            target_os: linux
+            arch: amd64
+          - runner: ubuntu-24.04-arm
+            target_os: linux
+            arch: arm64
+          - runner: macos-13
+            target_os: darwin
+            arch: amd64
+          - runner: macos-14
+            target_os: darwin
+            arch: arm64
+          - runner: windows-latest
+            target_os: windows
+            arch: amd64
 
     steps:
       - name: Checkout
@@ -35,27 +46,23 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          # 对齐项目的 Go 版本要求。
-          go-version: '1.26.x'
+          go-version: "1.26.x"
 
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
-          # 缓存前端依赖以加速构建。
-          cache: 'npm'
+          node-version: "20"
+          cache: "npm"
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install Linux build deps
-        if: runner.os == 'Linux'
-        # Wails 在 Linux 上需要 GTK/WebKit 的开发依赖。
+        if: matrix.target_os == 'linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y libgtk-3-dev libwebkit2gtk-4.1-dev
 
       - name: Install NSIS
-        if: runner.os == 'Windows'
-        # 生成 Windows 安装包需要 NSIS。
+        if: matrix.target_os == 'windows'
         shell: powershell
         run: |
           choco install -y nsis
@@ -67,7 +74,6 @@ jobs:
       - name: Install Wails and Task
         shell: bash
         run: |
-          # 安装构建与打包所需的 CLI 工具。
           go install github.com/wailsapp/wails/v3/cmd/wails3@latest
           go install github.com/go-task/task/v3/cmd/task@latest
           echo "$(go env GOPATH)/bin" >> "$GITHUB_PATH"
@@ -79,7 +85,6 @@ jobs:
 
       - name: Resolve package version
         shell: bash
-        # 优先使用发布 tag，其次回退到 VERSION 文件。
         run: |
           if [ "${GITHUB_EVENT_NAME}" = "release" ] && [ -n "${GITHUB_REF_NAME}" ]; then
             raw="${GITHUB_REF_NAME}"
@@ -97,122 +102,107 @@ jobs:
 
       - name: Build packages (no ffmpeg)
         shell: bash
-        # 产出依赖系统 FFmpeg 的版本。
         run: |
-          task package:no-ffmpeg
+          task package:no-ffmpeg ARCH="${TARGET_ARCH}"
 
       - name: Collect artifacts (no ffmpeg)
         shell: bash
-        # 用后缀区分产物版本。
         run: |
           mkdir -p dist
           shopt -s nullglob
           version="${PACKAGE_VERSION}"
           suffix="no-ffmpeg"
-          if [ "$RUNNER_OS" = "Windows" ]; then
-            if [ -f "bin/AI-ViewNote.exe" ]; then
-              cp "bin/AI-ViewNote.exe" "dist/AI-ViewNote-${version}-$suffix.exe"
-            fi
+
+          if [ "${TARGET_OS}" = "windows" ]; then
             for f in bin/AI-ViewNote-*-installer.exe; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.exe}-${version}-$suffix.exe"
+              cp "$f" "dist/${base%.exe}-${version}-${suffix}.exe"
             done
-            for f in bin/*.msix; do
-              base=$(basename "$f")
-              cp "$f" "dist/${base%.msix}-${version}-$suffix.msix"
-            done
-          elif [ "$RUNNER_OS" = "macOS" ]; then
+          elif [ "${TARGET_OS}" = "darwin" ]; then
             if [ -d "bin/AI-ViewNote.app" ]; then
-              ditto -c -k --sequesterRsrc --keepParent "bin/AI-ViewNote.app" "dist/AI-ViewNote-macos-${version}-$suffix.app.zip"
+              ditto -c -k --sequesterRsrc --keepParent "bin/AI-ViewNote.app" "dist/AI-ViewNote-macos-${TARGET_ARCH}-${version}-${suffix}.app.zip"
             fi
           else
-            if [ -f "bin/AI-ViewNote" ]; then
-              cp "bin/AI-ViewNote" "dist/AI-ViewNote-${version}-$suffix"
-            fi
             for f in bin/*.AppImage; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.AppImage}-${version}-$suffix.AppImage"
+              cp "$f" "dist/${base%.AppImage}-${version}-${suffix}-${TARGET_ARCH}.AppImage"
             done
             for f in bin/*.deb; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.deb}-${version}-$suffix.deb"
+              cp "$f" "dist/${base%.deb}-${version}-${suffix}-${TARGET_ARCH}.deb"
             done
             for f in bin/*.rpm; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.rpm}-${version}-$suffix.rpm"
+              cp "$f" "dist/${base%.rpm}-${version}-${suffix}-${TARGET_ARCH}.rpm"
             done
             for f in bin/*.pkg.tar.zst; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.pkg.tar.zst}-${version}-$suffix.pkg.tar.zst"
+              cp "$f" "dist/${base%.pkg.tar.zst}-${version}-${suffix}-${TARGET_ARCH}.pkg.tar.zst"
             done
           fi
 
+      - name: Clean package outputs
+        shell: bash
+        run: |
+          shopt -s nullglob
+          rm -rf "bin/AI-ViewNote.app"
+          rm -f \
+            bin/AI-ViewNote \
+            bin/AI-ViewNote.exe \
+            bin/*.AppImage \
+            bin/*.deb \
+            bin/*.rpm \
+            bin/*.pkg.tar.zst \
+            bin/AI-ViewNote-*-installer.exe \
+            bin/*.msix \
+            bin/ffmpeg \
+            bin/ffmpeg.exe
+
       - name: Build packages (with ffmpeg)
         shell: bash
-        # 将 FFmpeg 打包进各平台产物。
         run: |
-          # 先下载对应平台的 FFmpeg 到 bin 目录。
           mkdir -p bin
-          if [ "$RUNNER_OS" = "Windows" ]; then
-            curl -fL -H "X-Download-Token: ${FFMPEG_TOKEN}" "${FFMPEG_BASE_URL}/ffmpeg-windows-amd64.exe" -o "bin/ffmpeg-windows-amd64.exe"
-          elif [ "$RUNNER_OS" = "macOS" ]; then
-            arch="arm64"
-            if [ "$(uname -m)" = "x86_64" ]; then
-              arch="amd64"
-            fi
-            curl -fL -H "X-Download-Token: ${FFMPEG_TOKEN}" "${FFMPEG_BASE_URL}/ffmpeg-darwin-${arch}" -o "bin/ffmpeg-darwin-${arch}"
+          if [ "${TARGET_OS}" = "windows" ]; then
+            ffmpeg_name="ffmpeg-windows-${TARGET_ARCH}.exe"
           else
-            arch="amd64"
-            if [ "$(uname -m)" = "aarch64" ]; then
-              arch="arm64"
-            fi
-            curl -fL -H "X-Download-Token: ${FFMPEG_TOKEN}" "${FFMPEG_BASE_URL}/ffmpeg-linux-${arch}" -o "bin/ffmpeg-linux-${arch}"
+            ffmpeg_name="ffmpeg-${TARGET_OS}-${TARGET_ARCH}"
           fi
-          task package:with-ffmpeg NFPM_CONFIG=./build/linux/nfpm/nfpm-with-ffmpeg.yaml
+          curl -fL -H "X-Download-Token: ${FFMPEG_TOKEN}" "${FFMPEG_BASE_URL}/${ffmpeg_name}" -o "bin/${ffmpeg_name}"
+          task package:with-ffmpeg ARCH="${TARGET_ARCH}" NFPM_CONFIG=./build/linux/nfpm/nfpm-with-ffmpeg.yaml
 
       - name: Collect artifacts (with ffmpeg)
         shell: bash
-        # 保持文件名唯一，避免上传冲突。
         run: |
           mkdir -p dist
           shopt -s nullglob
           version="${PACKAGE_VERSION}"
           suffix="ffmpeg"
-          if [ "$RUNNER_OS" = "Windows" ]; then
-            if [ -f "bin/AI-ViewNote.exe" ]; then
-              cp "bin/AI-ViewNote.exe" "dist/AI-ViewNote-${version}-$suffix.exe"
-            fi
+
+          if [ "${TARGET_OS}" = "windows" ]; then
             for f in bin/AI-ViewNote-*-installer.exe; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.exe}-${version}-$suffix.exe"
+              cp "$f" "dist/${base%.exe}-${version}-${suffix}.exe"
             done
-            for f in bin/*.msix; do
-              base=$(basename "$f")
-              cp "$f" "dist/${base%.msix}-${version}-$suffix.msix"
-            done
-          elif [ "$RUNNER_OS" = "macOS" ]; then
+          elif [ "${TARGET_OS}" = "darwin" ]; then
             if [ -d "bin/AI-ViewNote.app" ]; then
-              ditto -c -k --sequesterRsrc --keepParent "bin/AI-ViewNote.app" "dist/AI-ViewNote-macos-${version}-$suffix.app.zip"
+              ditto -c -k --sequesterRsrc --keepParent "bin/AI-ViewNote.app" "dist/AI-ViewNote-macos-${TARGET_ARCH}-${version}-${suffix}.app.zip"
             fi
           else
-            if [ -f "bin/AI-ViewNote" ]; then
-              cp "bin/AI-ViewNote" "dist/AI-ViewNote-${version}-$suffix"
-            fi
             for f in bin/*.AppImage; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.AppImage}-${version}-$suffix.AppImage"
+              cp "$f" "dist/${base%.AppImage}-${version}-${suffix}-${TARGET_ARCH}.AppImage"
             done
             for f in bin/*.deb; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.deb}-${version}-$suffix.deb"
+              cp "$f" "dist/${base%.deb}-${version}-${suffix}-${TARGET_ARCH}.deb"
             done
             for f in bin/*.rpm; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.rpm}-${version}-$suffix.rpm"
+              cp "$f" "dist/${base%.rpm}-${version}-${suffix}-${TARGET_ARCH}.rpm"
             done
             for f in bin/*.pkg.tar.zst; do
               base=$(basename "$f")
-              cp "$f" "dist/${base%.pkg.tar.zst}-${version}-$suffix.pkg.tar.zst"
+              cp "$f" "dist/${base%.pkg.tar.zst}-${version}-${suffix}-${TARGET_ARCH}.pkg.tar.zst"
             done
           fi
 
@@ -220,13 +210,11 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.event_name == 'release'
         with:
-          # 上传 dist 中的所有产物到 Release。
           files: dist/**
 
       - name: Upload artifacts (manual)
         uses: actions/upload-artifact@v4
         if: github.event_name == 'workflow_dispatch'
         with:
-          # 手动触发时上传到 Actions 产物。
-          name: dist-${{ runner.os }}
+          name: dist-${{ matrix.target_os }}-${{ matrix.arch }}
           path: dist/**
