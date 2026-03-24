@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { LogEntry } from '../types';
 import { ChevronDown, ChevronUp } from 'lucide-react';
+import { GetConfig } from '../../bindings/AI-ViewNote/backend/service/configservice';
 
 interface LogPanelProps {
   logs: LogEntry[];
@@ -10,6 +11,36 @@ interface LogPanelProps {
 
 export function LogPanel({ logs, onClearLogs, getLogColor }: LogPanelProps) {
   const [isCollapsed, setIsCollapsed] = useState(true);
+
+  useEffect(() => {
+    let mounted = true;
+
+    const loadLogFoldingConfig = async () => {
+      try {
+        const response = await GetConfig('LogFolding');
+        if (!mounted) return;
+
+        if (response.success && response.data && response.data.value) {
+          setIsCollapsed(response.data.value === 'true');
+          return;
+        }
+
+        // default: collapsed when config not set
+        setIsCollapsed(true);
+      } catch (error) {
+        console.warn('Failed to load LogFolding config:', error);
+        if (mounted) {
+          setIsCollapsed(true);
+        }
+      }
+    };
+
+    void loadLogFoldingConfig();
+
+    return () => {
+      mounted = false;
+    };
+  }, []);
 
   return (
     <div className={`bg-white border-t border-gray-200 flex flex-col transition-all duration-300 ease-in-out ${isCollapsed ? 'h-10' : 'h-40'} overflow-hidden`}>

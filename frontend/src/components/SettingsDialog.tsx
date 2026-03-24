@@ -26,6 +26,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   // General Settings
   const [runInBackground, setRunInBackground] = useState(false);
   const [notifications, setNotifications] = useState(true);
+  const [logFolding, setLogFolding] = useState(true);
 
   // Service Settings
   const [llmBaseUrl, setLlmBaseUrl] = useState('');
@@ -70,6 +71,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
       // 加载各个配置项
       setRunInBackground(await loadConfig('RunInBackground', 'false') === 'true');
       setNotifications(await loadConfig('DesktopNotifications', 'true') === 'true');
+      setLogFolding(await loadConfig('LogFolding', 'true') === 'true');
       setLlmBaseUrl(await loadConfig('LlmBaseURL', ''));
       setLlmModelId(await loadConfig('LlmModelID', ''));
       setLlmApiKey(await loadConfig('LlmApiKey', ''));
@@ -106,6 +108,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
       const saveOperations = [
         { key: 'RunInBackground', value: runInBackground ? 'true' : 'false' },
         { key: 'DesktopNotifications', value: notifications ? 'true' : 'false' },
+        { key: 'LogFolding', value: logFolding ? 'true' : 'false' },
         { key: 'LlmBaseURL', value: llmBaseUrl },
         { key: 'LlmModelID', value: llmModelId },
         { key: 'LlmApiKey', value: llmApiKey },
@@ -142,6 +145,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   const handleReset = () => {
     setRunInBackground(false);
     setNotifications(true);
+    setLogFolding(true);
     setLlmBaseUrl('');
     setLlmModelId('');
     setLlmApiKey('');
@@ -295,6 +299,25 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
 
                       {/* Toggle Settings */}
                       <div className="space-y-4">
+                        <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">日志默认折叠</div>
+                            <div className="text-xs text-gray-500 mt-0.5">打开应用时日志栏默认折叠</div>
+                          </div>
+                          <button
+                            onClick={() => setLogFolding(!logFolding)}
+                            className={`
+                              w-11 h-6 rounded-full transition-colors relative
+                              ${logFolding ? 'bg-gray-900' : 'bg-gray-200'}
+                            `}
+                          >
+                            <div className={`
+                              w-4 h-4 bg-white rounded-full absolute top-1 transition-transform
+                              ${logFolding ? 'translate-x-6' : 'translate-x-1'}
+                            `} />
+                          </button>
+                        </div>
+
                         <div className="flex items-center justify-between py-3 border-b border-gray-100 hidden">
                           <div>
                             <div className="text-sm font-medium text-gray-900">桌面通知</div>
