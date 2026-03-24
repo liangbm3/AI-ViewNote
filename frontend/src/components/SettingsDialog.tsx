@@ -14,7 +14,7 @@ import { SaveConfig, GetConfig } from '../../bindings/AI-ViewNote/backend/servic
 import packageJson from '../../package.json';
 
 export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
-  const [activeCategory, setActiveCategory] = useState<SettingsCategory>('service');
+  const [activeCategory, setActiveCategory] = useState<SettingsCategory>('general');
 
   // 如果当前选中的是高级设置或通用设置，自动切换到服务设置
   useEffect(() => {
@@ -49,6 +49,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   // Load settings from backend when dialog opens
   useEffect(() => {
     if (isOpen) {
+      setActiveCategory('general');
       loadSettings();
     }
   }, [isOpen]);
