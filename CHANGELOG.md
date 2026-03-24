@@ -6,14 +6,37 @@
 
 ## [Unreleased] (未发布)
 
-
 ### 新增 (Added)
-
-- 新增设置选项：关闭时是否在后台运行
 
 ### 更改 (Changed)
 
 ### 修复 (Fixed)
+
+---
+
+## [1.1.0] - 2026-03-24
+
+### 新增 (Added)
+
+- ✨ 失败界面支持显示具体错误信息
+- ✨ 新增弹出消息通知功能，支持开启任务完成后弹窗提醒
+- ✨ 支持更改关闭按钮的默认行为，可以选择后台运行或者关闭程序
+- ✨ 支持设置打开程序栏时日志栏的折叠行为
+
+
+### 更改 (Changed)
+
+- 🎨 设置界面默认打开通用设置页面
+
+### 修复 (Fixed)
+
+- 🐛 修复文件大小始终显示为0的问题
+- 🐛 禁用拖拽上传功能以修复相关bug
+
+### 构建 (Build)
+
+- 🔧 更新GitHub工作流配置
+- 🔧 更新多平台构建配置（Windows、Linux、macOS）
 
 ---
 
@@ -33,5 +56,6 @@
 - 🔧 完整的配置管理系统 - 支持 API 密钥和服务配置
 ---
 
-[Unreleased]: https://github.com/liangbm3/AI-ViewNote/compare/v1.0.0...HEAD
-[1.0.0]: https://github.com/liangbm3/AI-ViewNote/releases/tag/v1.0.0
+[Unreleased]: https://github.com/liangbm3/AI-ViewNote/compare/v1.1.0...HEAD
+[1.1.0]: https://github.com/liangbm3/AI-ViewNote/compare/v1.0.1...v1.1.0
+[1.0.1]: https://github.com/liangbm3/AI-ViewNote/releases/tag/v1.0.1
