@@ -54,8 +54,12 @@ func main() {
 	confService := service.NewConfigService(confRepo)
 
 	// 确保默认配置项存在
-	ensureConfigExists(confService, "run_in_background", "false")
-	ensureConfigExists(confService, "desktop_notifications", "false")
+	if resp := confService.EnsureConfigDefaultValue(models.RunInBackground, "false"); !resp.Success {
+		log.Printf("Failed to ensure config '%s': %s\n", models.RunInBackground, resp.Message)
+	}
+	if resp := confService.EnsureConfigDefaultValue(models.DesktopNotifications, "false"); !resp.Success {
+		log.Printf("Failed to ensure config '%s': %s\n", models.DesktopNotifications, resp.Message)
+	}
 
 	app := application.New(application.Options{
 		Name:        "AI-ViewNote",
@@ -95,8 +99,23 @@ func main() {
 
 	// 托盘模式下拦截关闭按钮，改为隐藏窗口。
 	mainWindow.RegisterHook(events.Common.WindowClosing, func(event *application.WindowEvent) {
-		event.Cancel()
-		mainWindow.Hide()
+		resp := confService.GetBoolConfig(models.RunInBackground, false)
+		if !resp.Success {
+			log.Printf("Failed to load config '%s': %s. Using default value false.\n", models.RunInBackground, resp.Message)
+		}
+
+		runInBackground, ok := resp.Data.(bool)
+		if !resp.Success || !ok {
+			runInBackground = false
+		}
+
+		if runInBackground {
+			event.Cancel()
+			mainWindow.Hide()
+			return
+		}
+
+		app.Quit()
 	})
 
 	setupSystemTray(app, mainWindow)
@@ -153,19 +172,4 @@ func setupSystemTray(app *application.App, mainWindow application.Window) {
 	tray.OnClick(func() {
 		showMainWindow()
 	})
-}
-
-func ensureConfigExists(service *service.ConfigService, key string, defaultValue string) {
-	resp := service.ConfigExists(models.ConfigKey(key))
-	if !resp.Success {
-		log.Printf("Config '%s' does not exist, creating with default value.\n", key)
-		saveResp := service.SaveConfig(models.ConfigKey(key), defaultValue)
-		if !saveResp.Success {
-			log.Printf("Failed to create config '%s': %s\n", key, saveResp.Message)
-		} else {
-			log.Printf("Config '%s' created successfully.\n", key)
-		}
-	} else {
-		log.Printf("Config '%s' already exists.\n", key)
-	}
 }

@@ -2,18 +2,15 @@ import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
   X,
-  Check,
-  Folder,
   Globe,
-  Bell,
   Sparkles,
   Database,
   Palette,
   ChevronRight
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { SettingsDialogProps, SettingsCategory, Language, QualityOption } from '../types';
-import { SaveConfig, GetConfig, GetAllConfigs } from '../../bindings/AI-ViewNote/backend/service/configservice';
+import { SettingsDialogProps, SettingsCategory } from '../types';
+import { SaveConfig, GetConfig } from '../../bindings/AI-ViewNote/backend/service/configservice';
 import packageJson from '../../package.json';
 
 export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
@@ -21,13 +18,13 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
 
   // 如果当前选中的是高级设置或通用设置，自动切换到服务设置
   useEffect(() => {
-    if (activeCategory === 'advanced' || activeCategory === 'general') {
+    if (activeCategory === 'advanced') {
       setActiveCategory('service');
     }
   }, [activeCategory]);
 
   // General Settings
-  const [closeAction, setCloseAction] = useState<'background' | 'close'>('background');
+  const [runInBackground, setRunInBackground] = useState(false);
   const [notifications, setNotifications] = useState(true);
 
   // Service Settings
@@ -71,7 +68,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
       };
 
       // 加载各个配置项
-      setCloseAction(await loadConfig('RunInBackground', 'background') === 'true' ? 'background' : 'close');
+      setRunInBackground(await loadConfig('RunInBackground', 'false') === 'true');
       setNotifications(await loadConfig('DesktopNotifications', 'true') === 'true');
       setLlmBaseUrl(await loadConfig('LlmBaseURL', ''));
       setLlmModelId(await loadConfig('LlmModelID', ''));
@@ -107,7 +104,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
     try {
       // 分别保存每个配置项到后端
       const saveOperations = [
-        { key: 'RunInBackground', value: closeAction === 'background' ? 'true' : 'false' },
+        { key: 'RunInBackground', value: runInBackground ? 'true' : 'false' },
         { key: 'DesktopNotifications', value: notifications ? 'true' : 'false' },
         { key: 'LlmBaseURL', value: llmBaseUrl },
         { key: 'LlmModelID', value: llmModelId },
@@ -143,7 +140,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   };
 
   const handleReset = () => {
-    setCloseAction('background');
+    setRunInBackground(false);
     setNotifications(true);
     setLlmBaseUrl('');
     setLlmModelId('');
@@ -196,7 +193,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                 </div>
 
                 <nav className="flex-1 space-y-1">
-                  {categories.filter(cat => cat.id !== 'advanced' && cat.id !== 'general').map((category) => {
+                  {categories.filter(cat => cat.id !== 'advanced').map((category) => {
                     const Icon = category.icon;
                     return (
                       <button
@@ -248,10 +245,10 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                         </label>
                         <div className="space-y-2">
                           <button
-                            onClick={() => setCloseAction('background')}
+                            onClick={() => setRunInBackground(true)}
                             className={`
                               w-full px-4 py-3 rounded-lg border text-left transition-all flex items-center justify-between
-                              ${closeAction === 'background'
+                              ${runInBackground
                                 ? 'border-gray-900 bg-gray-50'
                                 : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                               }
@@ -260,21 +257,21 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                             <span className="text-sm text-gray-900">在后台运行</span>
                             <div className={`
                               w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all
-                              ${closeAction === 'background'
+                              ${runInBackground
                                 ? 'border-gray-900 bg-gray-900'
                                 : 'border-gray-300'
                               }
                             `}>
-                              {closeAction === 'background' && (
+                              {runInBackground && (
                                 <div className="w-2 h-2 bg-white rounded-full" />
                               )}
                             </div>
                           </button>
                           <button
-                            onClick={() => setCloseAction('close')}
+                            onClick={() => setRunInBackground(false)}
                             className={`
                               w-full px-4 py-3 rounded-lg border text-left transition-all flex items-center justify-between
-                              ${closeAction === 'close'
+                              ${!runInBackground
                                 ? 'border-gray-900 bg-gray-50'
                                 : 'border-gray-200 hover:border-gray-300 hover:bg-gray-50'
                               }
@@ -283,12 +280,12 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                             <span className="text-sm text-gray-900">关闭程序</span>
                             <div className={`
                               w-4 h-4 rounded-full border-2 flex items-center justify-center transition-all
-                              ${closeAction === 'close'
+                              ${!runInBackground
                                 ? 'border-gray-900 bg-gray-900'
                                 : 'border-gray-300'
                               }
                             `}>
-                              {closeAction === 'close' && (
+                              {!runInBackground && (
                                 <div className="w-2 h-2 bg-white rounded-full" />
                               )}
                             </div>

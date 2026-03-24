@@ -31,10 +31,32 @@ export function DeleteConfig(key) {
 }
 
 /**
+ * @param {models$0.ConfigKey} key
+ * @param {string} defaultValue
+ * @returns {$CancellablePromise<models$0.Response>}
+ */
+export function EnsureConfigDefaultValue(key, defaultValue) {
+    return $Call.ByID(3753997769, key, defaultValue).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType0($result);
+    }));
+}
+
+/**
  * @returns {$CancellablePromise<models$0.Response>}
  */
 export function GetAllConfigs() {
     return $Call.ByID(2286784159).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType0($result);
+    }));
+}
+
+/**
+ * @param {models$0.ConfigKey} key
+ * @param {boolean} defaultValue
+ * @returns {$CancellablePromise<models$0.Response>}
+ */
+export function GetBoolConfig(key, defaultValue) {
+    return $Call.ByID(399331395, key, defaultValue).then(/** @type {($result: any) => any} */(($result) => {
         return $$createType0($result);
     }));
 }

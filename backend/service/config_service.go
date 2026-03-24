@@ -3,6 +3,7 @@ package service
 import (
 	"AI-ViewNote/backend/models"
 	"AI-ViewNote/backend/repository"
+	"fmt"
 )
 
 type ConfigService struct {
@@ -47,10 +48,45 @@ func (s *ConfigService) GetAllConfigs() models.Response {
 	return successResponse("Configs retrieved successfully", configs)
 }
 
-func (s *ConfigService) ConfigExists(key models.ConfigKey) models.Response{
-	_, err := s.config_repo.GetConfig(key)
+func (s *ConfigService) ConfigExists(key models.ConfigKey) models.Response {
+	config, err := s.config_repo.GetConfig(key)
 	if err != nil {
 		return errorResponse("Failed to check config existence: " + err.Error())
 	}
-	return successResponse("Config exists", nil)
+	return successResponse("Config existence checked successfully", config != (models.AppConfig{}))
+}
+
+func (s *ConfigService) GetBoolConfig(key models.ConfigKey, defaultValue bool) models.Response {
+	resp := s.GetConfig(key)
+	if !resp.Success {
+		return resp
+	}
+
+	config, ok := resp.Data.(models.AppConfig)
+	if !ok || config == (models.AppConfig{}) {
+		return successResponse("Bool config retrieved successfully", defaultValue)
+	}
+
+	switch config.Value {
+	case "true":
+		return successResponse("Bool config retrieved successfully", true)
+	case "false":
+		return successResponse("Bool config retrieved successfully", false)
+	default:
+		return errorResponse(fmt.Sprintf("Invalid bool config value for key '%s': %s", key, config.Value))
+	}
+}
+
+func (s *ConfigService) EnsureConfigDefaultValue(key models.ConfigKey, defaultValue string) models.Response {
+	existsResp := s.ConfigExists(key)
+	if !existsResp.Success {
+		return existsResp
+	}
+
+	exists, ok := existsResp.Data.(bool)
+	if ok && exists {
+		return successResponse("Config already exists", nil)
+	}
+
+	return s.SaveConfig(key, defaultValue)
 }
