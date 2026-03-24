@@ -56,11 +56,14 @@ func main() {
 	confService := service.NewConfigService(confRepo)
 
 	// 确保默认配置项存在
-	if resp := confService.EnsureConfigDefaultValue(models.RunInBackground, "false"); !resp.Success {
+	if resp := confService.EnsureConfigDefaultValue(models.RunInBackground, "true"); !resp.Success {
 		log.Printf("Failed to ensure config '%s': %s\n", models.RunInBackground, resp.Message)
 	}
-	if resp := confService.EnsureConfigDefaultValue(models.DesktopNotifications, "false"); !resp.Success {
+	if resp := confService.EnsureConfigDefaultValue(models.DesktopNotifications, "true"); !resp.Success {
 		log.Printf("Failed to ensure config '%s': %s\n", models.DesktopNotifications, resp.Message)
+	}
+	if resp := confService.EnsureConfigDefaultValue(models.LogFolding, "true"); !resp.Success {
+		log.Printf("Failed to ensure config '%s': %s\n", models.LogFolding, resp.Message)
 	}
 
 	app := application.New(application.Options{
