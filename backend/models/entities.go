@@ -60,6 +60,7 @@ const (
 	LlmApiKey ConfigKey = "LlmApiKey"
 	RunInBackground ConfigKey = "RunInBackground"
 	DesktopNotifications ConfigKey = "DesktopNotifications"
+	LogFolding ConfigKey = "LogFolding"
 )
 
 type AppConfig struct {
