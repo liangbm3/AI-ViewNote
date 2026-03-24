@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { Dialogs } from '@wailsio/runtime';
 import { LogEntry, SelectedVideoFile } from '../types';
+import { GetFileSize } from '../../bindings/AI-ViewNote/backend/service/taskservice.js';
 
 function getFileNameFromPath(filePath: string): string {
   const segments = filePath.split(/[\\/]/);
@@ -28,9 +29,10 @@ export function useFileUpload(addLog: (message: string, type?: LogEntry['type'])
         return;
       }
 
+      const fileSize = await GetFileSize(selectedPath);
       const pickedFile: SelectedVideoFile = {
         name: getFileNameFromPath(selectedPath),
-        size: 0,
+        size: fileSize,
         path: selectedPath,
       };
 

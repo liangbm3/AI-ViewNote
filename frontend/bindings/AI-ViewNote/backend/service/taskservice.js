@@ -11,6 +11,14 @@ import { Call as $Call, CancellablePromise as $CancellablePromise, Create as $Cr
 import * as models$0 from "../models/models.js";
 
 /**
+ * @param {string} filePath
+ * @returns {$CancellablePromise<number>}
+ */
+export function GetFileSize(filePath) {
+    return $Call.ByID(2216568243, filePath);
+}
+
+/**
  * @param {number} id
  * @returns {$CancellablePromise<models$0.Response>}
  */

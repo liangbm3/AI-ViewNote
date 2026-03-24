@@ -98,6 +98,26 @@ func (s *TaskService) GetTaskByID(id int) models.Response {
 	return successResponse("Task retrieved successfully", task)
 }
 
+func (s *TaskService) GetFileSize(filePath string) (int64, error) {
+	cleanedPath := strings.TrimSpace(filePath)
+	if cleanedPath == "" {
+		return 0, errors.New("file path is empty")
+	}
+	if !filepath.IsAbs(cleanedPath) {
+		return 0, fmt.Errorf("invalid file path: expected absolute path but got %q", cleanedPath)
+	}
+
+	fileInfo, err := os.Stat(cleanedPath)
+	if err != nil {
+		return 0, fmt.Errorf("failed to stat file: %w", err)
+	}
+	if fileInfo.IsDir() {
+		return 0, errors.New("path points to a directory, not a file")
+	}
+
+	return fileInfo.Size(), nil
+}
+
 func (s *TaskService) task(taskID int) {
 	task, err := s.task_repo.GetByID(taskID)
 	if err != nil {
