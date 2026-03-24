@@ -1,4 +1,4 @@
-import React from 'react';
+﻿import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Upload, FileVideo, X, Film } from 'lucide-react';
 import { Button } from './ui/Button';
@@ -56,7 +56,7 @@ export function UploadSection({
                 <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mb-4">
                   <Upload className="w-6 h-6 text-gray-400" strokeWidth={1.5} />
                 </div>
-                <p className="text-gray-900 font-medium mb-1">点击或拖拽上传视频</p>
+                <p className="text-gray-900 font-medium mb-1">点击选择视频文件</p>
                 <p className="text-sm text-gray-400">支持 MP4, MOV, AVI, MKV</p>
               </div>
             </motion.div>

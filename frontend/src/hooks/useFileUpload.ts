@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+﻿import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 import { Dialogs } from '@wailsio/runtime';
 import { LogEntry, SelectedVideoFile } from '../types';
@@ -11,17 +11,17 @@ function getFileNameFromPath(filePath: string): string {
 
 export function useFileUpload(addLog: (message: string, type?: LogEntry['type']) => void) {
   const [selectedFile, setSelectedFile] = useState<SelectedVideoFile | null>(null);
-  const [dragActive, setDragActive] = useState(false);
+  const [dragActive] = useState(false);
 
   const selectVideoFromDialog = useCallback(async () => {
     try {
       const selectedPath = await Dialogs.OpenFile({
-        Title: '选择视频文件',
+        Title: 'Select video file',
         CanChooseFiles: true,
         CanChooseDirectories: false,
         AllowsMultipleSelection: false,
         Filters: [
-          { DisplayName: '视频文件', Pattern: '*.mp4;*.mov;*.avi;*.mkv;*.flv;*.wmv;*.m4v;*.webm' },
+          { DisplayName: 'Video files', Pattern: '*.mp4;*.mov;*.avi;*.mkv;*.flv;*.wmv;*.m4v;*.webm' },
         ],
       });
 
@@ -29,7 +29,13 @@ export function useFileUpload(addLog: (message: string, type?: LogEntry['type'])
         return;
       }
 
-      const fileSize = await GetFileSize(selectedPath);
+      let fileSize = 0;
+      try {
+        fileSize = await GetFileSize(selectedPath);
+      } catch {
+        fileSize = 0;
+      }
+
       const pickedFile: SelectedVideoFile = {
         name: getFileNameFromPath(selectedPath),
         size: fileSize,
@@ -37,50 +43,26 @@ export function useFileUpload(addLog: (message: string, type?: LogEntry['type'])
       };
 
       setSelectedFile(pickedFile);
-      addLog(`文件已选择: ${pickedFile.name}`, 'success');
-      toast.success('文件已选择');
+      addLog(`File selected: ${pickedFile.name}`, 'success');
+      toast.success('File selected');
     } catch (error) {
       const msg = error instanceof Error ? error.message : String(error);
-      addLog(`错误: 打开文件选择器失败 - ${msg}`, 'error');
-      toast.error('打开文件选择器失败');
+      addLog(`Error: failed to open file picker - ${msg}`, 'error');
+      toast.error('Failed to open file picker');
     }
   }, [addLog]);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    if (e.type === "dragenter" || e.type === "dragover") {
-      setDragActive(true);
-    } else if (e.type === "dragleave") {
-      setDragActive(false);
-    }
   }, []);
 
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    setDragActive(false);
-
-    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      const file = e.dataTransfer.files[0];
-      if (file.type.startsWith('video/')) {
-        const fileWithPath = file as File & { path?: string };
-        if (fileWithPath.path) {
-          setSelectedFile({ name: file.name, size: file.size, path: fileWithPath.path });
-          addLog(`文件已选择: ${file.name}`, 'success');
-          toast.success('文件已选择');
-          return;
-        }
-
-        addLog('拖拽文件未携带完整路径，将打开系统文件选择器以确保可处理', 'warning');
-        toast.warning('请在弹窗中重新确认视频文件');
-        void selectVideoFromDialog();
-      } else {
-        addLog('错误: 不支持的文件格式', 'error');
-        toast.error('请选择视频文件');
-      }
-    }
-  }, [addLog, selectVideoFromDialog]);
+    addLog('Drag-and-drop upload is disabled. Please click to select a file.', 'info');
+    toast.info('请点击选择文件');
+  }, [addLog]);
 
   const handleFileSelect = useCallback(() => {
     void selectVideoFromDialog();
@@ -88,7 +70,7 @@ export function useFileUpload(addLog: (message: string, type?: LogEntry['type'])
 
   const resetFile = useCallback(() => {
     setSelectedFile(null);
-    addLog('已重置文件选择', 'info');
+    addLog('File selection has been reset', 'info');
   }, [addLog]);
 
   return {
@@ -97,6 +79,6 @@ export function useFileUpload(addLog: (message: string, type?: LogEntry['type'])
     handleDrag,
     handleDrop,
     handleFileSelect,
-    resetFile
+    resetFile,
   };
 }
