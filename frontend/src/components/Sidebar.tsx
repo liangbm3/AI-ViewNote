@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { ChevronLeft, ChevronRight, ListTodo } from 'lucide-react';
 import { Task } from '../types';
@@ -6,6 +6,8 @@ import { Button } from './ui/Button';
 
 interface SidebarProps {
   isCollapsed: boolean;
+  width: number;
+  onWidthChange: (width: number) => void;
   tasks: Task[];
   selectedTaskId?: string;
   onToggleCollapse: () => void;
@@ -17,6 +19,8 @@ interface SidebarProps {
 
 export function Sidebar({
   isCollapsed,
+  width,
+  onWidthChange,
   tasks,
   selectedTaskId,
   onToggleCollapse,
@@ -25,16 +29,65 @@ export function Sidebar({
   onNewTask,
   onTaskSelect
 }: SidebarProps) {
+  const [isResizing, setIsResizing] = useState(false);
+  const resizeRef = useRef<HTMLDivElement>(null);
+
+  const MIN_WIDTH = 200;
+  const MAX_WIDTH = 600;
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsResizing(true);
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (!isResizing) return;
+
+    const newWidth = Math.min(
+      MAX_WIDTH,
+      Math.max(MIN_WIDTH, e.clientX - (resizeRef.current?.getBoundingClientRect().left || 0))
+    );
+    onWidthChange(newWidth);
+  };
+
+  const handleMouseUp = () => {
+    if (isResizing) {
+      setIsResizing(false);
+      localStorage.setItem('sidebarWidth', width.toString());
+    }
+  };
+
+  useEffect(() => {
+    if (isResizing) {
+      document.addEventListener('mousemove', handleMouseMove);
+      document.addEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = 'col-resize';
+      document.body.style.userSelect = 'none';
+    } else {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    }
+
+    return () => {
+      document.removeEventListener('mousemove', handleMouseMove);
+      document.removeEventListener('mouseup', handleMouseUp);
+      document.body.style.cursor = '';
+      document.body.style.userSelect = '';
+    };
+  }, [isResizing, width]);
   return (
     <div className="relative h-full flex flex-shrink-0 z-10">
       <AnimatePresence mode="wait">
         {!isCollapsed && (
           <motion.div
+            ref={resizeRef}
             initial={{ width: 0, opacity: 0 }}
-            animate={{ width: '280px', opacity: 1 }}
+            animate={{ width: `${width}px`, opacity: 1 }}
             exit={{ width: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
-            className="bg-white border-r border-gray-200 flex flex-col h-full overflow-hidden"
+            className="bg-white border-r border-gray-200 flex flex-col h-full overflow-hidden relative"
           >
             {/* 新建任务按钮 */}
             <div className="p-3 border-b border-gray-200">
@@ -102,13 +155,24 @@ export function Sidebar({
                 </div>
               ))}
             </div>
+            {/* Resize Handle */}
+            <div
+              className={`absolute top-0 right-0 w-1 h-full cursor-col-resize transition-colors ${
+                isResizing ? 'bg-blue-500' : 'bg-transparent hover:bg-gray-300'
+              }`}
+              onMouseDown={handleMouseDown}
+            />
           </motion.div>
         )}
       </AnimatePresence>
 
       {/* 悬浮折叠/展开按钮 */}
-      <div 
-        className={`absolute top-1/2 -translate-y-1/2 z-50 transition-all duration-200 ${isCollapsed ? '-right-6' : '-right-3'}`}
+      <div
+        className="absolute top-1/2 -translate-y-1/2 z-50 transition-all duration-200"
+        style={{
+          left: isCollapsed ? '0' : `${width}px`,
+          transform: 'translateY(-50%)'
+        }}
       >
         <button
           onClick={onToggleCollapse}

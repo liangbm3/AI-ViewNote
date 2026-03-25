@@ -20,6 +20,9 @@ import { useTasks } from '../hooks/useTasks';
 
 export function VideoConverter() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
+  const [sidebarWidth, setSidebarWidth] = useState(() => {
+    return parseInt(localStorage.getItem('sidebarWidth') || '280', 10);
+  });
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [showUploadInterface, setShowUploadInterface] = useState(true); // 控制是否显示上传界面
   const [selectedTask, setSelectedTask] = useState<Task | null>(null); // 选中的任务
@@ -121,6 +124,8 @@ export function VideoConverter() {
       <div className="flex-1 flex min-h-0">
         <Sidebar
           isCollapsed={sidebarCollapsed}
+          width={sidebarWidth}
+          onWidthChange={setSidebarWidth}
           tasks={tasks}
           selectedTaskId={selectedTask?.id}
           onToggleCollapse={() => setSidebarCollapsed(!sidebarCollapsed)}
