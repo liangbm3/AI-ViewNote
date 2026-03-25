@@ -11,6 +11,29 @@ import { Call as $Call, CancellablePromise as $CancellablePromise, Create as $Cr
 import * as models$0 from "../models/models.js";
 
 /**
+ * DownloadMarkdown downloads the markdown content for a specific task
+ * @param {number} taskID
+ * @returns {$CancellablePromise<models$0.Response>}
+ */
+export function DownloadMarkdown(taskID) {
+    return $Call.ByID(1497659073, taskID).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType0($result);
+    }));
+}
+
+/**
+ * DownloadSubtitles downloads the subtitle content for a specific task in the specified format
+ * @param {number} taskID
+ * @param {string} format
+ * @returns {$CancellablePromise<models$0.Response>}
+ */
+export function DownloadSubtitles(taskID, format) {
+    return $Call.ByID(620866277, taskID, format).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType0($result);
+    }));
+}
+
+/**
  * @param {string} filePath
  * @returns {$CancellablePromise<number>}
  */

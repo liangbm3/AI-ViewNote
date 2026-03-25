@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Sparkles, FileText, MessageSquare } from 'lucide-react';
+import { Sparkles, FileText, MessageSquare, Download, FileDown } from 'lucide-react';
+import { toast } from 'sonner';
+import { DownloadMarkdown, DownloadSubtitles } from '../../bindings/AI-ViewNote/backend/service/taskservice.js';
 
 interface SubtitleItem {
   start_time: number;
@@ -10,9 +12,68 @@ interface SubtitleItem {
 interface ContentDisplayProps {
   imageTextContent?: string;
   subtitles?: SubtitleItem[];
+  taskId?: string; // 添加任务ID用于下载功能
 }
 
-export function ContentDisplay({ imageTextContent, subtitles }: ContentDisplayProps) {
+export function ContentDisplay({ imageTextContent, subtitles, taskId }: ContentDisplayProps) {
+  const [downloading, setDownloading] = useState<{[key: string]: boolean}>({});
+
+  // 下载Markdown
+  const handleDownloadMarkdown = async () => {
+    if (!taskId) return;
+
+    setDownloading(prev => ({ ...prev, markdown: true }));
+    try {
+      const response = await DownloadMarkdown(parseInt(taskId));
+      if (response.success) {
+        toast.success('Markdown文件已保存到下载目录', {
+          description: response.data?.filename || '文件保存成功'
+        });
+      } else {
+        toast.error('下载失败', {
+          description: response.message
+        });
+      }
+    } catch (error) {
+      toast.error('下载出错', {
+        description: error instanceof Error ? error.message : '未知错误'
+      });
+      console.error('下载Markdown失败:', error);
+    } finally {
+      setDownloading(prev => ({ ...prev, markdown: false }));
+    }
+  };
+
+  // 下载字幕
+  const handleDownloadSubtitles = async (format: 'srt' | 'vtt' | 'txt') => {
+    if (!taskId) return;
+
+    setDownloading(prev => ({ ...prev, subtitles: true }));
+    try {
+      const response = await DownloadSubtitles(parseInt(taskId), format);
+      if (response.success) {
+        const formatNames = {
+          srt: 'SRT字幕',
+          vtt: 'VTT字幕',
+          txt: 'TXT字幕'
+        };
+        toast.success(`${formatNames[format]}文件已保存到下载目录`, {
+          description: response.data?.filename || '文件保存成功'
+        });
+      } else {
+        toast.error('下载失败', {
+          description: response.message
+        });
+      }
+    } catch (error) {
+      toast.error('下载出错', {
+        description: error instanceof Error ? error.message : '未知错误'
+      });
+      console.error('下载字幕失败:', error);
+    } finally {
+      setDownloading(prev => ({ ...prev, subtitles: false }));
+    }
+  };
   const displayContent = imageTextContent || '';
   const displaySubtitles = subtitles || [];
 
@@ -40,9 +101,61 @@ export function ContentDisplay({ imageTextContent, subtitles }: ContentDisplayPr
 
   return (
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col min-h-0 shadow-sm">
-      <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0 bg-gray-50/50 flex items-center gap-2">
-        <Sparkles className="w-5 h-5 text-amber-500" />
-        <h2 className="text-lg font-semibold text-gray-900 tracking-tight">转换结果</h2>
+      <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0 bg-gray-50/50 flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Sparkles className="w-5 h-5 text-amber-500" />
+          <h2 className="text-lg font-semibold text-gray-900 tracking-tight">转换结果</h2>
+        </div>
+
+        {/* 下载按钮组 */}
+        {taskId && (
+          <div className="flex items-center gap-3">
+            {/* Markdown下载按钮 */}
+            <button
+              onClick={handleDownloadMarkdown}
+              disabled={downloading.markdown}
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <Download className="w-4 h-4" />
+              {downloading.markdown ? '下载中...' : '下载Markdown'}
+            </button>
+
+            {/* 字幕下载下拉菜单 */}
+            <div className="relative group">
+              <button
+                disabled={downloading.subtitles}
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                <FileDown className="w-4 h-4" />
+                {downloading.subtitles ? '下载中...' : '下载字幕'}
+              </button>
+
+              {/* 下拉菜单 */}
+              <div className="absolute right-0 top-full mt-2 w-36 bg-white border border-gray-200 rounded-lg shadow-lg opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 z-10">
+                <div className="py-2">
+                  <button
+                    onClick={() => handleDownloadSubtitles('srt')}
+                    className="w-full px-4 py-2.5 text-sm text-left text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    SRT格式
+                  </button>
+                  <button
+                    onClick={() => handleDownloadSubtitles('vtt')}
+                    className="w-full px-4 py-2.5 text-sm text-left text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    VTT格式
+                  </button>
+                  <button
+                    onClick={() => handleDownloadSubtitles('txt')}
+                    className="w-full px-4 py-2.5 text-sm text-left text-gray-700 hover:bg-gray-50 transition-colors"
+                  >
+                    TXT格式
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-2 divide-x divide-gray-200 flex-1 min-h-0">

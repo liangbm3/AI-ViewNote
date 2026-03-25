@@ -153,6 +153,7 @@ export function VideoConverter() {
                   <ContentDisplay
                     imageTextContent={selectedTask.markdownContent}
                     subtitles={parseSubtitles(selectedTask.transcriptionText)}
+                    taskId={selectedTask.id}
                   />
                 ) : selectedTask.status === 'error' ? (
                   <ErrorPrompt

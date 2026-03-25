@@ -538,3 +538,213 @@ func (s *TaskService) generateMarkdown(data []models.Utterance, style models.Con
 	// 这里只取第一个回答
 	return resp.Choices[0].Message.Content, nil
 }
+
+// DownloadMarkdown downloads the markdown content for a specific task
+func (s *TaskService) DownloadMarkdown(taskID int) models.Response {
+	task, err := s.task_repo.GetByID(taskID)
+	if err != nil {
+		return errorResponse("Failed to retrieve task: " + err.Error())
+	}
+
+	if task.MarkdownContent == "" {
+		return errorResponse("No markdown content available for this task")
+	}
+
+	// 获取文件名
+	fileName := filepath.Base(task.FilePath)
+	if fileName == "." || fileName == string(filepath.Separator) {
+		fileName = fmt.Sprintf("task_%d", taskID)
+	}
+	fileName = strings.TrimSuffix(fileName, filepath.Ext(fileName))
+	markdownFileName := fileName + ".md"
+
+	// 获取用户下载目录
+	downloadDir, err := s.getDownloadDir()
+	if err != nil {
+		return errorResponse("Failed to get download directory: " + err.Error())
+	}
+
+	filePath := filepath.Join(downloadDir, markdownFileName)
+
+	// 保存文件
+	err = os.WriteFile(filePath, []byte(task.MarkdownContent), 0644)
+	if err != nil {
+		return errorResponse("Failed to save markdown file: " + err.Error())
+	}
+
+	if s.event_emitter != nil {
+		s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelInfo,
+			Message: fmt.Sprintf("Markdown file saved to: %s", filePath)})
+	}
+
+	return successResponse("Markdown file saved successfully", map[string]interface{}{
+		"file_path":   filePath,
+		"filename":    markdownFileName,
+		"task_id":     taskID,
+	})
+}
+
+// DownloadSubtitles downloads the subtitle content for a specific task in the specified format
+func (s *TaskService) DownloadSubtitles(taskID int, format string) models.Response {
+	task, err := s.task_repo.GetByID(taskID)
+	if err != nil {
+		return errorResponse("Failed to retrieve task: " + err.Error())
+	}
+
+	if len(task.TranscriptionText) == 0 {
+		return errorResponse("No subtitle content available for this task")
+	}
+
+	// 获取文件名
+	fileName := filepath.Base(task.FilePath)
+	if fileName == "." || fileName == string(filepath.Separator) {
+		fileName = fmt.Sprintf("task_%d", taskID)
+	}
+	fileName = strings.TrimSuffix(fileName, filepath.Ext(fileName))
+
+	var content string
+	var fileExtension string
+
+	switch format {
+	case "srt":
+		content = s.generateSRT(task.TranscriptionText)
+		fileExtension = ".srt"
+	case "vtt":
+		content = s.generateVTT(task.TranscriptionText)
+		fileExtension = ".vtt"
+	case "txt":
+		content = s.generatePlainText(task.TranscriptionText)
+		fileExtension = ".txt"
+	default:
+		return errorResponse("Unsupported subtitle format: " + format)
+	}
+
+	subtitleFileName := fileName + fileExtension
+
+	// 获取用户下载目录
+	downloadDir, err := s.getDownloadDir()
+	if err != nil {
+		return errorResponse("Failed to get download directory: " + err.Error())
+	}
+
+	filePath := filepath.Join(downloadDir, subtitleFileName)
+
+	// 保存文件
+	err = os.WriteFile(filePath, []byte(content), 0644)
+	if err != nil {
+		return errorResponse("Failed to save subtitle file: " + err.Error())
+	}
+
+	if s.event_emitter != nil {
+		s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelInfo,
+			Message: fmt.Sprintf("Subtitle file saved to: %s", filePath)})
+	}
+
+	return successResponse("Subtitle file saved successfully", map[string]interface{}{
+		"file_path":   filePath,
+		"filename":    subtitleFileName,
+		"format":      format,
+		"task_id":     taskID,
+	})
+}
+
+// generateSRT generates SRT format subtitles
+func (s *TaskService) generateSRT(utterances []models.Utterance) string {
+	var result strings.Builder
+
+	for i, utterance := range utterances {
+		index := i + 1
+		startTime := s.formatSRTTime(utterance.StartTime)
+		endTime := s.formatSRTTime(utterance.EndTime)
+
+		result.WriteString(fmt.Sprintf("%d\n", index))
+		result.WriteString(fmt.Sprintf("%s --> %s\n", startTime, endTime))
+		result.WriteString(fmt.Sprintf("%s\n\n", utterance.Text))
+	}
+
+	return result.String()
+}
+
+// generateVTT generates WebVTT format subtitles
+func (s *TaskService) generateVTT(utterances []models.Utterance) string {
+	var result strings.Builder
+
+	result.WriteString("WEBVTT\n\n")
+
+	for i, utterance := range utterances {
+		index := i + 1
+		startTime := s.formatVTTTime(utterance.StartTime)
+		endTime := s.formatVTTTime(utterance.EndTime)
+
+		result.WriteString(fmt.Sprintf("%d\n", index))
+		result.WriteString(fmt.Sprintf("%s --> %s\n", startTime, endTime))
+		result.WriteString(fmt.Sprintf("%s\n\n", utterance.Text))
+	}
+
+	return result.String()
+}
+
+// generatePlainText generates plain text format subtitles
+func (s *TaskService) generatePlainText(utterances []models.Utterance) string {
+	var result strings.Builder
+
+	for _, utterance := range utterances {
+		timeStamp := s.formatPlainTime(utterance.StartTime)
+		result.WriteString(fmt.Sprintf("[%s] %s\n", timeStamp, utterance.Text))
+	}
+
+	return result.String()
+}
+
+// formatSRTTime formats time for SRT format (HH:MM:SS,mmm)
+func (s *TaskService) formatSRTTime(milliseconds int) string {
+	totalSeconds := milliseconds / 1000
+	hours := totalSeconds / 3600
+	minutes := (totalSeconds % 3600) / 60
+	seconds := totalSeconds % 60
+	ms := milliseconds % 1000
+
+	return fmt.Sprintf("%02d:%02d:%02d,%03d", hours, minutes, seconds, ms)
+}
+
+// formatVTTTime formats time for VTT format (HH:MM:SS.mmm)
+func (s *TaskService) formatVTTTime(milliseconds int) string {
+	totalSeconds := milliseconds / 1000
+	hours := totalSeconds / 3600
+	minutes := (totalSeconds % 3600) / 60
+	seconds := totalSeconds % 60
+	ms := milliseconds % 1000
+
+	return fmt.Sprintf("%02d:%02d:%02d.%03d", hours, minutes, seconds, ms)
+}
+
+// formatPlainTime formats time for plain text (MM:SS)
+func (s *TaskService) formatPlainTime(milliseconds int) string {
+	totalSeconds := milliseconds / 1000
+	minutes := totalSeconds / 60
+	seconds := totalSeconds % 60
+
+	return fmt.Sprintf("%02d:%02d", minutes, seconds)
+}
+
+// getDownloadDir gets the user's download directory
+func (s *TaskService) getDownloadDir() (string, error) {
+	// 获取用户主目录
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return "", err
+	}
+
+	// 构建下载目录路径
+	downloadDir := filepath.Join(homeDir, "Downloads")
+
+	// 检查下载目录是否存在，如果不存在则创建
+	if _, err := os.Stat(downloadDir); os.IsNotExist(err) {
+		err = os.MkdirAll(downloadDir, 0755)
+		if err != nil {
+			return "", err
+		}
+	}
+
+	return downloadDir, nil
+}
