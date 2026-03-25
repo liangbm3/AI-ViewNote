@@ -11,7 +11,7 @@ info:
   description: "AI powered video note taking application" # The application description
   copyright: "(c) 2026, AI-ViewNote" # Copyright text
   comments: "AI powered video note taking application" # Comments
-  version: "1.1.0" # The application version
+  version: "1.2.0" # The application version
   # cfBundleIconName: "appicon" # The macOS icon name in Assets.car icon bundles (optional)
   #                               # Should match the name of your .icon file without the extension
   #                               # If not set and Assets.car exists, defaults to "appicon"
