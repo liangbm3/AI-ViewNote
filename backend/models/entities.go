@@ -71,6 +71,27 @@ type AppConfig struct {
 	UpdateAt string `json:"updated_at"`
 }
 
+// Service configuration structs
+type TOSConfig struct {
+	AccessKey string
+	SecretKey string
+	Endpoint  string
+	Region    string
+	Bucket    string
+}
+
+type ASRConfig struct {
+	AppID       string
+	AccessToken string
+	ClusterID   string
+}
+
+type LLMConfig struct {
+	BaseURL string
+	ModelID string
+	ApiKey  string
+}
+
 // 日志级别枚举
 type LogLevel string
 const (

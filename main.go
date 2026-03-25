@@ -61,14 +61,14 @@ func main() {
 	}
 
 	// 确保默认配置项存在
-	if resp := confService.EnsureConfigDefaultValue(models.RunInBackground, "true"); !resp.Success {
-		log.Printf("Failed to ensure config '%s': %s\n", models.RunInBackground, resp.Message)
+	if err := confService.EnsureConfigDefaultValue(models.RunInBackground, "true"); err != nil {
+		log.Printf("Failed to ensure config '%s': %s\n", models.RunInBackground, err.Error())
 	}
-	if resp := confService.EnsureConfigDefaultValue(models.DesktopNotifications, "true"); !resp.Success {
-		log.Printf("Failed to ensure config '%s': %s\n", models.DesktopNotifications, resp.Message)
+	if err := confService.EnsureConfigDefaultValue(models.DesktopNotifications, "true"); err != nil {
+		log.Printf("Failed to ensure config '%s': %s\n", models.DesktopNotifications, err.Error())
 	}
-	if resp := confService.EnsureConfigDefaultValue(models.LogFolding, "true"); !resp.Success {
-		log.Printf("Failed to ensure config '%s': %s\n", models.LogFolding, resp.Message)
+	if err := confService.EnsureConfigDefaultValue(models.LogFolding, "true"); err != nil {
+		log.Printf("Failed to ensure config '%s': %s\n", models.LogFolding, err.Error())
 	}
 
 	app := application.New(application.Options{
@@ -110,13 +110,9 @@ func main() {
 
 	// 托盘模式下拦截关闭按钮，改为隐藏窗口。
 	mainWindow.RegisterHook(events.Common.WindowClosing, func(event *application.WindowEvent) {
-		resp := confService.GetBoolConfig(models.RunInBackground, false)
-		if !resp.Success {
-			log.Printf("Failed to load config '%s': %s. Using default value false.\n", models.RunInBackground, resp.Message)
-		}
-
-		runInBackground, ok := resp.Data.(bool)
-		if !resp.Success || !ok {
+		runInBackground, err := confService.GetBoolConfig(models.RunInBackground, false)
+		if err != nil {
+			log.Printf("Failed to load config '%s': %s. Using default value false.\n", models.RunInBackground, err.Error())
 			runInBackground = false
 		}
 

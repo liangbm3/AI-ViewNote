@@ -6,6 +6,48 @@
 // @ts-ignore: Unused imports
 import { Create as $Create } from "@wailsio/runtime";
 
+export class ASRConfig {
+    /**
+     * Creates a new ASRConfig instance.
+     * @param {Partial<ASRConfig>} [$$source = {}] - The source object to create the ASRConfig.
+     */
+    constructor($$source = {}) {
+        if (!("AppID" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["AppID"] = "";
+        }
+        if (!("AccessToken" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["AccessToken"] = "";
+        }
+        if (!("ClusterID" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["ClusterID"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new ASRConfig instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {ASRConfig}
+     */
+    static createFrom($$source = {}) {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new ASRConfig(/** @type {Partial<ASRConfig>} */($$parsedSource));
+    }
+}
+
 /**
  * 配置项枚举
  * @readonly
@@ -32,6 +74,48 @@ export const ConfigKey = {
     DesktopNotifications: "DesktopNotifications",
     LogFolding: "LogFolding",
 };
+
+export class LLMConfig {
+    /**
+     * Creates a new LLMConfig instance.
+     * @param {Partial<LLMConfig>} [$$source = {}] - The source object to create the LLMConfig.
+     */
+    constructor($$source = {}) {
+        if (!("BaseURL" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["BaseURL"] = "";
+        }
+        if (!("ModelID" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["ModelID"] = "";
+        }
+        if (!("ApiKey" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["ApiKey"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new LLMConfig instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {LLMConfig}
+     */
+    static createFrom($$source = {}) {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new LLMConfig(/** @type {Partial<LLMConfig>} */($$parsedSource));
+    }
+}
 
 /**
  * 响应结构体
@@ -75,5 +159,64 @@ export class Response {
     static createFrom($$source = {}) {
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         return new Response(/** @type {Partial<Response>} */($$parsedSource));
+    }
+}
+
+/**
+ * Service configuration structs
+ */
+export class TOSConfig {
+    /**
+     * Creates a new TOSConfig instance.
+     * @param {Partial<TOSConfig>} [$$source = {}] - The source object to create the TOSConfig.
+     */
+    constructor($$source = {}) {
+        if (!("AccessKey" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["AccessKey"] = "";
+        }
+        if (!("SecretKey" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["SecretKey"] = "";
+        }
+        if (!("Endpoint" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["Endpoint"] = "";
+        }
+        if (!("Region" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["Region"] = "";
+        }
+        if (!("Bucket" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["Bucket"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new TOSConfig instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {TOSConfig}
+     */
+    static createFrom($$source = {}) {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new TOSConfig(/** @type {Partial<TOSConfig>} */($$parsedSource));
     }
 }

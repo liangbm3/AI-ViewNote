@@ -12,42 +12,41 @@ import * as models$0 from "../models/models.js";
 
 /**
  * @param {models$0.ConfigKey} key
- * @returns {$CancellablePromise<models$0.Response>}
+ * @param {string} defaultValue
+ * @returns {$CancellablePromise<void>}
  */
-export function ConfigExists(key) {
-    return $Call.ByID(1452669869, key).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType0($result);
-    }));
+export function EnsureConfigDefaultValue(key, defaultValue) {
+    return $Call.ByID(3753997769, key, defaultValue);
 }
 
 /**
- * @param {models$0.ConfigKey} key
- * @returns {$CancellablePromise<models$0.Response>}
- */
-export function DeleteConfig(key) {
-    return $Call.ByID(3228890338, key).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType0($result);
-    }));
-}
-
-/**
+ * Legacy compatibility methods that return models.Response
  * @param {models$0.ConfigKey} key
  * @param {string} defaultValue
  * @returns {$CancellablePromise<models$0.Response>}
  */
-export function EnsureConfigDefaultValue(key, defaultValue) {
-    return $Call.ByID(3753997769, key, defaultValue).then(/** @type {($result: any) => any} */(($result) => {
+export function EnsureConfigDefaultValueResp(key, defaultValue) {
+    return $Call.ByID(4075184007, key, defaultValue).then(/** @type {($result: any) => any} */(($result) => {
         return $$createType0($result);
     }));
 }
 
 /**
- * @returns {$CancellablePromise<models$0.Response>}
+ * @returns {$CancellablePromise<models$0.ASRConfig | null>}
  */
-export function GetAllConfigs() {
-    return $Call.ByID(2286784159).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType0($result);
+export function GetASRConfig() {
+    return $Call.ByID(4007572771).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType2($result);
     }));
+}
+
+/**
+ * @param {models$0.ConfigKey} key
+ * @param {boolean} defaultValue
+ * @returns {$CancellablePromise<boolean>}
+ */
+export function GetBoolConfig(key, defaultValue) {
+    return $Call.ByID(399331395, key, defaultValue);
 }
 
 /**
@@ -55,8 +54,8 @@ export function GetAllConfigs() {
  * @param {boolean} defaultValue
  * @returns {$CancellablePromise<models$0.Response>}
  */
-export function GetBoolConfig(key, defaultValue) {
-    return $Call.ByID(399331395, key, defaultValue).then(/** @type {($result: any) => any} */(($result) => {
+export function GetBoolConfigResp(key, defaultValue) {
+    return $Call.ByID(1470501433, key, defaultValue).then(/** @type {($result: any) => any} */(($result) => {
         return $$createType0($result);
     }));
 }
@@ -72,6 +71,32 @@ export function GetConfig(key) {
 }
 
 /**
+ * @returns {$CancellablePromise<boolean>}
+ */
+export function GetDesktopNotificationsConfig() {
+    return $Call.ByID(4128627187);
+}
+
+/**
+ * @returns {$CancellablePromise<models$0.LLMConfig | null>}
+ */
+export function GetLLMConfig() {
+    return $Call.ByID(346161410).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType4($result);
+    }));
+}
+
+/**
+ * @returns {$CancellablePromise<models$0.TOSConfig | null>}
+ */
+export function GetTOSConfig() {
+    return $Call.ByID(3815533851).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType6($result);
+    }));
+}
+
+/**
+ * Frontend compatibility methods
  * @param {models$0.ConfigKey} key
  * @param {string} value
  * @returns {$CancellablePromise<models$0.Response>}
@@ -84,3 +109,9 @@ export function SaveConfig(key, value) {
 
 // Private type creation functions
 const $$createType0 = models$0.Response.createFrom;
+const $$createType1 = models$0.ASRConfig.createFrom;
+const $$createType2 = $Create.Nullable($$createType1);
+const $$createType3 = models$0.LLMConfig.createFrom;
+const $$createType4 = $Create.Nullable($$createType3);
+const $$createType5 = models$0.TOSConfig.createFrom;
+const $$createType6 = $Create.Nullable($$createType5);
