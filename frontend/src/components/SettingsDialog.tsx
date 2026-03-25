@@ -11,6 +11,7 @@ import {
 import { toast } from 'sonner';
 import { SettingsDialogProps, SettingsCategory } from '../types';
 import { SaveConfig, GetConfig } from '../../bindings/AI-ViewNote/backend/service/configservice';
+import { Browser } from '@wailsio/runtime';
 import packageJson from '../../package.json';
 
 export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
@@ -566,21 +567,21 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
 
                       <div className="space-y-3 pt-6 border-t border-gray-200">
                         <button
-                          onClick={() => window.open('https://github.com/liangbm3/AI-ViewNote/releases/', '_blank')}
+                          onClick={() => Browser.OpenURL('https://github.com/liangbm3/AI-ViewNote/releases/')}
                           className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-between"
                         >
                           <span>检查更新</span>
                           <ChevronRight className="w-4 h-4 text-gray-400" strokeWidth={1.5} />
                         </button>
                         <button
-                          onClick={() => window.open('https://github.com/liangbm3/AI-ViewNote/blob/main/TERMS.md', '_blank')}
+                          onClick={() => Browser.OpenURL('https://github.com/liangbm3/AI-ViewNote/blob/main/TERMS.md')}
                           className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-between"
                         >
                           <span>用户协议</span>
                           <ChevronRight className="w-4 h-4 text-gray-400" strokeWidth={1.5} />
                         </button>
                         <button
-                          onClick={() => window.open('https://github.com/liangbm3/AI-ViewNote/blob/main/PRIVACY.md', '_blank')}
+                          onClick={() => Browser.OpenURL('https://github.com/liangbm3/AI-ViewNote/blob/main/PRIVACY.md')}
                           className="w-full px-4 py-3 border border-gray-200 rounded-lg text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors flex items-center justify-between"
                         >
                           <span>隐私政策</span>
