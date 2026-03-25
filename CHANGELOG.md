@@ -14,6 +14,24 @@
 
 ---
 
+## [1.2.0] - 2026-03-25
+
+### 新增 (Added)
+
+- ✨ 任务栏支持折叠功能，提升用户界面体验
+- ✨ 添加markdown和字幕文件下载功能，支持多种格式导出
+
+### 更改 (Changed)
+
+- 🎨 重构task_service，实现模块化服务架构，提高代码可维护性
+- 🎨 使用runtime窗口在浏览器中打开相关链接而不是webview窗口，提供更好的用户体验
+
+### 修复 (Fixed)
+
+- 🐛 修复应用程序处理任务时意外关闭任务永远停留在处理中的问题
+
+---
+
 ## [1.1.0] - 2026-03-24
 
 ### 新增 (Added)
@@ -56,6 +74,7 @@
 - 🔧 完整的配置管理系统 - 支持 API 密钥和服务配置
 ---
 
-[Unreleased]: https://github.com/liangbm3/AI-ViewNote/compare/v1.1.0...HEAD
+[Unreleased]: https://github.com/liangbm3/AI-ViewNote/compare/v1.2.0...HEAD
+[1.2.0]: https://github.com/liangbm3/AI-ViewNote/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/liangbm3/AI-ViewNote/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/liangbm3/AI-ViewNote/releases/tag/v1.0.1
