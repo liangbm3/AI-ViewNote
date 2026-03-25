@@ -47,7 +47,8 @@ export function ErrorPrompt({ task, onRetry, onBack }: ErrorPromptProps) {
                 <span className="text-red-600">
                   {task.errorStage === 'ExtractingAudioFailed' ? '提取音频失败' :
                    task.errorStage === 'ExtractingTextFailed' ? '提取文本失败' :
-                   task.errorStage === 'GeneratingMarkdownFailed' ? '生成Markdown失败' : '失败'}
+                   task.errorStage === 'GeneratingMarkdownFailed' ? '生成Markdown失败' :
+                   task.errorStage === 'InterruptedFailed' ? '任务中断失败' : '失败'}
                 </span>
               </div>
             </div>

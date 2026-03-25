@@ -109,3 +109,11 @@ func (r *TaskRepository) Update(task *models.TaskRecord) error {
 	}
 	return nil
 }
+
+// ResetStuckTasks resets tasks that were in progress when the application crashed
+func (r *TaskRepository) ResetStuckTasks() error {
+	query := `UPDATE tasks SET progress = ? WHERE progress IN (?, ?, ?)`
+	_, err := r.DB.Exec(query, models.InterruptedFailed,
+		models.ExtractingAudio, models.ExtractingText, models.GeneratingMarkdown)
+	return err
+}

@@ -48,5 +48,14 @@ export function NewTask(filePath, contentStyle) {
     }));
 }
 
+/**
+ * @returns {$CancellablePromise<models$0.Response>}
+ */
+export function ResetStuckTasks() {
+    return $Call.ByID(1021869045).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType0($result);
+    }));
+}
+
 // Private type creation functions
 const $$createType0 = models$0.Response.createFrom;

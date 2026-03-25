@@ -57,6 +57,16 @@ func NewTaskService(repo *repository.TaskRepository, config_repo *repository.Con
 	}
 }
 
+func (s *TaskService) ResetStuckTasks() models.Response {
+	err := s.task_repo.ResetStuckTasks()
+	if err != nil {
+		return errorResponse("Failed to reset stuck tasks: " + err.Error())
+	}
+	s.event_emitter.Emit("log", models.LogMessage{Level: models.LogLevelInfo,
+		Message: "Reset stuck tasks on application startup"})
+	return successResponse("Stuck tasks reset successfully", nil)
+}
+
 func (s *TaskService) NewTask(filePath string, contentStyle string) models.Response {
 
 	task := models.TaskRecord{

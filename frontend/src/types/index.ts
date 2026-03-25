@@ -15,7 +15,7 @@ export type Task = {
   timestamp: string;
   markdownContent?: string;
   transcriptionText?: Utterance[];
-  errorStage?: 'ExtractingAudioFailed' | 'ExtractingTextFailed' | 'GeneratingMarkdownFailed';
+  errorStage?: 'ExtractingAudioFailed' | 'ExtractingTextFailed' | 'GeneratingMarkdownFailed' | 'InterruptedFailed';
 };
 
 export type Utterance = {

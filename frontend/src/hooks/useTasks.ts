@@ -36,6 +36,7 @@ function mapProgressToStatus(p: number): Task['status'] {
     case 3: // ExtractingAudioFailed
     case 6: // ExtractingTextFailed
     case 9: // GeneratingMarkdownFailed
+    case 10: // InterruptedFailed
       return 'error';
     default:
       return 'processing';
@@ -50,6 +51,8 @@ function mapProgressToErrorStage(p: number): Task['errorStage'] {
       return 'ExtractingTextFailed';
     case 9: // GeneratingMarkdownFailed
       return 'GeneratingMarkdownFailed';
+    case 10: // InterruptedFailed
+      return 'InterruptedFailed';
     default:
       return undefined;
   }
@@ -75,7 +78,9 @@ function mapProgressToPercent(p: number): number {
       return 85;
     case 8: // GeneratingMarkdownSuccess
       return 100;
-    case 9: // GeneratingMarkdownFailed (如果存在)
+    case 9: // GeneratingMarkdownFailed
+      return 0;
+    case 10: // InterruptedFailed
       return 0;
     default:
       return 0;
@@ -202,6 +207,7 @@ export function useTasks() {
       case 'ExtractingAudioFailed': return '提取音频失败';
       case 'ExtractingTextFailed': return '提取文本失败';
       case 'GeneratingMarkdownFailed': return '生成Markdown失败';
+      case 'InterruptedFailed': return '任务中断失败';
       default: return '';
     }
   }, []);

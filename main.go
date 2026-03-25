@@ -55,6 +55,11 @@ func main() {
 	taskService := service.NewTaskService(taskRepo, confRepo, wailsEmitter, notificationService)
 	confService := service.NewConfigService(confRepo)
 
+	// 重置卡住的任务（应用意外关闭后）
+	if resp := taskService.ResetStuckTasks(); !resp.Success {
+		log.Printf("Failed to reset stuck tasks: %s\n", resp.Message)
+	}
+
 	// 确保默认配置项存在
 	if resp := confService.EnsureConfigDefaultValue(models.RunInBackground, "true"); !resp.Success {
 		log.Printf("Failed to ensure config '%s': %s\n", models.RunInBackground, resp.Message)

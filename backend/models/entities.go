@@ -20,6 +20,7 @@ const (
 	GeneratingMarkdown // 生成Markdown中
 	GeneratingMarkdownSuccess // 生成Markdown成功
 	GeneratingMarkdownFailed // 生成Markdown失败
+	InterruptedFailed // 中断失败（应用意外关闭导致）
 )
 
 // 内容风格枚举
