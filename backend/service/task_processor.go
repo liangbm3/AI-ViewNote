@@ -46,15 +46,15 @@ func (p *TaskProcessor) ProcessTask(taskID int) error {
 		return err
 	}
 
-	// Create temporary directory
-	tempDir, err := os.MkdirTemp("", "AI-ViewNote-ffmpeg-")
+	// Create temporary directory with task-specific name
+	tempDir, err := os.MkdirTemp("", fmt.Sprintf("AI-ViewNote-ffmpeg-task%d-", taskID))
 	if err != nil {
 		p.emitLog(fmt.Sprintf("Failed to create temporary directory for task ID %d: %s", taskID, err.Error()), models.LogLevelError)
 		return err
 	}
 	defer os.RemoveAll(tempDir)
 
-	audioPath := filepath.Join(tempDir, "output_audio.mp3")
+	audioPath := filepath.Join(tempDir, fmt.Sprintf("output_audio_task%d.mp3", taskID))
 
 	// Step 1: Extract audio
 	err = p.handleAudioExtraction(task, audioPath)
