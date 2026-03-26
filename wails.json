@@ -15,7 +15,7 @@
   "outputdir": ".",
   "outputfilename": "AI-ViewNote",
   "platform": "darwin/arm64,darwin/amd64,linux/amd64,windows/amd64",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "wailsjsdir": "frontend/src",
   "website": "https://github.com/liangbm3/AI-ViewNote"
 }

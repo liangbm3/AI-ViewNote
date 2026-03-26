@@ -1,5 +1,5 @@
 [Desktop Entry]
-Version=1.2.0
+Version=1.3.0
 Name=AI-ViewNote
 Comment=AI powered video note taking application
 # The Exec line includes %u to pass the URL to the application
