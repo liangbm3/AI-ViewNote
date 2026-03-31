@@ -115,6 +115,15 @@ export function ChatPanel({ taskId, isOpen, onClose }: ChatPanelProps) {
                   <div className="prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-li:my-0">
                     <ReactMarkdown>{msg.content || (msg.isStreaming ? '\u200b' : '')}</ReactMarkdown>
                   </div>
+                ) : msg.role === 'assistant' && msg.isStreaming && !msg.content ? (
+                  <div className="flex items-center gap-2 text-gray-500">
+                    <span className="text-xs">AI 正在思考</span>
+                    <div className="flex items-end gap-0.5 h-4" aria-label="等待响应中">
+                      <span className="w-0.5 h-2 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: '0ms' }} />
+                      <span className="w-0.5 h-3 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: '120ms' }} />
+                      <span className="w-0.5 h-4 rounded-full bg-gray-500 animate-bounce" style={{ animationDelay: '240ms' }} />
+                    </div>
+                  </div>
                 ) : (
                   <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                 )}
