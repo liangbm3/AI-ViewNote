@@ -56,3 +56,15 @@ export type SettingsDialogProps = {
   isOpen: boolean;
   onClose: () => void;
 };
+
+export type ChatMessage = {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  isStreaming?: boolean;
+};
+
+export type QuickPrompt = {
+  title: string;
+  message: string;
+};

@@ -11,6 +11,7 @@ import { Call as $Call, CancellablePromise as $CancellablePromise, Create as $Cr
 import * as models$0 from "../models/models.js";
 
 /**
+ * 确保配置项有默认值
  * @param {models$0.ConfigKey} key
  * @param {string} defaultValue
  * @returns {$CancellablePromise<void>}
@@ -32,6 +33,7 @@ export function EnsureConfigDefaultValueResp(key, defaultValue) {
 }
 
 /**
+ * 获取ASR配置
  * @returns {$CancellablePromise<models$0.ASRConfig | null>}
  */
 export function GetASRConfig() {
@@ -41,6 +43,7 @@ export function GetASRConfig() {
 }
 
 /**
+ * 获取布尔类型的配置项值，如果未设置或解析失败则返回默认值
  * @param {models$0.ConfigKey} key
  * @param {boolean} defaultValue
  * @returns {$CancellablePromise<boolean>}
@@ -71,6 +74,7 @@ export function GetConfig(key) {
 }
 
 /**
+ * 获取是否开启桌面通知的配置
  * @returns {$CancellablePromise<boolean>}
  */
 export function GetDesktopNotificationsConfig() {
@@ -78,6 +82,7 @@ export function GetDesktopNotificationsConfig() {
 }
 
 /**
+ * 获取LLM配置
  * @returns {$CancellablePromise<models$0.LLMConfig | null>}
  */
 export function GetLLMConfig() {
@@ -87,6 +92,7 @@ export function GetLLMConfig() {
 }
 
 /**
+ * 获取TOS配置
  * @returns {$CancellablePromise<models$0.TOSConfig | null>}
  */
 export function GetTOSConfig() {

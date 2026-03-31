@@ -51,9 +51,11 @@ func main() {
 
 	taskRepo := repository.NewTaskRepository(db)
 	confRepo := repository.NewConfigRepository(db)
+	chatRepo := repository.NewChatRepository(db)
 
 	taskService := service.NewTaskService(taskRepo, confRepo, wailsEmitter, notificationService)
 	confService := service.NewConfigService(confRepo)
+	chatService := service.NewChatService(confService, taskRepo, chatRepo, wailsEmitter)
 
 	// 重置卡住的任务（应用意外关闭后）
 	if resp := taskService.ResetStuckTasks(); !resp.Success {
@@ -77,6 +79,7 @@ func main() {
 		Services: []application.Service{
 			application.NewService(taskService),
 			application.NewService(confService),
+			application.NewService(chatService),
 			application.NewService(notificationService),
 		},
 		Assets: application.AssetOptions{

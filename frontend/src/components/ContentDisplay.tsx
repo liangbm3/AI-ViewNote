@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import ReactMarkdown from 'react-markdown';
-import { Sparkles, FileText, MessageSquare, Download, FileDown } from 'lucide-react';
+import { Sparkles, FileText, MessageSquare, Download, FileDown, Bot } from 'lucide-react';
 import { toast } from 'sonner';
 import { DownloadMarkdown, DownloadSubtitles } from '../../bindings/AI-ViewNote/backend/service/taskservice.js';
+import { ChatPanel } from './ChatPanel';
 
 interface SubtitleItem {
   start_time: number;
@@ -17,6 +18,7 @@ interface ContentDisplayProps {
 
 export function ContentDisplay({ imageTextContent, subtitles, taskId }: ContentDisplayProps) {
   const [downloading, setDownloading] = useState<{[key: string]: boolean}>({});
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   // 下载Markdown
   const handleDownloadMarkdown = async () => {
@@ -85,7 +87,7 @@ export function ContentDisplay({ imageTextContent, subtitles, taskId }: ContentD
           <Sparkles className="w-5 h-5 text-amber-500" />
           <h2 className="text-lg font-semibold text-gray-900 tracking-tight">转换结果</h2>
         </div>
-        <div className="p-6 flex-1 flex items-center justify-center text-gray-500">
+          <div className="p-6 flex-1 flex items-center justify-center text-gray-500">
           暂无内容，请稍后再试...
         </div>
       </div>
@@ -100,6 +102,7 @@ export function ContentDisplay({ imageTextContent, subtitles, taskId }: ContentD
   };
 
   return (
+    <>
     <div className="bg-white rounded-xl border border-gray-200 overflow-hidden h-full flex flex-col min-h-0 shadow-sm">
       <div className="px-6 py-4 border-b border-gray-200 flex-shrink-0 bg-gray-50/50 flex items-center justify-between">
         <div className="flex items-center gap-2">
@@ -107,8 +110,21 @@ export function ContentDisplay({ imageTextContent, subtitles, taskId }: ContentD
           <h2 className="text-lg font-semibold text-gray-900 tracking-tight">转换结果</h2>
         </div>
 
-        {/* 下载按钮组 */}
-        {taskId && (
+        <div className="flex items-center gap-3">
+          {/* AI 对话按钮 */}
+          {taskId && (
+            <button
+              onClick={() => setIsChatOpen(true)}
+              title="AI 对话"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors"
+            >
+              <Bot className="w-4 h-4" />
+              AI 对话
+            </button>
+          )}
+
+          {/* 下载按钮组 */}
+          {taskId && (
           <div className="flex items-center gap-3">
             {/* Markdown下载按钮 */}
             <button
@@ -123,11 +139,11 @@ export function ContentDisplay({ imageTextContent, subtitles, taskId }: ContentD
             {/* 字幕下载下拉菜单 */}
             <div className="relative group">
               <button
-                disabled={downloading.subtitles}
+                      disabled={downloading.subtitles}
                 className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <FileDown className="w-4 h-4" />
-                {downloading.subtitles ? '下载中...' : '下载字幕'}
+                  {downloading.subtitles ? '下载中...' : '下载字幕'}
               </button>
 
               {/* 下拉菜单 */}
@@ -155,7 +171,8 @@ export function ContentDisplay({ imageTextContent, subtitles, taskId }: ContentD
               </div>
             </div>
           </div>
-        )}
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-2 divide-x divide-gray-200 flex-1 min-h-0">
@@ -209,5 +226,7 @@ export function ContentDisplay({ imageTextContent, subtitles, taskId }: ContentD
         </div>
       </div>
     </div>
+    <ChatPanel taskId={taskId} isOpen={isChatOpen} onClose={() => setIsChatOpen(false)} />
+    </>
   );
 }

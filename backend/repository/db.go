@@ -62,5 +62,18 @@ func InitDB(dbPath string) (*sql.DB, error) {
 		return nil, err
 	}
 
+	// 创建表：聊天消息表，对应 models.ChatMessage
+	createChatMessagesTable := `CREATE TABLE IF NOT EXISTS chat_messages (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			task_id INTEGER NOT NULL,
+			role TEXT NOT NULL,
+			content TEXT NOT NULL,
+			created_at TEXT NOT NULL,
+			FOREIGN KEY (task_id) REFERENCES tasks(id) ON DELETE CASCADE
+			);`
+	if _, err := db.Exec(createChatMessagesTable); err != nil {
+		return nil, err
+	}
+
 	return db, nil
 }

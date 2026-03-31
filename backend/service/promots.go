@@ -97,3 +97,18 @@ func summaryDefaultPrompt() string {
 内容如下：`
 	return prompt
 }
+
+func chatSystemPrompt(markdownContent string, utteranceSummary string) string {
+	prompt := "你是一个智能视频内容助手，专门帮助用户理解和分析视频内容。\n\n" +
+		"以下是该视频的 AI 生成笔记内容，请基于此内容回答用户的问题：\n\n" +
+		"---\n" + markdownContent + "\n---\n\n"
+	if utteranceSummary != "" {
+		prompt += "原始字幕摘要（前1000字）：\n" + utteranceSummary + "\n\n"
+	}
+	prompt += "回答规范：\n" +
+		"- 优先基于上述视频内容回答问题\n" +
+		"- 如果问题超出上述内容范围，请明确说明\n" +
+		"- 回答简洁、准确，必要时使用 Markdown 列表或结构化格式\n" +
+		"- 默认使用中文回答，除非用户明确要求其他语言"
+	return prompt
+}

@@ -6,6 +6,9 @@
 // @ts-ignore: Unused imports
 import { Create as $Create } from "@wailsio/runtime";
 
+/**
+ * ASR配置定义
+ */
 export class ASRConfig {
     /**
      * Creates a new ASRConfig instance.
@@ -75,6 +78,9 @@ export const ConfigKey = {
     LogFolding: "LogFolding",
 };
 
+/**
+ * LLM配置定义
+ */
 export class LLMConfig {
     /**
      * Creates a new LLMConfig instance.
@@ -163,7 +169,7 @@ export class Response {
 }
 
 /**
- * Service configuration structs
+ * TOS配置定义
  */
 export class TOSConfig {
     /**
