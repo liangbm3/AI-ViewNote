@@ -13,13 +13,13 @@ import (
 )
 
 type TaskService struct {
-	taskRepo              *repository.TaskRepository
-	configService         *ConfigService
-	taskProcessor         *TaskProcessor
-	fileService           *FileService
-	subtitleService       *SubtitleService
-	eventEmitter          EventEmitter
-	notificationService   *NotificationService
+	taskRepo            *repository.TaskRepository
+	configService       *ConfigService
+	taskProcessor       *TaskProcessor
+	fileService         *FileService
+	subtitleService     *SubtitleService
+	eventEmitter        EventEmitter
+	notificationService *NotificationService
 }
 
 func NewTaskService(
@@ -50,7 +50,7 @@ func NewTaskService(
 	if llmCfg, err := configService.GetLLMConfig(); err == nil {
 		llmConfig = llmCfg
 	}
-	markdownService := NewMarkdownGenerationService(llmConfig)
+	markdownService := NewMarkdownGenerationService(llmConfig, configService)
 
 	fileService := NewFileService()
 	subtitleService := NewSubtitleService()
@@ -188,9 +188,9 @@ func (s *TaskService) DownloadMarkdown(taskID int) models.Response {
 	}
 
 	return successResponse("Markdown file saved successfully", map[string]interface{}{
-		"file_path":   filePath,
-		"filename":    markdownFileName,
-		"task_id":     taskID,
+		"file_path": filePath,
+		"filename":  markdownFileName,
+		"task_id":   taskID,
 	})
 }
 
@@ -250,9 +250,9 @@ func (s *TaskService) DownloadSubtitles(taskID int, format string) models.Respon
 	}
 
 	return successResponse("Subtitle file saved successfully", map[string]interface{}{
-		"file_path":   filePath,
-		"filename":    subtitleFileName,
-		"format":      format,
-		"task_id":     taskID,
+		"file_path": filePath,
+		"filename":  subtitleFileName,
+		"format":    format,
+		"task_id":   taskID,
 	})
 }

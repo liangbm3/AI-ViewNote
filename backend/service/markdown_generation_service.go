@@ -11,12 +11,14 @@ import (
 )
 
 type MarkdownGenerationService struct {
-	config *models.LLMConfig
+	config        *models.LLMConfig
+	configService *ConfigService
 }
 
-func NewMarkdownGenerationService(config *models.LLMConfig) *MarkdownGenerationService {
+func NewMarkdownGenerationService(config *models.LLMConfig, configService *ConfigService) *MarkdownGenerationService {
 	return &MarkdownGenerationService{
-		config: config,
+		config:        config,
+		configService: configService,
 	}
 }
 
@@ -31,18 +33,9 @@ func (s *MarkdownGenerationService) GenerateMarkdown(utterances []models.Utteran
 	config.BaseURL = s.config.BaseURL
 	client := ark.NewClientWithConfig(config)
 
-	var content string
-	switch style {
-	case models.NoteStyle:
-		content = noteDefaultPrompt()
-	case models.XiaohongshuStyle:
-		content = xiaohongshuDefaultPrompt()
-	case models.WeChatStyle:
-		content = wechatDefaultPrompt()
-	case models.SummaryStyle:
-		content = summaryDefaultPrompt()
-	default:
-		return "", errors.New("Unsupported content style: " + string(style))
+	content, err := s.configService.GetEffectivePrompt(style)
+	if err != nil {
+		return "", errors.New("Failed to resolve prompt: " + err.Error())
 	}
 
 	resp, err := client.CreateChatCompletion(

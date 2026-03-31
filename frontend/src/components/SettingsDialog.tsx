@@ -6,13 +6,32 @@ import {
   Sparkles,
   Database,
   Palette,
+  FileText,
   ChevronRight
 } from 'lucide-react';
 import { toast } from 'sonner';
-import { SettingsDialogProps, SettingsCategory } from '../types';
-import { SaveConfig, GetConfig } from '../../bindings/AI-ViewNote/backend/service/configservice';
+import { PromptProfile, SettingsDialogProps, SettingsCategory } from '../types';
+import { SaveConfig, GetConfig, GetPromptProfiles } from '../../bindings/AI-ViewNote/backend/service/configservice';
 import { Browser } from '@wailsio/runtime';
 import packageJson from '../../package.json';
+
+const PROMPT_MAX_LENGTH = 8000;
+
+const normalizePromptProfile = (profile: Partial<PromptProfile>): PromptProfile => ({
+  style: String(profile.style ?? ''),
+  label: String(profile.label ?? ''),
+  description: String(profile.description ?? ''),
+  key: String(profile.key ?? ''),
+  default_prompt: String(profile.default_prompt ?? ''),
+  custom_prompt: String(profile.custom_prompt ?? ''),
+  effective_prompt: String(profile.effective_prompt ?? ''),
+});
+
+const withEffectivePrompt = (profile: PromptProfile, customPrompt: string): PromptProfile => ({
+  ...profile,
+  custom_prompt: customPrompt,
+  effective_prompt: customPrompt.trim() === '' ? profile.default_prompt : customPrompt,
+});
 
 export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   const [activeCategory, setActiveCategory] = useState<SettingsCategory>('general');
@@ -41,6 +60,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   const [ossRegion, setOssRegion] = useState('');
   const [ossAccessKey, setOssAccessKey] = useState('');
   const [ossSecretKey, setOssSecretKey] = useState('');
+  const [promptProfiles, setPromptProfiles] = useState<PromptProfile[]>([]);
 
   // Advanced Settings
   const [smartScreenshot, setSmartScreenshot] = useState(true);
@@ -86,6 +106,13 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
       setOssAccessKey(await loadConfig('StorageAccessKey', ''));
       setOssSecretKey(await loadConfig('StorageSecretKey', ''));
 
+      const promptResponse = await GetPromptProfiles();
+      if (promptResponse.success && Array.isArray(promptResponse.data)) {
+        setPromptProfiles(promptResponse.data.map((item: Partial<PromptProfile>) => normalizePromptProfile(item)));
+      } else {
+        setPromptProfiles([]);
+      }
+
       // 对于高级设置，使用默认值（后端可能没有这些配置项）
       setSmartScreenshot(true);
       setCacheSize('1024');
@@ -99,13 +126,39 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
   const categories = [
     { id: 'general' as const, name: '通用', icon: Globe },
     { id: 'service' as const, name: '服务', icon: Database },
+    { id: 'prompts' as const, name: '提示词', icon: FileText },
     { id: 'advanced' as const, name: '高级', icon: Sparkles },
     { id: 'about' as const, name: '关于', icon: Palette },
   ];
 
+  const updatePromptProfile = (style: string, customPrompt: string) => {
+    setPromptProfiles((current) => current.map((profile) => (
+      profile.style === style ? withEffectivePrompt(profile, customPrompt) : profile
+    )));
+  };
+
+  const applyDefaultPrompt = (style: string) => {
+    const profile = promptProfiles.find((item) => item.style === style);
+    if (!profile) {
+      return;
+    }
+    updatePromptProfile(style, profile.default_prompt);
+  };
+
+  const restoreDefaultPrompt = (style: string) => {
+    updatePromptProfile(style, '');
+  };
+
   
   const handleSave = async () => {
     try {
+      const invalidPrompt = promptProfiles.find((profile) => profile.custom_prompt.length > PROMPT_MAX_LENGTH);
+      if (invalidPrompt) {
+        toast.error(`${invalidPrompt.label}提示词不能超过 ${PROMPT_MAX_LENGTH} 个字符`);
+        setActiveCategory('prompts');
+        return;
+      }
+
       // 分别保存每个配置项到后端
       const saveOperations = [
         { key: 'RunInBackground', value: runInBackground ? 'true' : 'false' },
@@ -121,7 +174,11 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
         { key: 'StorageBucket', value: ossBucket },
         { key: 'StorageRegion', value: ossRegion },
         { key: 'StorageAccessKey', value: ossAccessKey },
-        { key: 'StorageSecretKey', value: ossSecretKey }
+        { key: 'StorageSecretKey', value: ossSecretKey },
+        ...promptProfiles.map((profile) => ({
+          key: profile.key,
+          value: profile.custom_prompt.trim() === '' ? '' : profile.custom_prompt,
+        }))
       ];
 
       // 执行所有保存操作
@@ -130,7 +187,9 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
       );
 
       // 检查是否有失败的保存操作
-      const failedCount = results.filter(result => result.status === 'rejected').length;
+      const failedCount = results.filter((result) => (
+        result.status === 'rejected' || (result.status === 'fulfilled' && !result.value.success)
+      )).length;
 
       if (failedCount === 0) {
         toast.success('设置已保存');
@@ -159,6 +218,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
     setOssRegion('');
     setOssAccessKey('');
     setOssSecretKey('');
+    setPromptProfiles((current) => current.map((profile) => withEffectivePrompt(profile, '')));
     setSmartScreenshot(true);
     setCacheSize('1024');
     setAutoUpdate(true);
@@ -474,6 +534,79 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
                           </div>
                         </div>
                       </div>
+                    </div>
+                  )}
+
+                  {activeCategory === 'prompts' && (
+                    <div className="space-y-5">
+                      <div className="rounded-xl border border-gray-200 bg-gray-50 px-4 py-3">
+                        <h4 className="text-sm font-semibold text-gray-900">按输出风格自定义提示词</h4>
+                        <p className="mt-1 text-xs leading-5 text-gray-500">
+                          留空时自动使用系统默认提示词。保存后仅影响后续新任务，不会回溯修改历史任务。
+                        </p>
+                      </div>
+
+                      {promptProfiles.map((profile) => {
+                        const isUsingDefault = profile.custom_prompt.trim() === '';
+
+                        return (
+                          <div key={profile.style} className="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+                            <div className="flex flex-col gap-3 border-b border-gray-100 pb-4 md:flex-row md:items-start md:justify-between">
+                              <div>
+                                <div className="flex items-center gap-2">
+                                  <h4 className="text-base font-semibold text-gray-900">{profile.label}</h4>
+                                  <span className={`rounded-full px-2.5 py-1 text-xs font-medium ${isUsingDefault ? 'bg-gray-100 text-gray-600' : 'bg-emerald-50 text-emerald-700'}`}>
+                                    {isUsingDefault ? '使用默认模板' : '使用自定义模板'}
+                                  </span>
+                                </div>
+                                <p className="mt-1 text-sm text-gray-500">{profile.description}</p>
+                              </div>
+
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => applyDefaultPrompt(profile.style)}
+                                  className="px-3 py-2 border border-gray-200 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                                >
+                                  填充默认模板
+                                </button>
+                                <button
+                                  onClick={() => restoreDefaultPrompt(profile.style)}
+                                  className="px-3 py-2 border border-gray-200 rounded-lg text-xs font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+                                >
+                                  恢复默认
+                                </button>
+                              </div>
+                            </div>
+
+                            <div className="mt-4 space-y-3">
+                              <label className="block text-sm font-medium text-gray-900">
+                                自定义提示词
+                              </label>
+                              <textarea
+                                value={profile.custom_prompt}
+                                onChange={(e) => updatePromptProfile(profile.style, e.target.value)}
+                                className="min-h-[220px] w-full rounded-xl border border-gray-200 px-4 py-3 text-sm leading-6 text-gray-900 focus:outline-none focus:border-gray-900 transition-colors"
+                                placeholder="留空时将使用系统默认提示词"
+                              />
+                              <div className="flex items-center justify-between text-xs text-gray-500">
+                                <span>当前字符数 {profile.custom_prompt.length} / {PROMPT_MAX_LENGTH}</span>
+                                <span>{isUsingDefault ? '当前保存结果会回退到默认模板' : '当前保存结果会使用自定义模板'}</span>
+                              </div>
+                            </div>
+
+                            <details className="mt-4 rounded-xl border border-dashed border-gray-200 bg-gray-50/80 px-4 py-3">
+                              <summary className="cursor-pointer text-sm font-medium text-gray-700">查看系统默认提示词</summary>
+                              <pre className="mt-3 whitespace-pre-wrap break-words text-xs leading-6 text-gray-600">{profile.default_prompt}</pre>
+                            </details>
+                          </div>
+                        );
+                      })}
+
+                      {promptProfiles.length === 0 && (
+                        <div className="rounded-xl border border-dashed border-gray-200 px-4 py-6 text-sm text-gray-500">
+                          暂未读取到提示词配置，请检查后端绑定是否已更新。
+                        </div>
+                      )}
                     </div>
                   )}
 

@@ -39,7 +39,17 @@ export type LogEntry = {
 
 export type ConversionStatus = 'idle' | 'converting' | 'completed';
 
-export type SettingsCategory = 'general' | 'service' | 'advanced' | 'about';
+export type SettingsCategory = 'general' | 'service' | 'prompts' | 'advanced' | 'about';
+
+export type PromptProfile = {
+  style: string;
+  label: string;
+  description: string;
+  key: string;
+  default_prompt: string;
+  custom_prompt: string;
+  effective_prompt: string;
+};
 
 export type Language = {
   value: string;

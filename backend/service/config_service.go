@@ -128,6 +128,82 @@ func (s *ConfigService) GetBoolConfig(key models.ConfigKey, defaultValue bool) (
 	}
 }
 
+func (s *ConfigService) GetCustomPrompt(style models.ContentStyle) (string, error) {
+	key, err := promptConfigKeyByStyle(style)
+	if err != nil {
+		return "", err
+	}
+
+	config, err := s.configRepo.GetConfig(key)
+	if err != nil {
+		return "", err
+	}
+	if config == (models.AppConfig{}) {
+		return "", nil
+	}
+	if strings.TrimSpace(config.Value) == "" {
+		return "", nil
+	}
+	return config.Value, nil
+}
+
+func (s *ConfigService) GetEffectivePrompt(style models.ContentStyle) (string, error) {
+	customPrompt, err := s.GetCustomPrompt(style)
+	if err != nil {
+		return "", err
+	}
+	if strings.TrimSpace(customPrompt) != "" {
+		return customPrompt, nil
+	}
+
+	return defaultPromptByStyle(style)
+}
+
+func (s *ConfigService) BuildPromptProfile(style models.ContentStyle) (models.PromptProfile, error) {
+	key, err := promptConfigKeyByStyle(style)
+	if err != nil {
+		return models.PromptProfile{}, err
+	}
+
+	defaultPrompt, err := defaultPromptByStyle(style)
+	if err != nil {
+		return models.PromptProfile{}, err
+	}
+
+	customPrompt, err := s.GetCustomPrompt(style)
+	if err != nil {
+		return models.PromptProfile{}, err
+	}
+
+	effectivePrompt := defaultPrompt
+	if strings.TrimSpace(customPrompt) != "" {
+		effectivePrompt = customPrompt
+	}
+
+	return models.PromptProfile{
+		Style:           style,
+		Label:           promptLabelByStyle(style),
+		Description:     promptDescriptionByStyle(style),
+		Key:             key,
+		DefaultPrompt:   defaultPrompt,
+		CustomPrompt:    customPrompt,
+		EffectivePrompt: effectivePrompt,
+	}, nil
+}
+
+func (s *ConfigService) GetPromptProfiles() models.Response {
+	profiles := make([]models.PromptProfile, 0, len(promptStyles()))
+	for _, style := range promptStyles() {
+		profile, err := s.BuildPromptProfile(style)
+		if err != nil {
+			return models.Response{Success: false, Message: "Failed to build prompt profile: " + err.Error()}
+		}
+		profiles = append(profiles, profile)
+	}
+
+	return models.Response{Success: true, Message: "Prompt profiles retrieved successfully", Data: profiles}
+}
+
 // Legacy compatibility methods that return models.Response
 func (s *ConfigService) EnsureConfigDefaultValueResp(key models.ConfigKey, defaultValue string) models.Response {
 	err := s.EnsureConfigDefaultValue(key, defaultValue)

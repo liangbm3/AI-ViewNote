@@ -1,5 +1,11 @@
 package service
 
+import (
+	"errors"
+
+	"AI-ViewNote/backend/models"
+)
+
 func noteDefaultPrompt() string {
 	prompt := `你是一位高效的知识整理专家。请将以下文本内容转化为结构清晰、重点突出的 Markdown 笔记，便于后续复习和查阅。
 
@@ -111,4 +117,73 @@ func chatSystemPrompt(markdownContent string, utteranceSummary string) string {
 		"- 回答简洁、准确，必要时使用 Markdown 列表或结构化格式\n" +
 		"- 默认使用中文回答，除非用户明确要求其他语言"
 	return prompt
+}
+
+func defaultPromptByStyle(style models.ContentStyle) (string, error) {
+	switch style {
+	case models.NoteStyle:
+		return noteDefaultPrompt(), nil
+	case models.XiaohongshuStyle:
+		return xiaohongshuDefaultPrompt(), nil
+	case models.WeChatStyle:
+		return wechatDefaultPrompt(), nil
+	case models.SummaryStyle:
+		return summaryDefaultPrompt(), nil
+	default:
+		return "", errors.New("unsupported content style: " + string(style))
+	}
+}
+
+func promptConfigKeyByStyle(style models.ContentStyle) (models.ConfigKey, error) {
+	switch style {
+	case models.NoteStyle:
+		return models.PromptNote, nil
+	case models.XiaohongshuStyle:
+		return models.PromptXiaohongshu, nil
+	case models.WeChatStyle:
+		return models.PromptWechat, nil
+	case models.SummaryStyle:
+		return models.PromptSummary, nil
+	default:
+		return models.ConfigKey(""), errors.New("unsupported content style: " + string(style))
+	}
+}
+
+func promptLabelByStyle(style models.ContentStyle) string {
+	switch style {
+	case models.NoteStyle:
+		return "知识笔记"
+	case models.XiaohongshuStyle:
+		return "小红书"
+	case models.WeChatStyle:
+		return "公众号"
+	case models.SummaryStyle:
+		return "摘要"
+	default:
+		return string(style)
+	}
+}
+
+func promptDescriptionByStyle(style models.ContentStyle) string {
+	switch style {
+	case models.NoteStyle:
+		return "适合结构化整理课程、分享和长视频内容。"
+	case models.XiaohongshuStyle:
+		return "适合生成更强调互动感、情绪和分享欲的内容。"
+	case models.WeChatStyle:
+		return "适合生成更完整、更有论述性的公众号文章。"
+	case models.SummaryStyle:
+		return "适合快速提炼核心观点与重点信息。"
+	default:
+		return ""
+	}
+}
+
+func promptStyles() []models.ContentStyle {
+	return []models.ContentStyle{
+		models.NoteStyle,
+		models.XiaohongshuStyle,
+		models.WeChatStyle,
+		models.SummaryStyle,
+	}
 }

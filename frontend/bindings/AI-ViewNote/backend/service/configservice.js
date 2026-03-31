@@ -11,6 +11,16 @@ import { Call as $Call, CancellablePromise as $CancellablePromise, Create as $Cr
 import * as models$0 from "../models/models.js";
 
 /**
+ * @param {models$0.ContentStyle} style
+ * @returns {$CancellablePromise<models$0.PromptProfile>}
+ */
+export function BuildPromptProfile(style) {
+    return $Call.ByID(984555132, style).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType0($result);
+    }));
+}
+
+/**
  * 确保配置项有默认值
  * @param {models$0.ConfigKey} key
  * @param {string} defaultValue
@@ -28,7 +38,7 @@ export function EnsureConfigDefaultValue(key, defaultValue) {
  */
 export function EnsureConfigDefaultValueResp(key, defaultValue) {
     return $Call.ByID(4075184007, key, defaultValue).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType0($result);
+        return $$createType1($result);
     }));
 }
 
@@ -38,7 +48,7 @@ export function EnsureConfigDefaultValueResp(key, defaultValue) {
  */
 export function GetASRConfig() {
     return $Call.ByID(4007572771).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType2($result);
+        return $$createType3($result);
     }));
 }
 
@@ -59,7 +69,7 @@ export function GetBoolConfig(key, defaultValue) {
  */
 export function GetBoolConfigResp(key, defaultValue) {
     return $Call.ByID(1470501433, key, defaultValue).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType0($result);
+        return $$createType1($result);
     }));
 }
 
@@ -69,8 +79,16 @@ export function GetBoolConfigResp(key, defaultValue) {
  */
 export function GetConfig(key) {
     return $Call.ByID(3089215939, key).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType0($result);
+        return $$createType1($result);
     }));
+}
+
+/**
+ * @param {models$0.ContentStyle} style
+ * @returns {$CancellablePromise<string>}
+ */
+export function GetCustomPrompt(style) {
+    return $Call.ByID(199455176, style);
 }
 
 /**
@@ -82,12 +100,29 @@ export function GetDesktopNotificationsConfig() {
 }
 
 /**
+ * @param {models$0.ContentStyle} style
+ * @returns {$CancellablePromise<string>}
+ */
+export function GetEffectivePrompt(style) {
+    return $Call.ByID(2686113764, style);
+}
+
+/**
  * 获取LLM配置
  * @returns {$CancellablePromise<models$0.LLMConfig | null>}
  */
 export function GetLLMConfig() {
     return $Call.ByID(346161410).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType4($result);
+        return $$createType5($result);
+    }));
+}
+
+/**
+ * @returns {$CancellablePromise<models$0.Response>}
+ */
+export function GetPromptProfiles() {
+    return $Call.ByID(2804435273).then(/** @type {($result: any) => any} */(($result) => {
+        return $$createType1($result);
     }));
 }
 
@@ -97,7 +132,7 @@ export function GetLLMConfig() {
  */
 export function GetTOSConfig() {
     return $Call.ByID(3815533851).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType6($result);
+        return $$createType7($result);
     }));
 }
 
@@ -109,15 +144,16 @@ export function GetTOSConfig() {
  */
 export function SaveConfig(key, value) {
     return $Call.ByID(4973740, key, value).then(/** @type {($result: any) => any} */(($result) => {
-        return $$createType0($result);
+        return $$createType1($result);
     }));
 }
 
 // Private type creation functions
-const $$createType0 = models$0.Response.createFrom;
-const $$createType1 = models$0.ASRConfig.createFrom;
-const $$createType2 = $Create.Nullable($$createType1);
-const $$createType3 = models$0.LLMConfig.createFrom;
-const $$createType4 = $Create.Nullable($$createType3);
-const $$createType5 = models$0.TOSConfig.createFrom;
-const $$createType6 = $Create.Nullable($$createType5);
+const $$createType0 = models$0.PromptProfile.createFrom;
+const $$createType1 = models$0.Response.createFrom;
+const $$createType2 = models$0.ASRConfig.createFrom;
+const $$createType3 = $Create.Nullable($$createType2);
+const $$createType4 = models$0.LLMConfig.createFrom;
+const $$createType5 = $Create.Nullable($$createType4);
+const $$createType6 = models$0.TOSConfig.createFrom;
+const $$createType7 = $Create.Nullable($$createType6);

@@ -34,6 +34,16 @@ const (
 	SummaryStyle     ContentStyle = "summary"
 )
 
+type PromptProfile struct {
+	Style           ContentStyle `json:"style"`
+	Label           string       `json:"label"`
+	Description     string       `json:"description"`
+	Key             ConfigKey    `json:"key"`
+	DefaultPrompt   string       `json:"default_prompt"`
+	CustomPrompt    string       `json:"custom_prompt"`
+	EffectivePrompt string       `json:"effective_prompt"`
+}
+
 // 任务定义
 type TaskRecord struct {
 	ID                int          `json:"id"`
@@ -65,6 +75,10 @@ const (
 	RunInBackground      ConfigKey = "RunInBackground"
 	DesktopNotifications ConfigKey = "DesktopNotifications"
 	LogFolding           ConfigKey = "LogFolding"
+	PromptNote           ConfigKey = "PromptNote"
+	PromptXiaohongshu    ConfigKey = "PromptXiaohongshu"
+	PromptWechat         ConfigKey = "PromptWechat"
+	PromptSummary        ConfigKey = "PromptSummary"
 )
 
 // 配置项定义

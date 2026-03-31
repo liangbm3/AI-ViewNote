@@ -76,6 +76,27 @@ export const ConfigKey = {
     RunInBackground: "RunInBackground",
     DesktopNotifications: "DesktopNotifications",
     LogFolding: "LogFolding",
+    PromptNote: "PromptNote",
+    PromptXiaohongshu: "PromptXiaohongshu",
+    PromptWechat: "PromptWechat",
+    PromptSummary: "PromptSummary",
+};
+
+/**
+ * 内容风格枚举
+ * @readonly
+ * @enum {string}
+ */
+export const ContentStyle = {
+    /**
+     * The Go zero value for the underlying type of the enum.
+     */
+    $zero: "",
+
+    NoteStyle: "note",
+    XiaohongshuStyle: "xiaohongshu",
+    WeChatStyle: "wechat",
+    SummaryStyle: "summary",
 };
 
 /**
@@ -120,6 +141,76 @@ export class LLMConfig {
     static createFrom($$source = {}) {
         let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
         return new LLMConfig(/** @type {Partial<LLMConfig>} */($$parsedSource));
+    }
+}
+
+export class PromptProfile {
+    /**
+     * Creates a new PromptProfile instance.
+     * @param {Partial<PromptProfile>} [$$source = {}] - The source object to create the PromptProfile.
+     */
+    constructor($$source = {}) {
+        if (!("style" in $$source)) {
+            /**
+             * @member
+             * @type {ContentStyle}
+             */
+            this["style"] = ContentStyle.$zero;
+        }
+        if (!("label" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["label"] = "";
+        }
+        if (!("description" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["description"] = "";
+        }
+        if (!("key" in $$source)) {
+            /**
+             * @member
+             * @type {ConfigKey}
+             */
+            this["key"] = ConfigKey.$zero;
+        }
+        if (!("default_prompt" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["default_prompt"] = "";
+        }
+        if (!("custom_prompt" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["custom_prompt"] = "";
+        }
+        if (!("effective_prompt" in $$source)) {
+            /**
+             * @member
+             * @type {string}
+             */
+            this["effective_prompt"] = "";
+        }
+
+        Object.assign(this, $$source);
+    }
+
+    /**
+     * Creates a new PromptProfile instance from a string or object.
+     * @param {any} [$$source = {}]
+     * @returns {PromptProfile}
+     */
+    static createFrom($$source = {}) {
+        let $$parsedSource = typeof $$source === 'string' ? JSON.parse($$source) : $$source;
+        return new PromptProfile(/** @type {Partial<PromptProfile>} */($$parsedSource));
     }
 }
 
