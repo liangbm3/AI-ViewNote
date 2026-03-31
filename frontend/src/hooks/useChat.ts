@@ -15,6 +15,16 @@ export function useChat(taskId: string | undefined) {
   const [error, setError] = useState<string | null>(null);
   const loadedRef = useRef<string | null>(null);
 
+  const isSameTask = useCallback(
+    (eventTaskId: unknown) => {
+      if (!taskId) return false;
+      const lhs = Number(eventTaskId);
+      const rhs = Number(taskId);
+      return Number.isFinite(lhs) && Number.isFinite(rhs) && lhs === rhs;
+    },
+    [taskId]
+  );
+
   // 加载后端快速提问模板
   useEffect(() => {
     GetQuickPrompts()
@@ -59,7 +69,7 @@ export function useChat(taskId: string | undefined) {
   useEffect(() => {
     const offToken = Events.On('chat_token', (event: any) => {
       const { task_id, token } = event?.data ?? {};
-      if (String(task_id) !== taskId) return;
+      if (!isSameTask(task_id)) return;
       setMessages((prev) => {
         if (prev.length === 0) return prev;
         const last = prev[prev.length - 1];
@@ -73,18 +83,42 @@ export function useChat(taskId: string | undefined) {
 
     const offDone = Events.On('chat_done', (event: any) => {
       const { task_id } = event?.data ?? {};
-      if (String(task_id) !== taskId) return;
+      if (!isSameTask(task_id)) return;
       setStreaming(false);
       setMessages((prev) => {
         if (prev.length === 0) return prev;
-        const last = prev[prev.length - 1];
-        return [...prev.slice(0, -1), { ...last, isStreaming: false }];
+        // 优先关闭“最后一条仍在流式中的 assistant 消息”
+        const index = [...prev].reverse().findIndex((m) => m.role === 'assistant' && m.isStreaming);
+        if (index === -1) return prev;
+        const actualIndex = prev.length - 1 - index;
+        const updated = [...prev];
+        updated[actualIndex] = { ...updated[actualIndex], isStreaming: false };
+        return updated;
       });
+
+      // 以数据库为准刷新一次，避免前端局部状态导致“已完成但未切回 markdown 渲染”的问题。
+      if (taskId) {
+        GetChatHistory(parseInt(taskId))
+          .then((resp: any) => {
+            if (resp.success && Array.isArray(resp.data)) {
+              setMessages(
+                resp.data.map((m: any) => ({
+                  id: String(m.id),
+                  role: m.role as 'user' | 'assistant',
+                  content: m.content,
+                }))
+              );
+            }
+          })
+          .catch((e: unknown) => {
+            console.error('Failed to refresh chat history on done:', e);
+          });
+      }
     });
 
     const offError = Events.On('chat_error', (event: any) => {
       const { task_id, error: errMsg } = event?.data ?? {};
-      if (String(task_id) !== taskId) return;
+      if (!isSameTask(task_id)) return;
       setStreaming(false);
       setError(errMsg ?? '发生错误，请重试');
       // 移除流式占位消息
@@ -100,7 +134,7 @@ export function useChat(taskId: string | undefined) {
       if (typeof offDone === 'function') offDone();
       if (typeof offError === 'function') offError();
     };
-  }, [taskId]);
+  }, [isSameTask, taskId]);
 
   const sendMessage = useCallback(
     async (message: string) => {
