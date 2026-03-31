@@ -16,6 +16,7 @@ func NewAudioProcessingService() *AudioProcessingService {
 	return &AudioProcessingService{}
 }
 
+// 从视频中提取音频，保存为MP3格式
 func (s *AudioProcessingService) ExtractAudio(videoPath string, audioPath string) error {
 	cleanedPath := strings.TrimSpace(videoPath)
 	if cleanedPath == "" {

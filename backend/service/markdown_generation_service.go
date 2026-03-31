@@ -20,6 +20,7 @@ func NewMarkdownGenerationService(config *models.LLMConfig) *MarkdownGenerationS
 	}
 }
 
+// 根据ASR结果和指定的内容风格生成Markdown格式的文本
 func (s *MarkdownGenerationService) GenerateMarkdown(utterances []models.Utterance, style models.ContentStyle) (string, error) {
 	text, err := utils.UtterancesToText(utterances)
 	if err != nil {

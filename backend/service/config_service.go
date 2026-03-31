@@ -17,6 +17,7 @@ func NewConfigService(configRepo *repository.ConfigRepository) *ConfigService {
 	}
 }
 
+// 获取TOS配置
 func (s *ConfigService) GetTOSConfig() (*models.TOSConfig, error) {
 	accessKeyCfg, err := s.configRepo.GetConfig(models.StorageAccessKey)
 	if err != nil {
@@ -48,6 +49,7 @@ func (s *ConfigService) GetTOSConfig() (*models.TOSConfig, error) {
 	}, nil
 }
 
+// 获取ASR配置
 func (s *ConfigService) GetASRConfig() (*models.ASRConfig, error) {
 	appIDCfg, err := s.configRepo.GetConfig(models.AucAppID)
 	if err != nil {
@@ -69,6 +71,7 @@ func (s *ConfigService) GetASRConfig() (*models.ASRConfig, error) {
 	}, nil
 }
 
+// 获取LLM配置
 func (s *ConfigService) GetLLMConfig() (*models.LLMConfig, error) {
 	baseURLCfg, err := s.configRepo.GetConfig(models.LlmBaseURL)
 	if err != nil {
@@ -90,6 +93,7 @@ func (s *ConfigService) GetLLMConfig() (*models.LLMConfig, error) {
 	}, nil
 }
 
+// 获取是否开启桌面通知的配置
 func (s *ConfigService) GetDesktopNotificationsConfig() (bool, error) {
 	config, err := s.configRepo.GetConfig(models.DesktopNotifications)
 	if err != nil {
@@ -98,7 +102,7 @@ func (s *ConfigService) GetDesktopNotificationsConfig() (bool, error) {
 	return strings.EqualFold(strings.TrimSpace(config.Value), "true"), nil
 }
 
-
+// 确保配置项有默认值
 func (s *ConfigService) EnsureConfigDefaultValue(key models.ConfigKey, defaultValue string) error {
 	config, err := s.configRepo.GetConfig(key)
 	if err != nil || config == (models.AppConfig{}) {
@@ -107,6 +111,7 @@ func (s *ConfigService) EnsureConfigDefaultValue(key models.ConfigKey, defaultVa
 	return nil
 }
 
+// 获取布尔类型的配置项值，如果未设置或解析失败则返回默认值
 func (s *ConfigService) GetBoolConfig(key models.ConfigKey, defaultValue bool) (bool, error) {
 	config, err := s.configRepo.GetConfig(key)
 	if err != nil || config == (models.AppConfig{}) {

@@ -14,6 +14,7 @@ func NewFileService() *FileService {
 	return &FileService{}
 }
 
+// 获取文件大小
 func (s *FileService) GetFileSize(filePath string) (int64, error) {
 	cleanedPath := strings.TrimSpace(filePath)
 	if cleanedPath == "" {
@@ -34,6 +35,7 @@ func (s *FileService) GetFileSize(filePath string) (int64, error) {
 	return fileInfo.Size(), nil
 }
 
+// 获取下载目录路径
 func (s *FileService) GetDownloadDir() (string, error) {
 	// Get user home directory
 	homeDir, err := os.UserHomeDir()
@@ -55,6 +57,7 @@ func (s *FileService) GetDownloadDir() (string, error) {
 	return downloadDir, nil
 }
 
+// 将内容保存到指定文件路径
 func (s *FileService) SaveFile(content string, filePath string) error {
 	return os.WriteFile(filePath, []byte(content), 0644)
 }

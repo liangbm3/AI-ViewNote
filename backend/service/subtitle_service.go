@@ -13,6 +13,7 @@ func NewSubtitleService() *SubtitleService {
 	return &SubtitleService{}
 }
 
+// 根据ASR结果生成SRT格式的字幕内容
 func (s *SubtitleService) GenerateSRT(utterances []models.Utterance) string {
 	var result strings.Builder
 
@@ -29,6 +30,7 @@ func (s *SubtitleService) GenerateSRT(utterances []models.Utterance) string {
 	return result.String()
 }
 
+// 根据ASR结果生成VTT格式的字幕内容
 func (s *SubtitleService) GenerateVTT(utterances []models.Utterance) string {
 	var result strings.Builder
 
@@ -47,6 +49,7 @@ func (s *SubtitleService) GenerateVTT(utterances []models.Utterance) string {
 	return result.String()
 }
 
+// 根据ASR结果生成纯文本格式的字幕内容，包含时间戳
 func (s *SubtitleService) GeneratePlainText(utterances []models.Utterance) string {
 	var result strings.Builder
 
@@ -58,6 +61,7 @@ func (s *SubtitleService) GeneratePlainText(utterances []models.Utterance) strin
 	return result.String()
 }
 
+// 将毫秒时间格式化为SRT字幕所需的时间格式
 func (s *SubtitleService) FormatSRTTime(milliseconds int) string {
 	totalSeconds := milliseconds / 1000
 	hours := totalSeconds / 3600
@@ -68,6 +72,7 @@ func (s *SubtitleService) FormatSRTTime(milliseconds int) string {
 	return fmt.Sprintf("%02d:%02d:%02d,%03d", hours, minutes, seconds, ms)
 }
 
+// 将毫秒时间格式化为VTT字幕所需的时间格式
 func (s *SubtitleService) FormatVTTTime(milliseconds int) string {
 	totalSeconds := milliseconds / 1000
 	hours := totalSeconds / 3600
@@ -78,6 +83,7 @@ func (s *SubtitleService) FormatVTTTime(milliseconds int) string {
 	return fmt.Sprintf("%02d:%02d:%02d.%03d", hours, minutes, seconds, ms)
 }
 
+// 将毫秒时间格式化为纯文本字幕所需的时间格式（mm:ss）
 func (s *SubtitleService) FormatPlainTime(milliseconds int) string {
 	totalSeconds := milliseconds / 1000
 	minutes := totalSeconds / 60

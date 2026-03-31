@@ -64,6 +64,7 @@ const (
 	LogFolding ConfigKey = "LogFolding"
 )
 
+// 配置项定义
 type AppConfig struct {
 	ID int `json:"id"`
 	Key ConfigKey `json:"key"`
@@ -71,7 +72,7 @@ type AppConfig struct {
 	UpdateAt string `json:"updated_at"`
 }
 
-// Service configuration structs
+// TOS配置定义
 type TOSConfig struct {
 	AccessKey string
 	SecretKey string
@@ -80,12 +81,14 @@ type TOSConfig struct {
 	Bucket    string
 }
 
+// ASR配置定义
 type ASRConfig struct {
 	AppID       string
 	AccessToken string
 	ClusterID   string
 }
 
+// LLM配置定义
 type LLMConfig struct {
 	BaseURL string
 	ModelID string

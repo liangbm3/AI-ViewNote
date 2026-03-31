@@ -15,6 +15,7 @@ func NewConfigRepository(db *sql.DB) *ConfigRepository {
 	}
 }
 
+// 使用指定的key获取配置项
 func (r *ConfigRepository) GetConfig(key models.ConfigKey) (models.AppConfig, error) {
 	query := `SELECT id, key, value, updated_at FROM configs WHERE key = ?`
 	row := r.DB.QueryRow(query, key)
@@ -28,6 +29,7 @@ func (r *ConfigRepository) GetConfig(key models.ConfigKey) (models.AppConfig, er
 	return *config, nil
 }
 
+// 保存配置项，如果key已存在则更新，否则插入新记录
 func (r *ConfigRepository) SaveConfig(key models.ConfigKey, value string) error {
 	// 先检查是否存在
 	existingConfig, err := r.GetConfig(key)
@@ -46,12 +48,14 @@ func (r *ConfigRepository) SaveConfig(key models.ConfigKey, value string) error 
 	return err
 }
 
+// 删除指定key的配置项
 func (r *ConfigRepository) DeleteConfig(key models.ConfigKey) error {
 	query := `DELETE FROM configs WHERE key = ?`
 	_, err := r.DB.Exec(query, key)
 	return err
 }
 
+// 获取所有配置项
 func (r *ConfigRepository) GetAllConfigs() ([]*models.AppConfig, error) {
 	query := `SELECT id, key, value, updated_at FROM configs ORDER BY updated_at DESC`
 	rows, err := r.DB.Query(query)

@@ -21,6 +21,7 @@ func NewCloudStorageService(config *models.TOSConfig) *CloudStorageService {
 	}
 }
 
+// 将音频文件上传到云存储，并返回可访问的URL
 func (s *CloudStorageService) UploadAudio(audioPath string) (string, error) {
 	ctx := context.Background()
 

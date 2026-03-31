@@ -19,6 +19,7 @@ func NewASRService(config *models.ASRConfig) *ASRService {
 	}
 }
 
+// 提交ASR任务，返回任务ID
 func (s *ASRService) SubmitTask(audioURL string) (string, error) {
 	volcengineSubmitURL := "https://openspeech.bytedance.com/api/v1/auc/submit"
 
@@ -59,6 +60,7 @@ func (s *ASRService) SubmitTask(audioURL string) (string, error) {
 	return submitResp.Resp.ID, nil
 }
 
+// 根据任务ID查询ASR结果
 func (s *ASRService) QueryResult(taskID string) ([]models.Utterance, error) {
 	volcengineQueryURL := "https://openspeech.bytedance.com/api/v1/auc/query"
 
@@ -103,6 +105,7 @@ func (s *ASRService) QueryResult(taskID string) ([]models.Utterance, error) {
 	}
 }
 
+// 轮询ASR结果，直到完成或失败
 func (s *ASRService) PollResult(taskID string) ([]models.Utterance, error) {
 	for {
 		utterances, err := s.QueryResult(taskID)
@@ -112,7 +115,6 @@ func (s *ASRService) PollResult(taskID string) ([]models.Utterance, error) {
 		if utterances != nil {
 			return utterances, nil
 		}
-		// ASR task is still running, wait before polling again
 		time.Sleep(5 * time.Second)
 	}
 }
