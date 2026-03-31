@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"strings"
+	"unicode/utf8"
 
 	"AI-ViewNote/backend/models"
 	"AI-ViewNote/backend/repository"
@@ -162,6 +163,10 @@ func (s *ChatService) streamResponse(taskID int, task *models.TaskRecord, histor
 		}
 		token := resp.Choices[0].Delta.Content
 		if token != "" {
+			// 防御性处理：确保推送到前端的 token 为有效 UTF-8，避免出现替换字符乱码。
+			if !utf8.ValidString(token) {
+				token = strings.ToValidUTF8(token, "")
+			}
 			fullResponse.WriteString(token)
 			s.eventEmitter.Emit("chat_token", map[string]interface{}{
 				"task_id": taskID,

@@ -111,15 +111,16 @@ export function ChatPanel({ taskId, isOpen, onClose }: ChatPanelProps) {
                     : 'bg-gray-100 text-gray-800 rounded-bl-sm'
                 }`}
               >
-                {msg.role === 'assistant' ? (
+                {msg.role === 'assistant' && !msg.isStreaming ? (
                   <div className="prose prose-sm max-w-none prose-p:my-1 prose-headings:my-2 prose-li:my-0">
                     <ReactMarkdown>{msg.content || (msg.isStreaming ? '\u200b' : '')}</ReactMarkdown>
-                    {msg.isStreaming && (
-                      <span className="inline-block w-0.5 h-4 bg-gray-500 animate-pulse ml-0.5 align-middle rounded-full" />
-                    )}
                   </div>
                 ) : (
                   <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
+                )}
+
+                {msg.role === 'assistant' && msg.isStreaming && (
+                  <span className="inline-block w-0.5 h-4 bg-gray-500 animate-pulse ml-0.5 align-middle rounded-full" />
                 )}
 
                 {/* 悬浮复制按钮 */}
