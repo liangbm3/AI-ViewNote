@@ -107,7 +107,7 @@ func chatSystemPrompt(markdownContent string, utteranceSummary string) string {
 	}
 	prompt += "回答规范：\n" +
 		"- 优先基于上述视频内容回答问题\n" +
-		"- 如果问题超出上述内容范围，请明确说明\n" +
+		"- 如果问题超出上述内容范围，你也可以利用你的知识回答，但请明确说明\n" +
 		"- 回答简洁、准确，必要时使用 Markdown 列表或结构化格式\n" +
 		"- 默认使用中文回答，除非用户明确要求其他语言"
 	return prompt
