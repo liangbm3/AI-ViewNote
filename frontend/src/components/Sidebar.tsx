@@ -114,7 +114,7 @@ export function Sidebar({
                   key={task.id}
                   className={`rounded-lg p-3 border transition-colors cursor-pointer ${
                     selectedTaskId === task.id
-                      ? 'bg-blue-50 border-blue-200 shadow-sm'
+                      ? 'bg-gray-100 border-gray-300 shadow-sm'
                       : 'bg-gray-50 border-gray-100 hover:border-gray-200'
                   }`}
                   onClick={() => onTaskSelect(task)}
@@ -135,7 +135,7 @@ export function Sidebar({
                     <div className="mb-2">
                       <div className="h-1.5 bg-gray-200 rounded-full overflow-hidden">
                         <div
-                          className="h-full bg-blue-600 rounded-full transition-all"
+                          className="h-full bg-gray-900 rounded-full transition-all"
                           style={{ width: `${task.progress}%` }}
                         />
                       </div>
@@ -158,7 +158,7 @@ export function Sidebar({
             {/* Resize Handle */}
             <div
               className={`absolute top-0 right-0 w-1 h-full cursor-col-resize transition-colors ${
-                isResizing ? 'bg-blue-500' : 'bg-transparent hover:bg-gray-300'
+                isResizing ? 'bg-gray-500' : 'bg-transparent hover:bg-gray-300'
               }`}
               onMouseDown={handleMouseDown}
             />
