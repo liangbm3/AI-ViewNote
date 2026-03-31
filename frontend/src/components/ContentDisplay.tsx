@@ -116,7 +116,7 @@ export function ContentDisplay({ imageTextContent, subtitles, taskId }: ContentD
             <button
               onClick={() => setIsChatOpen(true)}
               title="AI 对话"
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-violet-600 text-white rounded-lg hover:bg-violet-700 transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors"
             >
               <Bot className="w-4 h-4" />
               AI 对话
@@ -130,7 +130,7 @@ export function ContentDisplay({ imageTextContent, subtitles, taskId }: ContentD
             <button
               onClick={handleDownloadMarkdown}
               disabled={downloading.markdown}
-              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gray-900 text-white rounded-lg hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
             >
               <Download className="w-4 h-4" />
               {downloading.markdown ? '下载中...' : '下载Markdown'}
@@ -140,7 +140,7 @@ export function ContentDisplay({ imageTextContent, subtitles, taskId }: ContentD
             <div className="relative group">
               <button
                       disabled={downloading.subtitles}
-                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium bg-white border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
                 <FileDown className="w-4 h-4" />
                   {downloading.subtitles ? '下载中...' : '下载字幕'}

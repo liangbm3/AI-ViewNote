@@ -58,10 +58,10 @@ export function ChatPanel({ taskId, isOpen, onClose }: ChatPanelProps) {
       {/* 标题栏 */}
       <div className="px-4 py-3 border-b border-gray-200 bg-gray-50 flex items-center justify-between flex-shrink-0">
         <div className="flex items-center gap-2">
-          <Bot className="w-5 h-5 text-blue-500" />
+          <Bot className="w-5 h-5 text-gray-700" />
           <span className="font-semibold text-gray-900">AI 对话</span>
           {messages.length > 0 && (
-            <span className="text-xs text-gray-400 bg-gray-200 px-1.5 py-0.5 rounded-full">
+            <span className="text-xs text-gray-500 bg-gray-200 px-1.5 py-0.5 rounded-full">
               {messages.length}
             </span>
           )}
@@ -90,8 +90,8 @@ export function ChatPanel({ taskId, isOpen, onClose }: ChatPanelProps) {
       <div className="flex-1 overflow-y-auto p-4 space-y-4 min-h-0">
         {messages.length === 0 ? (
           <div className="flex flex-col items-center justify-center h-full gap-3 text-center px-4">
-            <div className="w-14 h-14 bg-blue-50 rounded-full flex items-center justify-center">
-              <Sparkles className="w-7 h-7 text-blue-400" />
+            <div className="w-14 h-14 bg-gray-100 rounded-full flex items-center justify-center border border-gray-200">
+              <Sparkles className="w-7 h-7 text-gray-500" />
             </div>
             <div>
               <p className="text-sm font-medium text-gray-700 mb-1">基于视频内容提问</p>
@@ -107,7 +107,7 @@ export function ChatPanel({ taskId, isOpen, onClose }: ChatPanelProps) {
               <div
                 className={`group relative max-w-[85%] rounded-2xl px-3.5 py-2.5 text-sm ${
                   msg.role === 'user'
-                    ? 'bg-blue-600 text-white rounded-br-sm'
+                    ? 'bg-gray-900 text-white rounded-br-sm'
                     : 'bg-gray-100 text-gray-800 rounded-bl-sm'
                 }`}
               >
@@ -129,7 +129,7 @@ export function ChatPanel({ taskId, isOpen, onClose }: ChatPanelProps) {
                     title="复制"
                     className={`absolute -top-2.5 opacity-0 group-hover:opacity-100 p-1 rounded-md transition-opacity ${
                       msg.role === 'user'
-                        ? 'left-1 bg-blue-700 text-white'
+                        ? 'left-1 bg-gray-800 text-white'
                         : 'right-1 bg-white border border-gray-200 text-gray-500 shadow-sm'
                     }`}
                   >
@@ -163,7 +163,7 @@ export function ChatPanel({ taskId, isOpen, onClose }: ChatPanelProps) {
               key={p.title}
               onClick={() => sendMessage(p.message)}
               disabled={streaming}
-              className="text-xs px-3 py-1.5 bg-blue-50 text-blue-600 border border-blue-100 rounded-full hover:bg-blue-100 transition-colors disabled:opacity-50"
+              className="text-xs px-3 py-1.5 bg-white text-gray-700 border border-gray-200 rounded-full hover:bg-gray-100 transition-colors disabled:opacity-50"
             >
               {p.title}
             </button>
@@ -182,12 +182,12 @@ export function ChatPanel({ taskId, isOpen, onClose }: ChatPanelProps) {
             placeholder="输入消息… (Shift+Enter 换行)"
             disabled={streaming}
             rows={2}
-            className="flex-1 resize-none text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:opacity-50 disabled:bg-gray-50 transition-colors"
+            className="flex-1 resize-none text-sm border border-gray-200 rounded-xl px-3 py-2.5 focus:outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900 disabled:opacity-50 disabled:bg-gray-50 transition-colors"
           />
           <button
             onClick={handleSend}
             disabled={!input.trim() || streaming}
-            className="p-2.5 bg-blue-600 text-white rounded-xl hover:bg-blue-700 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
+            className="p-2.5 bg-gray-900 text-white rounded-xl hover:bg-gray-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors flex-shrink-0"
           >
             {streaming ? (
               <Loader2 className="w-5 h-5 animate-spin" />
