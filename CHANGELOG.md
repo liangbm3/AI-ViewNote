@@ -14,6 +14,32 @@
 
 ---
 
+## [1.3.0] - 2026-04-01
+
+### 新增 (Added)
+
+- ✨ 新增基于生成内容的 AI 聊天功能
+- ✨ 支持自定义提示词
+- ✨ 新增截图功能
+- ✨ 新增是否启用截图功能开关
+
+### 更改 (Changed)
+
+- 🎨 完善前端 UI 样式，保持整体风格统一
+- 📝 增补代码注释，提升可读性
+
+### 修复 (Fixed)
+
+- 🐛 修复 AI 对话界面乱码问题
+- 🐛 修复 UI 卡住问题
+- 🐛 修复提示词相关问题
+- 🐛 修复 Markdown 渲染问题
+- 🐛 修复任务列表进度条和选中框样式问题，保持风格统一
+- 🐛 修复临时目录命名导致的多任务冲突问题
+
+
+---
+
 ## [1.2.0] - 2026-03-25
 
 ### 新增 (Added)
@@ -74,7 +100,8 @@
 - 🔧 完整的配置管理系统 - 支持 API 密钥和服务配置
 ---
 
-[Unreleased]: https://github.com/liangbm3/AI-ViewNote/compare/v1.2.0...HEAD
+[Unreleased]: https://github.com/liangbm3/AI-ViewNote/compare/v1.3.0...HEAD
+[1.3.0]: https://github.com/liangbm3/AI-ViewNote/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/liangbm3/AI-ViewNote/compare/v1.1.0...v1.2.0
 [1.1.0]: https://github.com/liangbm3/AI-ViewNote/compare/v1.0.1...v1.1.0
 [1.0.1]: https://github.com/liangbm3/AI-ViewNote/releases/tag/v1.0.1
