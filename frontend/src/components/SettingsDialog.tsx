@@ -94,6 +94,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
       setRunInBackground(await loadConfig('RunInBackground', 'false') === 'true');
       setNotifications(await loadConfig('DesktopNotifications', 'false') === 'true');
       setLogFolding(await loadConfig('LogFolding', 'true') === 'true');
+      setSmartScreenshot(await loadConfig('EnableScreenshot', 'true') === 'true');
       setLlmBaseUrl(await loadConfig('LlmBaseURL', ''));
       setLlmModelId(await loadConfig('LlmModelID', ''));
       setLlmApiKey(await loadConfig('LlmApiKey', ''));
@@ -114,7 +115,6 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
       }
 
       // 对于高级设置，使用默认值（后端可能没有这些配置项）
-      setSmartScreenshot(true);
       setCacheSize('1024');
       setAutoUpdate(true);
     } catch (error) {
@@ -164,6 +164,7 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
         { key: 'RunInBackground', value: runInBackground ? 'true' : 'false' },
         { key: 'DesktopNotifications', value: notifications ? 'true' : 'false' },
         { key: 'LogFolding', value: logFolding ? 'true' : 'false' },
+        { key: 'EnableScreenshot', value: smartScreenshot ? 'true' : 'false' },
         { key: 'LlmBaseURL', value: llmBaseUrl },
         { key: 'LlmModelID', value: llmModelId },
         { key: 'LlmApiKey', value: llmApiKey },
@@ -361,6 +362,25 @@ export function SettingsDialog({ isOpen, onClose }: SettingsDialogProps) {
 
                       {/* Toggle Settings */}
                       <div className="space-y-4">
+                        <div className="flex items-center justify-between py-3 border-b border-gray-100">
+                          <div>
+                            <div className="text-sm font-medium text-gray-900">启用截图生成</div>
+                            <div className="text-xs text-gray-500 mt-0.5">关闭后会忽略并删除 #image[秒数] 标记</div>
+                          </div>
+                          <button
+                            onClick={() => setSmartScreenshot(!smartScreenshot)}
+                            className={`
+                              w-11 h-6 rounded-full transition-colors relative
+                              ${smartScreenshot ? 'bg-gray-900' : 'bg-gray-200'}
+                            `}
+                          >
+                            <div className={`
+                              w-4 h-4 bg-white rounded-full absolute top-1 transition-transform
+                              ${smartScreenshot ? 'translate-x-6' : 'translate-x-1'}
+                            `} />
+                          </button>
+                        </div>
+
                         <div className="flex items-center justify-between py-3 border-b border-gray-100">
                           <div>
                             <div className="text-sm font-medium text-gray-900">日志默认折叠</div>

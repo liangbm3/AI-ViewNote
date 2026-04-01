@@ -76,6 +76,7 @@ export const ConfigKey = {
     RunInBackground: "RunInBackground",
     DesktopNotifications: "DesktopNotifications",
     LogFolding: "LogFolding",
+    EnableScreenshot: "EnableScreenshot",
     PromptNote: "PromptNote",
     PromptXiaohongshu: "PromptXiaohongshu",
     PromptWechat: "PromptWechat",

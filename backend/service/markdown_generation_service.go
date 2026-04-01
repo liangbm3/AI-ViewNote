@@ -68,15 +68,15 @@ func (s *MarkdownGenerationService) GenerateMarkdown(utterances []models.Utteran
 	return resp.Choices[0].Message.Content, nil
 }
 
-// imageTagRe 匹配 #image[秒数] 标记（单独占一行或内联均可）
-var imageTagRe = regexp.MustCompile(`#image\[(\d+)\]`)
+// imageTagLineCaptureRe 匹配独占一行的 #image[秒数] 标记。
+var imageTagLineCaptureRe = regexp.MustCompile(`(?m)^[ \t]*#image\[(\d+)\][ \t]*\r?\n?`)
 
 // ProcessScreenshots 解析 Markdown 中的 #image[N] 标记，用 ffmpeg 截图并替换为内嵌 base64 图片。
 // 截图临时文件写入 tempDir，函数返回后由调用方负责清理。
 // 单张截图失败时会静默跳过（删除该标记行），不影响整体流程。
 func (s *MarkdownGenerationService) ProcessScreenshots(markdown, videoPath, tempDir string) (string, error) {
-	// 收集所有不重复的时间戳
-	matches := imageTagRe.FindAllStringSubmatch(markdown, -1)
+	// 收集所有不重复的时间戳（仅处理独占一行的标记）
+	matches := imageTagLineCaptureRe.FindAllStringSubmatch(markdown, -1)
 	if len(matches) == 0 {
 		return markdown, nil
 	}
@@ -108,9 +108,9 @@ func (s *MarkdownGenerationService) ProcessScreenshots(markdown, videoPath, temp
 		screenshotCache[ts] = base64.StdEncoding.EncodeToString(data)
 	}
 
-	// 逐个替换标记
-	result := imageTagRe.ReplaceAllStringFunc(markdown, func(tag string) string {
-		sub := imageTagRe.FindStringSubmatch(tag)
+	// 逐行替换标记：成功时替换为图片行，失败时删除整行
+	result := imageTagLineCaptureRe.ReplaceAllStringFunc(markdown, func(line string) string {
+		sub := imageTagLineCaptureRe.FindStringSubmatch(line)
 		if len(sub) < 2 {
 			return ""
 		}
@@ -120,10 +120,15 @@ func (s *MarkdownGenerationService) ProcessScreenshots(markdown, videoPath, temp
 		}
 		b64, ok := screenshotCache[ts]
 		if !ok || b64 == "" {
-			return "" // 截图失败，删除标记
+			return "" // 截图失败，删除整行
 		}
-		return fmt.Sprintf("![视频第%ds帧](data:image/jpeg;base64,%s)", ts, b64)
+		return fmt.Sprintf("![视频第%ds帧](data:image/jpeg;base64,%s)\n", ts, b64)
 	})
 
 	return result, nil
+}
+
+// StripScreenshotTags 删除 markdown 中的 #image[N] 标记（关闭截图开关时使用）。
+func (s *MarkdownGenerationService) StripScreenshotTags(markdown string) string {
+	return imageTagLineCaptureRe.ReplaceAllString(markdown, "")
 }

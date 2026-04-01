@@ -14,6 +14,7 @@ type TaskProcessor struct {
 	cloudStorage        *CloudStorageService
 	asrService          *ASRService
 	markdownService     *MarkdownGenerationService
+	configService       *ConfigService
 	taskRepo            *repository.TaskRepository
 	eventEmitter        EventEmitter
 	notificationService *NotificationService
@@ -24,6 +25,7 @@ func NewTaskProcessor(
 	cloudStorage *CloudStorageService,
 	asrService *ASRService,
 	markdownService *MarkdownGenerationService,
+	configService *ConfigService,
 	taskRepo *repository.TaskRepository,
 	eventEmitter EventEmitter,
 	notificationService *NotificationService,
@@ -33,6 +35,7 @@ func NewTaskProcessor(
 		cloudStorage:        cloudStorage,
 		asrService:          asrService,
 		markdownService:     markdownService,
+		configService:       configService,
 		taskRepo:            taskRepo,
 		eventEmitter:        eventEmitter,
 		notificationService: notificationService,
@@ -159,6 +162,19 @@ func (p *TaskProcessor) handleMarkdownGeneration(task *models.TaskRecord) error 
 }
 
 func (p *TaskProcessor) handleScreenshotProcessing(task *models.TaskRecord, tempDir string) error {
+	enableScreenshot, err := p.configService.GetBoolConfig(models.EnableScreenshot, true)
+	if err != nil {
+		p.emitLog(fmt.Sprintf("Failed to read screenshot config, use default enabled=true for task ID %d: %s", task.ID, err.Error()), models.LogLevelWarning)
+		enableScreenshot = true
+	}
+
+	if !enableScreenshot {
+		p.emitLog(fmt.Sprintf("Screenshot generation is disabled, stripping #image tags for task ID %d", task.ID), models.LogLevelInfo)
+		task.MarkdownContent = p.markdownService.StripScreenshotTags(task.MarkdownContent)
+		p.updateTask(task)
+		return nil
+	}
+
 	p.emitLog(fmt.Sprintf("Starting screenshot processing for task ID %d", task.ID), models.LogLevelInfo)
 	task.Progress = models.ProcessingScreenshots
 	p.updateTask(task)

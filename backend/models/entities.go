@@ -78,6 +78,7 @@ const (
 	RunInBackground      ConfigKey = "RunInBackground"
 	DesktopNotifications ConfigKey = "DesktopNotifications"
 	LogFolding           ConfigKey = "LogFolding"
+	EnableScreenshot     ConfigKey = "EnableScreenshot"
 	PromptNote           ConfigKey = "PromptNote"
 	PromptXiaohongshu    ConfigKey = "PromptXiaohongshu"
 	PromptWechat         ConfigKey = "PromptWechat"

@@ -62,6 +62,7 @@ func NewTaskService(
 		cloudStorage,
 		asrService,
 		markdownService,
+		configService,
 		taskRepo,
 		eventEmitter,
 		appNotificationService,

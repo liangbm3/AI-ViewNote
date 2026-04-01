@@ -72,6 +72,9 @@ func main() {
 	if err := confService.EnsureConfigDefaultValue(models.LogFolding, "true"); err != nil {
 		log.Printf("Failed to ensure config '%s': %s\n", models.LogFolding, err.Error())
 	}
+	if err := confService.EnsureConfigDefaultValue(models.EnableScreenshot, "true"); err != nil {
+		log.Printf("Failed to ensure config '%s': %s\n", models.EnableScreenshot, err.Error())
+	}
 
 	app := application.New(application.Options{
 		Name:        "AI-ViewNote",
