@@ -28,15 +28,18 @@ function mapProgressToStatus(p: number): Task['status'] {
     case 1: // ExtractingAudio
     case 4: // ExtractingText
     case 7: // GeneratingMarkdown
+    case 11: // ProcessingScreenshots
       return 'processing';
     case 2: // ExtractingAudioSuccess
     case 5: // ExtractingTextSuccess
     case 8: // GeneratingMarkdownSuccess
+    case 12: // ProcessingScreenshotsSuccess
       return 'completed';
     case 3: // ExtractingAudioFailed
     case 6: // ExtractingTextFailed
     case 9: // GeneratingMarkdownFailed
     case 10: // InterruptedFailed
+    case 13: // ProcessingScreenshotsFailed
       return 'error';
     default:
       return 'processing';
@@ -53,6 +56,8 @@ function mapProgressToErrorStage(p: number): Task['errorStage'] {
       return 'GeneratingMarkdownFailed';
     case 10: // InterruptedFailed
       return 'InterruptedFailed';
+    case 13: // ProcessingScreenshotsFailed
+      return 'ProcessingScreenshotsFailed';
     default:
       return undefined;
   }
@@ -77,10 +82,16 @@ function mapProgressToPercent(p: number): number {
     case 7: // GeneratingMarkdown
       return 85;
     case 8: // GeneratingMarkdownSuccess
-      return 100;
+      return 90;
     case 9: // GeneratingMarkdownFailed
       return 0;
     case 10: // InterruptedFailed
+      return 0;
+    case 11: // ProcessingScreenshots
+      return 95;
+    case 12: // ProcessingScreenshotsSuccess
+      return 100;
+    case 13: // ProcessingScreenshotsFailed
       return 0;
     default:
       return 0;

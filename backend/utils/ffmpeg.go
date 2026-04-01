@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -89,6 +90,40 @@ func ExtractAudioWithFFmpeg(videoPath string, audioPath string) error {
 		"-q:a", "0",
 		"-map", "a",
 		audioPath,
+	)
+
+	// 在Windows上隐藏控制台窗口
+	setHideWindowAttr(cmd)
+
+	var stderr bytes.Buffer
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if err != nil {
+		return errors.New(stderr.String())
+	}
+	return nil
+}
+
+// CaptureScreenshot 从视频中截取指定时间戳的帧，保存为 JPEG 图片。
+// timestamp 单位为秒，outputPath 应以 .jpg 结尾。
+func CaptureScreenshot(videoPath string, timestamp int, outputPath string) error {
+	ffmpegPath := GetFFmpegPath()
+	if ffmpegPath == "" {
+		return errors.New("ffmpeg not found")
+	}
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Minute)
+	defer cancel()
+
+	cmd := exec.CommandContext(
+		ctx,
+		ffmpegPath,
+		"-y",
+		"-ss", fmt.Sprintf("%d", timestamp),
+		"-i", videoPath,
+		"-vframes", "1",
+		"-q:v", "5",
+		outputPath,
 	)
 
 	// 在Windows上隐藏控制台窗口

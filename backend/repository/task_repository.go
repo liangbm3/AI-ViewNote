@@ -112,8 +112,8 @@ func (r *TaskRepository) Update(task *models.TaskRecord) error {
 
 // 重置程序意外关闭导致的卡住的任务为失败状态
 func (r *TaskRepository) ResetStuckTasks() error {
-	query := `UPDATE tasks SET progress = ? WHERE progress IN (?, ?, ?)`
+	query := `UPDATE tasks SET progress = ? WHERE progress IN (?, ?, ?, ?)`
 	_, err := r.DB.Exec(query, models.InterruptedFailed,
-		models.ExtractingAudio, models.ExtractingText, models.GeneratingMarkdown)
+		models.ExtractingAudio, models.ExtractingText, models.GeneratingMarkdown, models.ProcessingScreenshots)
 	return err
 }

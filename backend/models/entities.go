@@ -11,17 +11,20 @@ type Utterance struct {
 type TaskProgress int
 
 const (
-	NotStarted                TaskProgress = iota // 任务未开始
-	ExtractingAudio                               // 提取音频中
-	ExtractingAudioSuccess                        // 提取音频成功
-	ExtractingAudioFailed                         // 提取音频失败
-	ExtractingText                                // 提取文本中
-	ExtractingTextSuccess                         // 提取文本成功
-	ExtractingTextFailed                          // 提取文本失败
-	GeneratingMarkdown                            // 生成Markdown中
-	GeneratingMarkdownSuccess                     // 生成Markdown成功
-	GeneratingMarkdownFailed                      // 生成Markdown失败
-	InterruptedFailed                             // 中断失败（应用意外关闭导致）
+	NotStarted                   TaskProgress = iota // 任务未开始
+	ExtractingAudio                                  // 提取音频中
+	ExtractingAudioSuccess                           // 提取音频成功
+	ExtractingAudioFailed                            // 提取音频失败
+	ExtractingText                                   // 提取文本中
+	ExtractingTextSuccess                            // 提取文本成功
+	ExtractingTextFailed                             // 提取文本失败
+	GeneratingMarkdown                               // 生成Markdown中
+	GeneratingMarkdownSuccess                        // 生成Markdown成功
+	GeneratingMarkdownFailed                         // 生成Markdown失败
+	InterruptedFailed                                // 中断失败（应用意外关闭导致）
+	ProcessingScreenshots                            // 处理截图中
+	ProcessingScreenshotsSuccess                     // 处理截图成功
+	ProcessingScreenshotsFailed                      // 处理截图失败
 )
 
 // 内容风格枚举

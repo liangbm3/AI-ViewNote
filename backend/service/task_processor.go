@@ -10,12 +10,12 @@ import (
 )
 
 type TaskProcessor struct {
-	audioService      *AudioProcessingService
-	cloudStorage      *CloudStorageService
-	asrService        *ASRService
-	markdownService   *MarkdownGenerationService
-	taskRepo          *repository.TaskRepository
-	eventEmitter      EventEmitter
+	audioService        *AudioProcessingService
+	cloudStorage        *CloudStorageService
+	asrService          *ASRService
+	markdownService     *MarkdownGenerationService
+	taskRepo            *repository.TaskRepository
+	eventEmitter        EventEmitter
 	notificationService *NotificationService
 }
 
@@ -29,12 +29,12 @@ func NewTaskProcessor(
 	notificationService *NotificationService,
 ) *TaskProcessor {
 	return &TaskProcessor{
-		audioService:      audioService,
-		cloudStorage:      cloudStorage,
-		asrService:        asrService,
-		markdownService:   markdownService,
-		taskRepo:          taskRepo,
-		eventEmitter:      eventEmitter,
+		audioService:        audioService,
+		cloudStorage:        cloudStorage,
+		asrService:          asrService,
+		markdownService:     markdownService,
+		taskRepo:            taskRepo,
+		eventEmitter:        eventEmitter,
 		notificationService: notificationService,
 	}
 }
@@ -42,7 +42,7 @@ func NewTaskProcessor(
 func (p *TaskProcessor) ProcessTask(taskID int) error {
 	task, err := p.taskRepo.GetByID(taskID)
 	if err != nil {
-		p.emitLog("Failed to retrieve task for processing: " + err.Error(), models.LogLevelError)
+		p.emitLog("Failed to retrieve task for processing: "+err.Error(), models.LogLevelError)
 		return err
 	}
 
@@ -70,6 +70,12 @@ func (p *TaskProcessor) ProcessTask(taskID int) error {
 
 	// Step 3: Generate markdown content
 	err = p.handleMarkdownGeneration(task)
+	if err != nil {
+		return err
+	}
+
+	// Step 4: Process screenshots embedded in markdown
+	err = p.handleScreenshotProcessing(task, tempDir)
 	if err != nil {
 		return err
 	}
@@ -148,6 +154,26 @@ func (p *TaskProcessor) handleMarkdownGeneration(task *models.TaskRecord) error 
 	p.emitLog(fmt.Sprintf("Markdown generation completed for task ID %d", task.ID), models.LogLevelInfo)
 	task.MarkdownContent = markdown
 	task.Progress = models.GeneratingMarkdownSuccess
+	p.updateTask(task)
+	return nil
+}
+
+func (p *TaskProcessor) handleScreenshotProcessing(task *models.TaskRecord, tempDir string) error {
+	p.emitLog(fmt.Sprintf("Starting screenshot processing for task ID %d", task.ID), models.LogLevelInfo)
+	task.Progress = models.ProcessingScreenshots
+	p.updateTask(task)
+
+	processed, err := p.markdownService.ProcessScreenshots(task.MarkdownContent, task.FilePath, tempDir)
+	if err != nil {
+		p.emitLog(fmt.Sprintf("Screenshot processing failed for task ID %d: %s", task.ID, err.Error()), models.LogLevelError)
+		task.Progress = models.ProcessingScreenshotsFailed
+		p.updateTask(task)
+		return err
+	}
+
+	p.emitLog(fmt.Sprintf("Screenshot processing completed for task ID %d", task.ID), models.LogLevelInfo)
+	task.MarkdownContent = processed
+	task.Progress = models.ProcessingScreenshotsSuccess
 	p.updateTask(task)
 	return nil
 }

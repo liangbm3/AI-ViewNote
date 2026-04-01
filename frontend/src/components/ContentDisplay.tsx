@@ -184,6 +184,7 @@ export function ContentDisplay({ imageTextContent, subtitles, taskId }: ContentD
           </div>
           <div className="prose prose-sm max-w-none overflow-y-auto flex-1 pr-2">
             <ReactMarkdown
+              urlTransform={(url) => url}
               components={{
                 h1: ({children}) => <h1 className="text-lg font-semibold text-gray-900 mb-3">{children}</h1>,
                 h2: ({children}) => <h2 className="text-base font-semibold text-gray-900 mb-2 mt-4">{children}</h2>,
@@ -195,6 +196,13 @@ export function ContentDisplay({ imageTextContent, subtitles, taskId }: ContentD
                 blockquote: ({children}) => <blockquote className="border-l-4 border-gray-300 pl-4 italic text-gray-600 mb-3">{children}</blockquote>,
                 code: ({children}) => <code className="bg-gray-100 px-1 py-0.5 rounded text-xs">{children}</code>,
                 pre: ({children}) => <pre className="bg-gray-100 p-3 rounded text-xs overflow-x-auto mb-3">{children}</pre>,
+                img: ({src, alt}) => (
+                  <img
+                    src={src}
+                    alt={alt}
+                    className="max-w-full rounded-lg shadow-md border border-gray-200 my-3 block"
+                  />
+                ),
               }}
             >
               {displayContent}
